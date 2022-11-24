@@ -1,0 +1,93 @@
+<div class="sidebar pe-4 pb-3">
+    <nav class="navbar bg-secondary navbar-dark">
+
+        <!-- Title -->
+        <a href="/home" class="navbar-brand mx-4 mb-3">
+            <h3 class="text-primary">Tibia Statistic</h3>
+        </a>
+
+        <!-- Side bar Start -->
+        <div class="navbar-nav w-100">
+
+            <!-- Main page -->
+            <a href="/home" class="nav-item nav-link {% if request.path == '/home/' %} active {% endif %}"><i class="fas fa-link me-2"></i>Main page</a>
+
+            <!-- Experience menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Experience</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Top 500 yesterday</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Mainland</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Rookgaard</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
+                </div>
+            </div>
+
+            <!-- Charms menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-pastafarianism me-2"></i>Charms</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Top 500 yesterday</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Mainland</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Rookgaard</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
+                </div>
+            </div>
+
+            <!-- Char bazaar menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-shopping-basket me-2"></i>Char Bazaar</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Active auctions</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">History</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
+                </div>
+            </div>
+
+            <!-- Worlds menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-globe me-2"></i>Worlds</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">All worlds</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Chose world</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Online counter</a>
+                </div>
+            </div>
+
+            <!-- Character menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-users me-2"></i>Characters</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Find character</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">World transfers</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Name change</a>
+                </div>
+            </div>
+
+            <!-- Boss menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-crosshairs me-2"></i>Bosses</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">List</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
+                </div>
+            </div>
+
+            <!-- Calculators menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-calculator me-2"></i>Calculators</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Training</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Loot</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stamina</a>
+                </div>
+            </div>
+
+            <!-- Other -->
+            <a href="" class="nav-item nav-link {% if request.path == '' %} active {% endif %}"><i class="fab fa-discord me-2"></i>Discords</a>
+            <a href="" class="nav-item nav-link {% if request.path == '' %} active {% endif %}"><i class="fa fa-table me-2"></i>About</a>
+        </div>
+        <!-- Side bar End -->
+
+    </nav>
+</div>
