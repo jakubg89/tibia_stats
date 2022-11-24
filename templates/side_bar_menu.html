@@ -1,95 +1,69 @@
-        <div class="sidebar pe-4 pb-3">
-            <nav class="navbar bg-secondary navbar-dark">
-                <a href="/index" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary">Tibia Statistic</h3>
-                </a>
-                <div class="d-flex align-items-center ms-4 mb-4">
+<div class="sidebar pe-4 pb-3">
+    <nav class="navbar bg-secondary navbar-dark">
+        <a href="/index" class="navbar-brand mx-4 mb-3">
+            <h3 class="text-primary">Tibia Statistic</h3>
+        </a>
 
+        <!-- Side bar Start -->
+        <div class="navbar-nav w-100">
 
+            <!-- Main page -->
+            <a href="/index" class="nav-item nav-link {% if request.path == '/index/' %} active {% endif %}"><i class="fas fa-link me-2"></i>Main page</a>
+
+            <!-- Experience menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Experience</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '/exp/top500/' or request.path == '/exp/zap/' %} show {% endif %}">
+                    <a href="/exp/top500" class="dropdown-item {% if request.path == '/exp/top500/' %} active {% endif %}">Top 500</a>
+                    <a href="/exp/zap" class="dropdown-item {% if request.path == '/exp/gain/' %} active {% endif %}">Exp Gain</a>
+                    <a href="chart.html" class="dropdown-item {% if request.path == '/exp/stats/' %} active {% endif %}">Stats</a>
                 </div>
-                <div class="navbar-nav w-100">
+            </div>
 
-
-                    <!-- Main page -->
-
-                    <a href="/index" class="nav-item nav-link {% if request.path == '/index/' %} active {% endif %}"><i class="fas fa-link me-2"></i>Main page</a>
-
-
-                    <!-- Experience menu -->
-
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Experience</a>
-                        <div class="dropdown-menu bg-transparent border-0 {% if request.path == '/exp/top500/' or request.path == '/exp/zap/' %} show {% endif %}">
-
-                            <a href="/exp/top500" class="dropdown-item {% if request.path == '/exp/top500/' %} active {% endif %}">Top 500</a>
-                            <a href="/exp/zap" class="dropdown-item {% if request.path == '/exp/gain/' %} active {% endif %}">Exp Gain</a>
-                            <a href="chart.html" class="dropdown-item {% if request.path == '/exp/stats/' %} active {% endif %}">Stats</a>
-
-                        </div>
-                    </div>
-
-
-                    <!-- Charms menu -->
-
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-pastafarianism me-2"></i>Charms</a>
-                        <div class="dropdown-menu bg-transparent border-0 {% if request.path == '/exp/top500/' or request.path == '/exp/zap/' %} show {% endif %}">
-
-                            <a href="/exp/top500" class="dropdown-item {% if request.path == '/exp/top500/' %} active {% endif %}">Top 500</a>
-                            <a href="/exp/zap" class="dropdown-item {% if request.path == '/exp/gain/' %} active {% endif %}">Charms Gain</a>
-                            <a href="chart.html" class="dropdown-item {% if request.path == '/exp/stats/' %} active {% endif %}">Stats</a>
-
-                        </div>
-                    </div>
-
-
-                    <!-- Char bazar menu -->
-
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-shopping-basket me-2"></i>Char Bazar</a>
-                        <div class="dropdown-menu bg-transparent border-0">
-
-                            <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Active auctions</a>
-                            <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">History</a>
-                            <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
-
-                        </div>
-                    </div>
-
-
-                    <!-- Worlds menu -->
-
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-globe me-2"></i>Worlds</a>
-                        <div class="dropdown-menu bg-transparent border-0">
-
-                            <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">All worlds</a>
-                            <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Chose world</a>
-
-                        </div>
-                    </div>
-
-
-                    <!-- Character menu -->
-
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-users me-2"></i>Characters</a>
-                        <div class="dropdown-menu bg-transparent border-0">
-
-                            <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">World transfers</a>
-                            <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Name change</a>
-
-                        </div>
-                    </div>
-
-
-                    <!-- Other -->
-
-                    <a href="table.html" class="nav-item nav-link"><i class="fab fa-discord me-2"></i>Discords</a>
-                    <a href="/testy" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Testy zapytań</a>
-                    <a href="table.html" class="nav-item nav-link"><i class="fa fa-table me-2"></i>About</a>
-
-
+            <!-- Charms menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-pastafarianism me-2"></i>Charms</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '/exp/top500/' or request.path == '/exp/zap/' %} show {% endif %}">
+                    <a href="/exp/top500" class="dropdown-item {% if request.path == '/exp/top500/' %} active {% endif %}">Top 500</a>
+                    <a href="/exp/zap" class="dropdown-item {% if request.path == '/exp/gain/' %} active {% endif %}">Charms Gain</a>
+                    <a href="chart.html" class="dropdown-item {% if request.path == '/exp/stats/' %} active {% endif %}">Stats</a>
                 </div>
-            </nav>
+            </div>
+
+            <!-- Char bazar menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-shopping-basket me-2"></i>Char Bazar</a>
+                <div class="dropdown-menu bg-transparent border-0">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Active auctions</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">History</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
+                </div>
+            </div>
+
+            <!-- Worlds menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-globe me-2"></i>Worlds</a>
+                <div class="dropdown-menu bg-transparent border-0">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">All worlds</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Chose world</a>
+                </div>
+            </div>
+
+            <!-- Character menu -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-users me-2"></i>Characters</a>
+                <div class="dropdown-menu bg-transparent border-0">
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">World transfers</a>
+                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Name change</a>
+                </div>
+            </div>
+
+            <!-- Other -->
+            <a href="table.html" class="nav-item nav-link"><i class="fab fa-discord me-2"></i>Discords</a>
+            <a href="/testy" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Testy zapytań</a>
+            <a href="table.html" class="nav-item nav-link"><i class="fa fa-table me-2"></i>About</a>
         </div>
+        <!-- Side bar End -->
+
+    </nav>
+</div>
