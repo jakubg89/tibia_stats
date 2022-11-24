@@ -37,7 +37,7 @@
             <!-- Char bazaar menu -->
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-shopping-basket me-2"></i>Char Bazaar</a>
-                <div class="dropdown-menu bg-transparent border-0">
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Active auctions</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">History</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
@@ -47,7 +47,7 @@
             <!-- Worlds menu -->
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-globe me-2"></i>Worlds</a>
-                <div class="dropdown-menu bg-transparent border-0">
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">All worlds</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Chose world</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Online counter</a>
@@ -57,7 +57,7 @@
             <!-- Character menu -->
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-users me-2"></i>Characters</a>
-                <div class="dropdown-menu bg-transparent border-0">
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Find character</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">World transfers</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Name change</a>
@@ -67,7 +67,7 @@
             <!-- Boss menu -->
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-crosshairs me-2"></i>Bosses</a>
-                <div class="dropdown-menu bg-transparent border-0">
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">List</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
                 </div>
@@ -76,7 +76,7 @@
             <!-- Calculators menu -->
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-calculator me-2"></i>Calculators</a>
-                <div class="dropdown-menu bg-transparent border-0">
+                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Training</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Loot</a>
                     <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stamina</a>
@@ -84,8 +84,8 @@
             </div>
 
             <!-- Other -->
-            <a href="table.html" class="nav-item nav-link"><i class="fab fa-discord me-2"></i>Discords</a>
-            <a href="table.html" class="nav-item nav-link"><i class="fa fa-table me-2"></i>About</a>
+            <a href="" class="nav-item nav-link {% if request.path == '' %} active {% endif %}"><i class="fab fa-discord me-2"></i>Discords</a>
+            <a href="" class="nav-item nav-link {% if request.path == '' %} active {% endif %}"><i class="fa fa-table me-2"></i>About</a>
         </div>
         <!-- Side bar End -->
 
