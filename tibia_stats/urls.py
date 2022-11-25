@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import main_page, error404, under_construction
+from main.views import main_page, under_construction, sign_in, sign_up
 
 handler404 = 'main.views.error404'
 # handler500 = 'mysite.views.my_custom_error_view'
@@ -26,6 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_page),
     path('home/', main_page),
+    path('signin/', sign_in),
+    path('signup/', sign_up),
 ]
 
 

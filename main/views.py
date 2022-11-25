@@ -14,3 +14,13 @@ def error404(request, *args, **kwargs):
 # Under construction
 def under_construction(request, *args, **kwargs):
     return render(request, "sites/under_construction.html")
+
+
+# Sign in
+def sign_in(request, *args, **kwargs):
+    return render(request, "sites/sign_in.html")
+
+
+# Sign up
+def sign_up(request, *args, **kwargs):
+    return render(request, "sites/sign_up.html")
