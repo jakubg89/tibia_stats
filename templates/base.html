@@ -37,7 +37,7 @@
         </div>
         <!-- Spinner End -->
 
-        {% if request.path != '/signin/' %}
+        {% if request.path != '/signin/' and request.path != '/signup/' %}
             <!-- Sidebar Start -->
             {% include 'side_bar_menu.html' %}
             <!-- Sidebar End -->
@@ -53,7 +53,7 @@
         {% block content %}
         {% endblock %}
 
-        {% if request.path != '/signin/' %}
+        {% if request.path != '/signin/' and request.path != '/signup/' %}
             <!-- Footer Start -->
             {% include 'footer.html' %}
             <!-- Footer End -->
