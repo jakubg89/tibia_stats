@@ -24,3 +24,13 @@ def sign_in(request, *args, **kwargs):
 # Sign up
 def sign_up(request, *args, **kwargs):
     return render(request, "sites/sign_up.html")
+
+
+# About
+def about(request, *args, **kwargs):
+    return render(request, "sites/about.html")
+
+
+# Discords
+def discord(request, *args, **kwargs):
+    return render(request, "sites/discords.html")
