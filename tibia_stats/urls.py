@@ -17,9 +17,15 @@ from django.contrib import admin
 from django.urls import path
 from main.views import main_page, error404, under_construction
 
+handler404 = 'main.views.error404'
+# handler500 = 'mysite.views.my_custom_error_view'
+# handler403 = 'mysite.views.my_custom_permission_denied_view'
+# handler400 = 'mysite.views.my_custom_bad_request_view'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_page),
     path('home/', main_page),
 ]
+
+
