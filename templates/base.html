@@ -37,26 +37,30 @@
         </div>
         <!-- Spinner End -->
 
-        <!-- Sidebar Start -->
-        {% include 'side_bar_menu.html' %}
-        <!-- Sidebar End -->
+        {% if request.path != '/signin/' and request.path != '/signup/' %}
+            <!-- Sidebar Start -->
+            {% include 'side_bar_menu.html' %}
+            <!-- Sidebar End -->
 
-        <!-- Content Start -->
-        <div class="content">
+            <!-- Content Start -->
+            <div class="content">
 
-            <!-- Navbar Start -->
-            {% include 'nav_bar.html' %}
-            <!-- Navbar End -->
+                <!-- Navbar Start -->
+                {% include 'nav_bar.html' %}
+                <!-- Navbar End -->
+        {% endif %}
 
-            {% block content %}
-            {% endblock %}
+        {% block content %}
+        {% endblock %}
 
+        {% if request.path != '/signin/' and request.path != '/signup/' %}
             <!-- Footer Start -->
             {% include 'footer.html' %}
             <!-- Footer End -->
 
-        </div>
-        <!-- Content End -->
+            </div>
+            <!-- Content End -->
+        {% endif %}
 
         <!-- Back to Top -->
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
