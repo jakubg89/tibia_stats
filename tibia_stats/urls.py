@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import main_page
+from main.views import main_page, error404, under_construction
 
 
 urlpatterns = [
