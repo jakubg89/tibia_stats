@@ -15,11 +15,11 @@
             <!-- Experience menu -->
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Experience</a>
-                <div class="dropdown-menu bg-transparent border-0 {% if request.path == '' or request.path == '' %} show {% endif %}">
-                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Top 500 yesterday</a>
-                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Mainland</a>
-                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Rookgaard</a>
-                    <a href="" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
+                <div class="dropdown-menu bg-transparent border-0 {% if 'experience/' in request.path %} show {% endif %}">
+                    <a href="/experience/top500" class="dropdown-item {% if request.path == '' %} active {% endif %}">Top 500 yesterday</a>
+                    <a href="/experience/mainland" class="dropdown-item {% if request.path == '' %} active {% endif %}">Mainland</a>
+                    <a href="/experience/rookgaard" class="dropdown-item {% if request.path == '' %} active {% endif %}">Rookgaard</a>
+                    <a href="/experience/stats" class="dropdown-item {% if request.path == '' %} active {% endif %}">Stats</a>
                 </div>
             </div>
 
