@@ -12,9 +12,12 @@ def scrap_proxy():
     proxy_df = pd.DataFrame(data=pd.read_html(request.text)[0])
     proxy_df = proxy_df[proxy_df['Anonymity'] == 'elite proxy']
     proxy_df = proxy_df[['IP Address', 'Port']].reset_index(drop=True).drop_duplicates(subset='IP Address')
-    return proxy_df
-
-
+    proxy_df.to_csv('proxy_list.csv',
+                    encoding='utf-8',
+                    index=False,
+                    sep=':',
+                    header=False,
+                    mode='a')
 
 
 
