@@ -1,5 +1,5 @@
 import pandas as pd
-from proxy_scrapper import scrap_proxy
+from .proxy_scrapper import scrap_proxy
 
 
 def delete_duplicates():
