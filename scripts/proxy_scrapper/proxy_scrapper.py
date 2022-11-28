@@ -20,8 +20,15 @@ def scrap_proxy():
                     mode='a')
 
 
-
-
+def delete_duplicates():
+    proxy_list = pd.read_csv('proxy_list.csv', sep=':')
+    proxy_list = proxy_list.drop_duplicates()
+    proxy_list.to_csv('proxy_list.csv',
+                      encoding='utf-8',
+                      index=False,
+                      sep=':',
+                      header=False,
+                      mode='w')
 
 
 
