@@ -55,9 +55,6 @@ def get_char_info(name):
                 player_info.pop('Comment')
                 break
 
-        # for key, value in player_info.items():
-            # print(key, value)
-
         does_it_exist = True
 
     return player_info, does_it_exist
