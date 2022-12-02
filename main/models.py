@@ -1,3 +1,31 @@
 from django.db import models
 
-# Create your models here.
+
+class News(models.Model):
+    news_id = models.AutoField(primary_key=True)
+    id_on_tibiacom = models.SmallIntegerField(blank=True, null=True)
+    url_tibiacom = models.CharField(unique=True, max_length=255, blank=True, null=True)
+    type = models.CharField(max_length=20, blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
+    content_html = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'news'
+
+
+class World(models.Model):
+    world_id = models.SmallIntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    name_value = models.CharField(max_length=45, blank=True, null=True)
+    pvp_type = models.CharField(max_length=30, blank=True, null=True)
+    pvp_type_value = models.IntegerField(blank=True, null=True)
+    battleye_protected = models.CharField(max_length=45, blank=True, null=True)
+    battleye_date = models.DateField(blank=True, null=True)
+    battleye_value = models.IntegerField(blank=True, null=True)
+    location = models.CharField(max_length=45, blank=True, null=True)
+    location_value = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'world'
