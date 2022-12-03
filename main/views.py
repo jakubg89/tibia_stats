@@ -10,9 +10,13 @@ def main_page(request, *args, **kwargs):
     # boosted boss
     boosted_boss = Boosted.objects.filter(type='boss').order_by('-boosted_id')[:1]
 
+    # boosted creature
+    boosted_creature = Boosted.objects.filter(type='creature').order_by('-boosted_id')[:1]
+
     content = {
         'news_ticker': latest_tickers,
         'boosted_boss': boosted_boss,
+        'boosted_creature': boosted_creature,
     }
     return render(request, "sites/index.html", content)
 
