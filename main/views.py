@@ -1,13 +1,18 @@
 from django.shortcuts import render
-from .models import News
+from .models import News, Boosted
 
 
 # Main page
 def main_page(request, *args, **kwargs):
     # news ticker
     latest_tickers = News.objects.filter(type='ticker').order_by('-news_id')[:3]
+
+    # boosted boss
+    boosted_boss = Boosted.objects.filter(type='boss').order_by('-boosted_id')[:1]
+
     content = {
-        'news_ticker': latest_tickers
+        'news_ticker': latest_tickers,
+        'boosted_boss': boosted_boss,
     }
     return render(request, "sites/index.html", content)
 
