@@ -30,3 +30,15 @@ class World(models.Model):
     class Meta:
         managed = True
         db_table = 'world'
+
+
+class Boosted(models.Model):
+    boosted_id = models.AutoField(db_column='Boosted_id', primary_key=True)  # Field name made lowercase.
+    name = models.CharField(max_length=50, blank=True, null=True)
+    image_url = models.CharField(max_length=100, blank=True, null=True)
+    type = models.CharField(max_length=15, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'boosted'
