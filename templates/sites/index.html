@@ -12,17 +12,21 @@
                             <h4 class="mb-0">News ticker</h4>
                         </div>
 
-                        <div class="d-flex align-items-center border-bottom py-3">
+                        {% for i in news_ticker %}
+                        <div class="d-flex align-items-center {% if not forloop.last %}border-bottom{% endif %} py-3">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-0">tibia.com</h6>
-                                    <small>12.12.2022</small>
+                                    <h6 class="mb-0">Check at tibia.com
+                                        <a href="{{ i.url_tibiacom }}" target="_blank"><i class="fas fa-external-link-alt fa-xs"></i></a>
+                                    </h6>
+                                    <small>{{ i.date_added }}</small>
                                 </div>
-                                <span><small><a href="https://tibiahome.com" target="_blank" rel="noopener">TibiaHome.com</a> invites you to participate in in their special Christmas edition of their weekly challenges. There are four tasks you need to fulfill throughout December in order to qualify. Are you up for the task? Check out all details, either in <a href="https://tibiahome.com/challenge-of-the-week-special-christmas-2022/" target="_blank" rel="noopener noreferrer" rel="noopener">English</a> or <a href="https://tibiahome.com/desafio-da-semana-especial-de-natal-2022" target="_blank" rel="noopener noreferrer" rel="noopener">Portuguese</a>, directly on TibiaHome!"</small></span>
+                                <span><small>{{ i.content_html| safe }}</small></span>
                             </div>
                         </div>
+                        {% endfor %}
 
-                        <div class="d-flex align-items-center border-bottom py-3">
+                       <!-- <div class="d-flex align-items-center border-bottom py-3">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-0">tibia.com</h6>
@@ -30,9 +34,9 @@
                                 </div>
                                 <span><small>With today's server save, we have fixed the folluld be transferred to the higher level via a staircase, for example).</small></span>
                             </div>
-                        </div>
+                        </div>-->
 
-                        <div class="d-flex align-items-center py-3">
+                       <!-- <div class="d-flex align-items-center py-3">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-0">tibia.com</h6>
@@ -40,7 +44,7 @@
                                 </div>
                                 <span><small>h today's server save, we have fixed the folluld be transferred to the higher level via a staircase, for example).</small></span>
                             </div>
-                        </div>
+                        </div>-->
 
                     </div>
                 </div>
@@ -127,19 +131,19 @@
                             <p>After two content and three feature teasers, it is our pleasure to finally announce the winter update of 2022. <img src="https://static.tibia.com/images/news/updatetreewinter135x135.png" border="0" hspace="10" vspace="0" width="135" height="135" align="right"><br/><br/>Let us start with the new content first:</p>\n<p><a href="https://www.tibia.com/news/?subtopic=newsarchive&amp;id=7005" target="_blank">Galthen</a> is back! Follow the footsteps of the legendary knight once again and set out to unravel the mysteries of the golden city. Battle new adversaries and navigate through the dangers of Iksupan to earn a place in the lineage of the great ancestors. Can you go where even this great explorer did not go during his lifetime? This one is for adventurers!</p>\n<p>The second new addition is called <a href="https://www.tibia.com/news/?subtopic=newsarchive&amp;id=7004" target="_blank">The Cradle of Monsters</a>. And the name speaks for itself. The horror story about a mad scientist takes you to a strange island called Ingol. Previously unknown enemies and tricky tasks make it difficult for you to stay alive. Sharpen your mind and keep your wits about you, fighting skills alone are not enough to pave the way towards the final boss. Can you fight your way through this devilish labyrinth and stop the madness going on there?</p>\n<center><img src="https://static.tibia.com/images/news/2022_wu_website_image.jpg" hspace="10" vspace="10" width="500" height="370"/></center>\n<p>Switching to less creepy but very significant topics, switching to features:</p>\n<p><a href="https://www.tibia.com/news/?subtopic=newsarchive&amp;id=7013" target="_blank" rel="noopener noreferrer" rel="noopener">The Wheel of Destiny</a>. This new feature allows you to further specialise your character based on your needs and playstyle as you level up. The Wheel of Destiny offers something to look forward to for all promoted Premium characters above level 50. You will gain promotion points which you can use to unlock various benefits ranging from small perks all the way up to new powerful spells and abilities depending on your vocation. Experiment and try out which of the benefits suit you best or are most useful to you in a specific scenario - you can spend and remove points for free.<br/><br/>In addition to this, several further <a href="https://www.tibia.com/news/?subtopic=newsarchive&amp;id=7006" target="_blank" >convenience features</a> were added with this year&#39;s winter update.</p>\n<p>The Imbuement Tracker gives you a neat overview of the current imbuements on equipped items. It allows you to see how much time is left for each imbuement at a glance, and you will also be able to spot items with empty imbuement slots.</p>\n<p>The Collect All Option allows you to empty your reward chest in the Adventurer&#39;s Guild with just one click. It will put as many items as possible in your inventory according to your loot configuration. Limited only by your character&#39;s capacity and the room in your backpacks. </p>\n<p>The last change on our list is the reduction of boss cooldowns for bosses that currently have a cooldown of one day or more. Their cooldown will be reduced by 4 hours to facilitate the planning of boss battles.</p>\n<p>That is it for this time. A long list, many changes, many innovations, many things to try out.</p>\n<p>We wish you tons of fun with the new stuff and a great time in Tibia!<br/>Your Community Managers</p>
                         </div>
                         <div class="testimonial-item text-center">
-                            <img class="img-fluid rounded-circle mx-auto mb-4" src="img/testimonial-2.jpg" style="width: 100px; height: 100px;">
+                            <!--<img class="img-fluid rounded-circle mx-auto mb-4" src="img/testimonial-2.jpg" style="width: 100px; height: 100px;"> -->
                             <h5 class="mb-1">Winter Update 2022</h5>
                             <p>Profession</p>
                             <p class="mb-0">Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod eos labore diam</p>
                         </div>
                         <div class="testimonial-item text-center">
-                            <img class="img-fluid rounded-circle mx-auto mb-4" src="img/testimonial-2.jpg" style="width: 100px; height: 100px;">
+                            <!--<img class="img-fluid rounded-circle mx-auto mb-4" src="img/testimonial-2.jpg" style="width: 100px; height: 100px;"> -->
                             <h5 class="mb-1">Client Name</h5>
                             <p>Profession</p>
                             <p class="mb-0">Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod eos labore diam</p>
                         </div>
                         <div class="testimonial-item text-center">
-                            <img class="img-fluid rounded-circle mx-auto mb-4" src="img/testimonial-2.jpg" style="width: 100px; height: 100px;">
+                            <!--<img class="img-fluid rounded-circle mx-auto mb-4" src="img/testimonial-2.jpg" style="width: 100px; height: 100px;"> -->
                             <h5 class="mb-1">Client Name</h5>
                             <p>Profession</p>
                             <p class="mb-0">Dolor et eos labore, stet justo sed <br>est <br><br><br><br><br><br><br><br><br>sed. Diam sed sed dolor stet amet eirmod eos labore diam</p>
