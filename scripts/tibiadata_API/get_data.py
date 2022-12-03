@@ -39,10 +39,15 @@ def boosted_boss():
     news = request(url)
     return news['boostable_bosses']['boosted']
 
+
+# get boosted boss
+def boosted_creature():
+    url = 'https://api.tibiadata.com/v3/creatures'
+    news = request(url)
+    return news['creatures']['boosted']
+
 # # # # # # # Boosted creature/boss end # # # # # # #
 
 
 # # # # # # # News # # # # # # #
 # # # # # # # News end # # # # # # #
-
-print(boosted_boss())
