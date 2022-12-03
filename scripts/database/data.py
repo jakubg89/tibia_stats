@@ -78,6 +78,7 @@ def get_latest_news_id():
 
 # # # # # # # Boosted creature/boss # # # # # # #
 
+# adds boosted boss to database
 def add_boss_to_db():
     boss_info = dataapi.boosted_boss()
     category = 'boss'
@@ -97,6 +98,25 @@ def add_boss_to_db():
                                    date=date))
 
 
+# adds boosted creature to database
+def add_creature_to_db():
+    creature_info = dataapi.boosted_creature()
+    category = 'creature'
+
+    # check if list is not empty
+    if creature_info:
+        date = datetime.now().strftime("%Y-%m-%d")
+        with connection.cursor() as cursor:
+
+            # execute query
+            cursor.execute("INSERT INTO Boosted (boosted_id,"
+                           " name, image_url, type, date)"
+                           " VALUES (NULL, '{name}', '{image_url}', '{type}', '{date}');"
+                           .format(name=creature_info['name'],
+                                   image_url=creature_info['image_url'],
+                                   type=category,
+                                   date=date))
+
 # # # # # # # Boosted creature/boss end # # # # # # #
 
 
@@ -104,4 +124,4 @@ def add_boss_to_db():
 # # # # # # # News end # # # # # # #
 
 
-add_boss_to_db()
+add_creature_to_db()
