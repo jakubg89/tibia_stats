@@ -8,9 +8,10 @@ class News(models.Model):
     type = models.CharField(max_length=20, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     content_html = models.TextField(blank=True, null=True)
+    date_added = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'news'
 
 
@@ -27,5 +28,5 @@ class World(models.Model):
     location_value = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'world'
