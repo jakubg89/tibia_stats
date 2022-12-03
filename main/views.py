@@ -5,9 +5,9 @@ from .models import News
 # Main page
 def main_page(request, *args, **kwargs):
     # news ticker
-    latest_news = News.objects.filter(type='ticker').order_by('-news_id')[:3]
+    latest_tickers = News.objects.filter(type='ticker').order_by('-news_id')[:3]
     content = {
-        'news_ticker': latest_news
+        'news_ticker': latest_tickers
     }
     return render(request, "sites/index.html", content)
 
