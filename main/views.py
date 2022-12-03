@@ -5,8 +5,7 @@ from .models import News
 # Main page
 def main_page(request, *args, **kwargs):
     # news ticker
-    latest_news = News.objects.all().order_by('-news_id')[:3] # dodać warunek  że type to ticker
-    # działa x = Table1.objects.filter(name_tb1='Szalony Leo').values()
+    latest_news = News.objects.filter(type='ticker').order_by('-news_id')[:3]
     content = {
         'news_ticker': latest_news
     }
