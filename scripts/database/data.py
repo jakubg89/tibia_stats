@@ -4,15 +4,23 @@ import pandas as pd
 import scripts.tibiadata_API.get_data as dataapi
 from datetime import datetime
 
-
 environ.setdefault('DJANGO_SETTINGS_MODULE', 'tibia_stats.settings')
 
+
+def format_data(text):
+    text = text.replace("'", "\\'")
+    return text
+
+
+# # # # # # # News ticker # # # # # # #
 
 # adding news to database if it not exists
 def add_news_to_db():
 
     # get latest id list
     id_list = get_latest_news_id()
+
+    # check if list is not empty, if yes we just skip that part. All news tickers are up to date.
     if id_list:
         for i in id_list:
             with connection.cursor() as cursor:
@@ -29,8 +37,8 @@ def add_news_to_db():
 
                     # prepare data
                     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    content = single_news['content'].replace("'", "\\'")
-                    content_html = single_news['content_html'].replace("'", "\\'")
+                    content = format_data(single_news['content'])
+                    content_html = format_data(single_news['content_html'])
 
                     # execute query
                     cursor.execute("INSERT INTO News (news_id,"
@@ -65,4 +73,35 @@ def get_latest_news_id():
     # return list of unique id that are not included in db
     return list(set(all_id_tibia_com) - set(all_id_db))
 
-add_news_to_db()
+# # # # # # # News ticker end # # # # # # #
+
+
+# # # # # # # Boosted creature/boss # # # # # # #
+
+def add_boss_to_db():
+    boss_info = dataapi.boosted_boss()
+    category = 'boss'
+
+    # check if list is not empty
+    if boss_info:
+        date = datetime.now().strftime("%Y-%m-%d")
+        with connection.cursor() as cursor:
+
+            # execute query
+            cursor.execute("INSERT INTO Boosted (boosted_id,"
+                           " name, image_url, type, date)"
+                           " VALUES (NULL, '{name}', '{image_url}', '{type}', '{date}');"
+                           .format(name=boss_info['name'],
+                                   image_url=boss_info['image_url'],
+                                   type=category,
+                                   date=date))
+
+
+# # # # # # # Boosted creature/boss end # # # # # # #
+
+
+# # # # # # # News # # # # # # #
+# # # # # # # News end # # # # # # #
+
+
+add_boss_to_db()
