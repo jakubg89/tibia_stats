@@ -9,6 +9,7 @@ class News(models.Model):
     content = models.TextField(blank=True, null=True)
     content_html = models.TextField(blank=True, null=True)
     date_added = models.DateTimeField()
+    title = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         managed = True
