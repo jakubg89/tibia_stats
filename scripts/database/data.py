@@ -237,6 +237,3 @@ def add_creature_to_db():
             )
 
 # # # # # # # Boosted creature/boss end # # # # # # #
-
-
-add_news_to_db()
