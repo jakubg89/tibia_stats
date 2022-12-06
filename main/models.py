@@ -8,9 +8,11 @@ class News(models.Model):
     type = models.CharField(max_length=20, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
     content_html = models.TextField(blank=True, null=True)
+    date_added = models.DateTimeField()
+    title = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'news'
 
 
@@ -27,5 +29,17 @@ class World(models.Model):
     location_value = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'world'
+
+
+class Boosted(models.Model):
+    boosted_id = models.AutoField(db_column='Boosted_id', primary_key=True)  # Field name made lowercase.
+    name = models.CharField(max_length=50, blank=True, null=True)
+    image_url = models.CharField(max_length=100, blank=True, null=True)
+    type = models.CharField(max_length=15, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'boosted'

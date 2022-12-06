@@ -1,9 +1,28 @@
 from django.shortcuts import render
+from .models import News, Boosted
 
 
 # Main page
 def main_page(request, *args, **kwargs):
-    return render(request, "sites/index.html")
+    # news ticker
+    latest_tickers = News.objects.filter(type='ticker').order_by('-news_id')[:3]
+
+    # boosted boss
+    boosted_boss = Boosted.objects.filter(type='boss').order_by('-boosted_id')[:1]
+
+    # boosted creature
+    boosted_creature = Boosted.objects.filter(type='creature').order_by('-boosted_id')[:1]
+
+    # news
+    latest_news = News.objects.filter(type='news').order_by('-news_id')[:5]
+
+    content = {
+        'news_ticker': latest_tickers,
+        'boosted_boss': boosted_boss,
+        'boosted_creature': boosted_creature,
+        'latest_news': latest_news,
+    }
+    return render(request, "sites/index.html", content)
 
 
 # Error 404
