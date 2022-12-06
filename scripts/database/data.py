@@ -143,13 +143,13 @@ def add_news_to_db():
                     content = add_backslashes(single_news['content'])
                     content_html = add_backslashes(single_news['content_html'])
                     formatted_content = format_content(content_html)
-                    title = add_backslashes(single_news['title'])
+                    title = add_backslashes(single_news['news_title'])
 
                     # execute query
                     cursor.execute(
                         "INSERT INTO News (news_id,"
-                        " id_on_tibiacom, url_tibiacom, type, content, content_html, date_added, title)"
-                        " VALUES (NULL, {id}, '{url}', '{type}', '{content}', '{content_html}', '{date}', '{title}');"
+                        " id_on_tibiacom, url_tibiacom, type, content, content_html, date_added, news_title)"
+                        " VALUES (NULL, {id}, '{url}', '{type}', '{content}', '{content_html}', '{date}', '{news_title}');"
                         .format(
                             id=single_news['id'],
                             url=single_news['url'],
@@ -157,7 +157,7 @@ def add_news_to_db():
                             content=content,
                             content_html=formatted_content,
                             date=date,
-                            title=title,
+                            news_title=title,
                         )
                     )
 
