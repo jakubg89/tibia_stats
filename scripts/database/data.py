@@ -15,7 +15,7 @@ def format_data(text):
 # # # # # # # News ticker # # # # # # #
 
 # adding news to database if it not exists
-def add_news_to_db():
+def add_news_ticker_to_db():
 
     # get latest id list
     id_list = get_latest_news_id()
@@ -124,4 +124,4 @@ def add_creature_to_db():
 # # # # # # # News end # # # # # # #
 
 
-add_creature_to_db()
+add_news_ticker_to_db()
