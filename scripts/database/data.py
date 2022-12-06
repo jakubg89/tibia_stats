@@ -148,6 +148,7 @@ def add_news_to_db():
                     # execute query
                     cursor.execute(
                         "INSERT INTO News (news_id,"
+
                         " id_on_tibiacom, url_tibiacom, type, content, content_html, date_added, news_title)"
                         " VALUES (NULL, {id}, '{url}', '{type}', '{content}', '{content_html}', '{date}', '{news_title}');"
                         .format(
@@ -237,3 +238,4 @@ def add_creature_to_db():
             )
 
 # # # # # # # Boosted creature/boss end # # # # # # #
+
