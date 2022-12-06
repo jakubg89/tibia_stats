@@ -18,17 +18,27 @@ def request(url):
 # collecting news tickers from last 90 days
 def get_ticker_history():
     url = 'https://api.tibiadata.com/v3/news/newsticker'
-    history = request(url)
-    return history['news']
+    ticker_history = request(url)
+    return ticker_history['news']
 
 
-# collect specific news
+# collect specific news or ticker
 def get_specific_news(id_news):
     url = f'https://api.tibiadata.com/v3/news/id/{id_news}'
     news = request(url)
     return news['news']
 
 # # # # # # # News ticker end # # # # # # #
+
+
+# # # # # # # News # # # # # # #
+
+def get_news_history():
+    url = 'https://api.tibiadata.com/v3/news/latest'
+    news_history = request(url)
+    return news_history['news']
+
+# # # # # # # News end # # # # # # #
 
 
 # # # # # # # Boosted creature/boss # # # # # # #
@@ -47,7 +57,3 @@ def boosted_creature():
     return news['creatures']['boosted']
 
 # # # # # # # Boosted creature/boss end # # # # # # #
-
-
-# # # # # # # News # # # # # # #
-# # # # # # # News end # # # # # # #
