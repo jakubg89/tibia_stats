@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import main_page, under_construction, sign_in, sign_up
+from main.views \
+    import \
+    main_page,\
+    under_construction,\
+    sign_in,\
+    sign_up,\
+    about
 
 # Error custom view
 handler404 = 'main.views.error404'
@@ -74,7 +80,7 @@ urlpatterns = [
 
     # Other
     path('discord/', under_construction),
-    path('about/', under_construction),
+    path('about/', about),
 ]
 
 
