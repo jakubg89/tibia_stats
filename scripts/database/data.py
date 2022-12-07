@@ -55,8 +55,8 @@ def add_news_ticker_to_db():
             with connection.cursor() as cursor:
 
                 # check if database already has that id return 1 or 0
-                query = "SELECT EXISTS(SELECT id_on_tibiacom FROM news WHERE id_on_tibiacom = {id} AND (type='ticker')) as truth;" \
-                    .format(id=i)
+                query = f"SELECT EXISTS" \
+                        f"(SELECT id_on_tibiacom FROM news WHERE id_on_tibiacom = {i} AND (type='ticker')) as truth;"
                 cursor.execute(query)
                 exist = cursor.fetchone()
 
@@ -71,17 +71,8 @@ def add_news_ticker_to_db():
 
                     # execute query
                     cursor.execute(
-                        "INSERT INTO News (news_id,"
-                        " id_on_tibiacom, url_tibiacom, type, content, content_html, date_added)"
-                        " VALUES (NULL, {id}, '{url}', '{type}', '{content}', '{content_html}', '{date}');"
-                        .format(
-                            id=single_news['id'],
-                            url=single_news['url'],
-                            type=single_news['type'],
-                            content=content,
-                            content_html=content_html,
-                            date=date
-                        )
+                        f"INSERT INTO News (news_id, id_on_tibiacom, url_tibiacom, type, content, content_html, date_added) "
+                        f"VALUES (NULL, {single_news['id']}, '{single_news['url']}', '{single_news['type']}', '{content}', '{ontent_html}', '{date}');"
                     )
 
 
@@ -126,11 +117,8 @@ def add_news_to_db():
 
                 # check if database already has that id return 1 or 0
                 cursor.execute(
-                    "SELECT EXISTS(SELECT id_on_tibiacom FROM news "
-                    "WHERE id_on_tibiacom = {id} AND (type='news')) as truth;"
-                    .format(
-                        id=i
-                    )
+                    f"SELECT EXISTS(SELECT id_on_tibiacom FROM news "
+                    f"WHERE id_on_tibiacom = {i} AND (type='news')) as truth;"
                 )
                 exist = cursor.fetchone()
 
@@ -147,19 +135,16 @@ def add_news_to_db():
 
                     # execute query
                     cursor.execute(
-                        "INSERT INTO News (news_id,"
-
-                        " id_on_tibiacom, url_tibiacom, type, content, content_html, date_added, news_title)"
-                        " VALUES (NULL, {id}, '{url}', '{type}', '{content}', '{content_html}', '{date}', '{news_title}');"
-                        .format(
-                            id=single_news['id'],
-                            url=single_news['url'],
-                            type='news',
-                            content=content,
-                            content_html=formatted_content,
-                            date=date,
-                            news_title=title,
-                        )
+                        f"INSERT INTO News "
+                        f"(news_id, id_on_tibiacom, url_tibiacom, type, content, content_html, date_added, news_title) "
+                        f"VALUES (NULL, "
+                        f"{single_news['id']}, "
+                        f"'{single_news['url']}', "
+                        f"'news', "
+                        f"'{content}', "
+                        f"'{formatted_content}', "
+                        f"'{date}', "
+                        f"'{title}');"
                     )
 
 
@@ -202,15 +187,8 @@ def add_boss_to_db():
 
             # execute query
             cursor.execute(
-                "INSERT INTO Boosted (boosted_id,"
-                " name, image_url, type, date)"
-                " VALUES (NULL, '{name}', '{image_url}', '{type}', '{date}');"
-                .format(
-                    name=boss_info['name'],
-                    image_url=boss_info['image_url'],
-                    type=category,
-                    date=date
-                )
+                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date) "
+                f"VALUES (NULL, '{boss_info['name']}', '{boss_info['image_url']}', '{category}', '{date}');"
             )
 
 
@@ -226,16 +204,8 @@ def add_creature_to_db():
 
             # execute query
             cursor.execute(
-                "INSERT INTO Boosted (boosted_id,"
-                " name, image_url, type, date)"
-                " VALUES (NULL, '{name}', '{image_url}', '{type}', '{date}');"
-                .format(
-                    name=creature_info['name'],
-                    image_url=creature_info['image_url'],
-                    type=category,
-                    date=date
-                )
+                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date) "
+                f"VALUES (NULL, '{creature_info['name']}', '{creature_info['image_url']}', '{category}', '{date}');"
             )
 
 # # # # # # # Boosted creature/boss end # # # # # # #
-
