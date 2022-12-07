@@ -71,8 +71,15 @@ def add_news_ticker_to_db():
 
                     # execute query
                     cursor.execute(
-                        f"INSERT INTO News (news_id, id_on_tibiacom, url_tibiacom, type, content, content_html, date_added) "
-                        f"VALUES (NULL, {single_news['id']}, '{single_news['url']}', '{single_news['type']}', '{content}', '{ontent_html}', '{date}');"
+                        f"INSERT INTO News "
+                        f"(news_id, id_on_tibiacom, url_tibiacom, type, content, content_html, date_added) "
+                        f"VALUES (NULL,"
+                        f" {single_news['id']}, "
+                        f"'{single_news['url']}', "
+                        f"'{single_news['type']}', "
+                        f"'{content}', "
+                        f"'{content_html}', "
+                        f"'{date}');"
                     )
 
 
