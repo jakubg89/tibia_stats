@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from .models import News, Boosted
+from .models import News, Boosted, World
 
 
 # Main page
 def main_page(request, *args, **kwargs):
+
     # news ticker
     latest_tickers = News.objects.filter(type='ticker').order_by('-news_id')[:3]
 
@@ -43,6 +44,18 @@ def sign_in(request, *args, **kwargs):
 # Sign up
 def sign_up(request, *args, **kwargs):
     return render(request, "sites/sign_up.html")
+
+
+# Worlds
+def worlds(request, *args, **kwargs):
+
+    # All worlds
+    all_worlds = World.objects.all()
+
+    content = {
+        'all_worlds': all_worlds,
+    }
+    return render(request, "sites/worlds/all_worlds.html", content)
 
 
 # About
