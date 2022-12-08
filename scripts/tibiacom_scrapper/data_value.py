@@ -5,7 +5,7 @@ from pathlib import Path
 import os
 
 
-def get_data_category_values():
+def get_data_highscores_category_values():
     base_dir = Path(__file__).resolve().parent.parent
     path = os.path.join(base_dir, 'tibiacom_scrapper\\temp\\data_value\\data.json')
     data_categories = [
@@ -26,6 +26,13 @@ def get_data_category_values():
                 if i['value'] != '':
                     data.update({i.text: i['value']})
         name_and_value.update({item: data})
+
+    pvp_type = {}
+    button = soup.find_all("input", {"name": "worldtypes[]"})
+    for i in button:
+        type_text = soup.findAll("label", {"for": i['id']})
+        pvp_type.update({type_text[0].text: i['value']})
+    name_and_value.update({'pvp_type': pvp_type})
 
     with open(path, 'w') as file:
         json.dump(name_and_value, file)
