@@ -9,9 +9,7 @@ class News(models.Model):
     content = models.TextField(blank=True, null=True)
     content_html = models.TextField(blank=True, null=True)
     date_added = models.DateTimeField()
-
     news_title = models.CharField(max_length=150, blank=True, null=True)
-
 
     class Meta:
         managed = True
@@ -29,6 +27,7 @@ class World(models.Model):
     battleye_value = models.IntegerField(blank=True, null=True)
     location = models.CharField(max_length=45, blank=True, null=True)
     location_value = models.IntegerField(blank=True, null=True)
+    creation_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = True
@@ -40,8 +39,19 @@ class Boosted(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     image_url = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(max_length=15, blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
+    date_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = 'boosted'
+
+
+class WorldOnlineHistory(models.Model):
+    id_online = models.AutoField(primary_key=True)
+    world = models.ForeignKey(World, models.DO_NOTHING)
+    players_online = models.SmallIntegerField(blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'world_online_history'
