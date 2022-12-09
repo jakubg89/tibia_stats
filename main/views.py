@@ -1,5 +1,9 @@
 from django.shortcuts import render
-from .models import News, Boosted, World
+from django.db import connection
+from .models import News, Boosted, World, WorldOnlineHistory
+from datetime import datetime
+import datetime
+
 
 
 # Main page
@@ -50,7 +54,9 @@ def sign_up(request, *args, **kwargs):
 def worlds(request, *args, **kwargs):
 
     # All worlds
-    all_worlds = World.objects.all()
+    all_worlds = WorldOnlineHistory.objects\
+        .select_related('world')\
+        # .filter(date__gte=datetime.datetime.now() - datetime.timedelta(seconds=300))
 
     content = {
         'all_worlds': all_worlds,
