@@ -13,6 +13,13 @@ from main.models import World
 
 # environ.setdefault('DJANGO_SETTINGS_MODULE', 'tibia_stats.settings')
 
+def main():
+    add_news_ticker_to_db()
+    add_boss_to_db()
+    add_creature_to_db()
+    add_world_online_history()
+    add_news_to_db()
+
 
 def add_backslashes(text):
     text = text.replace("'", "\\'")
@@ -143,8 +150,8 @@ def add_news_to_db():
                     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     content = add_backslashes(single_news['content'])
                     content_html = add_backslashes(single_news['content_html'])
-                    formatted_content = format_content(content_html)
-                    title = add_backslashes(single_news['news_title'])
+                    formatted_content = add_backslashes(format_content(content_html))
+                    title = add_backslashes(single_news['title'])
 
                     # execute query
                     cursor.execute(
@@ -315,4 +322,5 @@ def add_world_online_history():
 
 # # # # # # # Worlds end # # # # # # #
 
-add_world_online_history()
+if __name__ == '__main__':
+    main()
