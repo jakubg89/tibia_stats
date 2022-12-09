@@ -200,7 +200,7 @@ def add_boss_to_db():
         with connection.cursor() as cursor:
             # execute query
             cursor.execute(
-                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date) "
+                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date_time) "
                 f"VALUES (NULL, '{boss_info['name']}', '{boss_info['image_url']}', '{category}', '{date}');"
             )
 
@@ -216,7 +216,7 @@ def add_creature_to_db():
         with connection.cursor() as cursor:
             # execute query
             cursor.execute(
-                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date) "
+                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date_time) "
                 f"VALUES (NULL, '{creature_info['name']}', '{creature_info['image_url']}', '{category}', '{date}');"
             )
 
@@ -248,16 +248,20 @@ def add_worlds_information_to_db():
 
                     # getting data of creation date if world is initially protected
                     if world['battleye_date'] == 'release':
-                        creation_date = dataapi.get_world_details(world['name'])
-                        date = creation_date['creation_date'] + '-01'
+                        world_details = dataapi.get_world_details(world['name'])
+                        date = world_details['creation_date'] + '-01'
                         battleye_value = values['beprotection']['Initially Protected']
+                        creation_date = date
                     elif world['battleye_date'] == '':
-                        creation_date = dataapi.get_world_details(world['name'])
-                        date = creation_date['creation_date'] + '-01'
+                        world_details = dataapi.get_world_details(world['name'])
+                        date = world_details['creation_date'] + '-01'
                         battleye_value = values['beprotection']['Unprotected']
+                        creation_date = date
                     else:
+                        world_details = dataapi.get_world_details(world['name'])
                         date = world['battleye_date']
                         battleye_value = values['beprotection']['Protected']
+                        creation_date = world_details['creation_date'] + '-01'
 
                     # add value based on location
                     if world['location'] == 'Europe':
@@ -269,17 +273,46 @@ def add_worlds_information_to_db():
 
                     # execute query
                     cursor.execute(
-                        f"INSERT INTO world (world_id, name, name_value, pvp_type, pvp_type_value, battleye_protected, battleye_date, battleye_value, location, location_value) VALUES (NULL, "
-                        f"'{world['name']}', "
-                        f"'{values['world'][world['name']]}', "  # name_value
-                        f"'{world['pvp_type']}', "  # pvp_type
+                        f"INSERT INTO world (world_id, name, name_value, pvp_type, pvp_type_value, battleye_protected, battleye_date, battleye_value, location, location_value, creation_date) VALUES (NULL, "
+                        f"'{world['name']}', "                          # name
+                        f"'{values['world'][world['name']]}', "         # name_value
+                        f"'{world['pvp_type']}', "                      # pvp_type
                         f"'{values['pvp_type'][world['pvp_type']]}', "  # pvp_value
-                        f"'{world['battleye_protected']}', "  # battleye_protected
-                        f"'{date}',"  # battleye_date
-                        f"'{battleye_value}',"  # battleye_value
-                        f"'{world['location']}',"  # location
-                        f"'{location_value}');"  # location_value
+                        f"'{world['battleye_protected']}', "            # battleye_protected
+                        f"'{date}',"                                    # battleye_date
+                        f"'{battleye_value}',"                          # battleye_value
+                        f"'{world['location']}',"                       # location
+                        f"'{location_value}',"                          # location_value
+                        f"'{creation_date}');"                          # creation_date
                     )
+
+
+def add_world_online_history():
+    worlds_information_api = dataapi.get_worlds_information()
+    worlds_id = {}
+
+    with connection.cursor() as cursor:
+        # check if database already has that id return 1 or 0
+        cursor.execute(
+            f"SELECT name, world_id FROM world;"
+        )
+        query_result = cursor.fetchall()
+
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for i in query_result:
+            worlds_id.update({i[0]: i[1]})
+
+        for world in worlds_information_api:
+
+            # execute query
+            cursor.execute(
+                f"INSERT INTO world_online_history () VALUES (NULL, "
+                f"'{worlds_id[world['name']]}', "  # world id
+                f"'{world['players_online']}', "  # online players
+                f"'{date}');"  # date_time
+            )
+
 
 # # # # # # # Worlds end # # # # # # #
 
+add_world_online_history()
