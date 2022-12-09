@@ -57,3 +57,20 @@ def boosted_creature():
     return news['creatures']['boosted']
 
 # # # # # # # Boosted creature/boss end # # # # # # #
+
+
+# # # # # # # Worlds # # # # # # #
+
+# get worlds list with basic information
+def get_worlds_information():
+    url = 'https://api.tibiadata.com/v3/worlds'
+    worlds_info = request(url)
+    return worlds_info['worlds']['regular_worlds']
+
+
+def get_world_details(world):
+    url = f'https://api.tibiadata.com/v3/world/{world}'
+    world_info = request(url)
+    return world_info['worlds']['world']
+
+# # # # # # # Worlds end # # # # # # #

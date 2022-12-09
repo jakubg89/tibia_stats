@@ -1,9 +1,17 @@
 from django.shortcuts import render
-from .models import News, Boosted
+from django.db import connection
+from .models import News, Boosted, World, WorldOnlineHistory
+from datetime import datetime
+import datetime
+from pathlib import Path
+import os
+import json
+import pandas as pd
 
 
 # Main page
 def main_page(request, *args, **kwargs):
+
     # news ticker
     latest_tickers = News.objects.filter(type='ticker').order_by('-news_id')[:3]
 
@@ -14,7 +22,7 @@ def main_page(request, *args, **kwargs):
     boosted_creature = Boosted.objects.filter(type='creature').order_by('-boosted_id')[:1]
 
     # news
-    latest_news = News.objects.filter(type='news').order_by('-news_id')[:5]
+    latest_news = News.objects.filter(type='news').order_by('-news_id')[:4]
 
     content = {
         'news_ticker': latest_tickers,
@@ -43,6 +51,52 @@ def sign_in(request, *args, **kwargs):
 # Sign up
 def sign_up(request, *args, **kwargs):
     return render(request, "sites/sign_up.html")
+
+
+# Worlds
+def worlds_main(request, *args, **kwargs):
+
+    # All worlds
+    all_worlds = WorldOnlineHistory.objects\
+        .select_related('world')\
+        .filter(date__gte=datetime.datetime.now() - datetime.timedelta(seconds=260))
+
+    # Load data for creation chart from json
+    path_to_json = Path(__file__).resolve().parent.parent
+    creation_chart = json.load(open(os.path.join(path_to_json, 'scripts\\json_files\\creation_chart.json')))
+
+    # Online history chart
+    get_online_history = WorldOnlineHistory.objects \
+        .select_related('world') \
+        .filter(date__gte=datetime.datetime.now() - datetime.timedelta(hours=24)) \
+        .values('world__location', 'world_id', 'players_online', 'date')
+
+    df = pd.DataFrame(get_online_history)
+    df['hour'] = df['date'].dt.round('H').dt.hour
+    df = df.sort_values(by=['date'])
+    world = df['world__location'].unique()
+    hours = df['hour'].unique()
+    online_history = {}
+    online_history_all = {}
+
+    for i in world:
+        mean_location = {}
+        for hour in hours:
+            mean_location.update({
+                hour: int(df.loc[(df['world__location'] == i) & (df['hour'] == hour), 'players_online'].mean())
+            })
+            if i == world[-1]:
+                online_history_all.update({
+                    hour: int(df.loc[df['hour'] == hour, 'players_online'].mean())
+                })
+        online_history.update({i: mean_location})
+    online_history.update({'Total': online_history_all})
+    content = {
+        'all_worlds': all_worlds,
+        'created': creation_chart,
+        'online_history': online_history
+    }
+    return render(request, "sites/worlds/all_worlds.html", content)
 
 
 # About
