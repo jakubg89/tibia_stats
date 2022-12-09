@@ -1,14 +1,122 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<!-- Charts start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
 
-<!-- Worlds list Start -->
+        <!-- Creation date start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">New server release history</h6>
+                <canvas id="creation-date"></canvas>
+
+                    {% load static %}
+                    <script src="{% static 'root/lib/chart/chart.min.js' %}"></script>
+                    <script type="text/javascript">
+
+                        Chart.defaults.color = "#6C7293";
+                        Chart.defaults.borderColor = "#000000";
+                        var ctx1 = document.getElementById("creation-date").getContext("2d");
+                        var myChart1 = new Chart(ctx1, {
+                            type: "bar",
+                            data: {
+                                labels: [
+                                {% for key, value in created.Open_PvP.items %}
+                                    "{{ key }}",
+                                {% endfor %}],
+                                datasets: [
+
+                                    {% for key, value in created.items %}
+                                    {
+                                        {% load custom_tags %}
+                                        label: "{{ key |put_space }}",
+                                        data: [
+                                        {% for date, number in value.items %}
+                                            {{ number }}{% if not date.forloop.last %},{% endif %}
+                                        {% endfor %}
+                                        ],
+                                        backgroundColor: "rgba(235, 22, 22, .{{ forloop.counter|add:"4" }})",
+                                        fill: true
+                                    }
+                                        {% if not key.forloop.last %},{% endif %}
+                                    {% endfor %}
+
+                                ]
+                                },
+                            options: {
+                                responsive: true
+                            }
+                        });
+
+                    </script>
+
+            </div>
+        </div>
+        <!-- Creation date end -->
+
+        <!-- Online history start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">Average players online in last 24 hours by location.</h6>
+                <canvas id="online-history"></canvas>
+
+
+                    {% load static %}
+                    <script src="{% static 'root/lib/chart/chart.min.js' %}"></script>
+                    <script type="text/javascript">
+
+                        Chart.defaults.color = "#6C7293";
+                        Chart.defaults.borderColor = "#000000";
+                        var ctx1 = document.getElementById("online-history").getContext("2d");
+                        var myChart1 = new Chart(ctx1, {
+                            type: "bar",
+                            data: {
+                                labels: [
+                                {% for key, value in online_history.Europe.items %}
+                                    "{{ key }}",
+                                {% endfor %}],
+                                datasets: [
+
+                                    {% for key, value in online_history.items %}
+                                    {
+                                        {% load custom_tags %}
+                                        label: "{{ key |put_space }}",
+                                        data: [
+                                        {% for date, number in value.items %}
+                                            {{ number }}{% if not date.forloop.last %},{% endif %}
+                                        {% endfor %}
+                                        ],
+                                        backgroundColor: "rgba(235, 22, 22, .{{ forloop.counter|add:"3" }})",
+                                        fill: true
+                                    }
+                                        {% if not key.forloop.last %},{% endif %}
+                                    {% endfor %}
+
+                                ]
+                                },
+                            options: {
+                                responsive: true
+                            }
+                        });
+
+                    </script>
+
+            </div>
+        </div>
+        <!-- Online history end -->
+
+    </div>
+</div>
+<!-- Charts end -->
+
+<!-- Sign In Start -->
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
 
         <div class="col-sm-12">
             <div class="bg-secondary rounded h-100 p-4">
-                <h2 class="mb-4 text-center">Worlds</h2>
+                <h2 class="mb-4 text-center">Overview</h2>
                 <div class="table-responsive-xl">
                     <table id="worlds_table" class="table table-hover">
                         <thead>
@@ -78,6 +186,6 @@
 
     </div>
 </div>
-<!-- Worlds list end -->
+<!-- Sign In Start -->
 
 {% endblock %}
