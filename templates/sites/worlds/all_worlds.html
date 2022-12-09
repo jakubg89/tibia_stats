@@ -1,31 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded h-100 p-4">
-                <h6 class="mb-4">Creation date</h6>
-                <canvas id="worldwide-sales"></canvas>
-            </div>
-        </div>
 
-        <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded h-100 p-4">
-                <h6 class="mb-4">Multiple Line Chart</h6>
-                <canvas id="salse-revenue"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
 
+<!-- Worlds list Start -->
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
 
         <div class="col-sm-12">
             <div class="bg-secondary rounded h-100 p-4">
-                <h6 class="mb-4">Worlds</h6>
+                <h2 class="mb-4 text-center">Worlds</h2>
                 <div class="table-responsive-xl">
-                    <table id="test_table" class="table table-hover">
+                    <table id="worlds_table" class="table table-hover">
                         <thead>
                             <tr>
                                 <th scope="col">Name</th>
@@ -39,39 +24,50 @@
                         <tbody>
                         {% for i in all_worlds %}
                             <tr>
-                                <td><a href="#">{{ i.name }}</a></td>
+                                <!-- Name -->
+                                <td>
+                                    <a href="#">{{ i.world.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
 
-                                {% if i.pvp_type_value == 0 %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" width="23"> {{ i.pvp_type }}</td>
-                                {% elif i.pvp_type_value == 1 %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" width="23"> {{ i.pvp_type }}</td>
-                                {% elif i.pvp_type_value == 3 %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" width="23"> {{ i.pvp_type }}</td>
-                                {% elif i.pvp_type_value == 4 %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" width="23"> {{ i.pvp_type }}</td>
-                                {% elif i.pvp_type_value == 2 %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_hardcore.gif" width="23"> {{ i.pvp_type }}</td>
+                                <!-- PvP -->
+                                {% if i.world.pvp_type_value == 0 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 1 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 3 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 4 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 2 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_hardcore.gif" width="23"> {{ i.world.pvp_type }}</td>
                                 {% endif %}
 
-
-                                {% if i.location_value == 0 %}
-                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_eur.png" width="23"> {{ i.location }}</td>
-                                {% elif i.location_value == 1 %}
-                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_bra.png" width="23"> {{ i.location }}</td>
-                                {% elif i.location_value == 2 %}
-                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_usa.png" width="23"> {{ i.location }}</td>
+                                <!-- Location -->
+                                {% if i.world.location_value == 0 %}
+                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_eur.png" width="23"> {{ i.world.location }}</td>
+                                {% elif i.world.location_value == 1 %}
+                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_bra.png" width="23"> {{ i.world.location }}</td>
+                                {% elif i.world.location_value == 2 %}
+                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_usa.png" width="23"> {{ i.world.location }}</td>
                                 {% endif %}
 
-
-                                {% if i.battleye_value == 1 %}
+                                <!-- Battleye -->
+                                {% if i.world.battleye_value == 1 %}
                                     <td><img src="https://static.tibia.com/images/global/content/icon_battleye.gif"> Yellow</td>
-                                {% elif i.battleye_value == 2 %}
+                                {% elif i.world.battleye_value == 2 %}
                                     <td><img src="https://static.tibia.com/images/global/content/icon_battleyeinitial.gif"> Green</td>
-                                {% elif i.battleye_value == 0 %}
+                                {% elif i.world.battleye_value == 0 %}
                                     <td></td>
                                 {% endif %}
-                                <td></td>
-                                <td></td>
+
+                                <!-- Creation date -->
+                                <td>{{ i.world.creation_date |date:'Y-m' }}</td>
+
+                                <!-- Online -->
+                                <td class="{% if i.players_online >= 250 %}text-danger{% else %}text-success{% endif %}">{{ i.players_online }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -82,4 +78,6 @@
 
     </div>
 </div>
+<!-- Worlds list end -->
+
 {% endblock %}
