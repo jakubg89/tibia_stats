@@ -109,17 +109,18 @@ def single_world(request, name):
 
     # data for chart ( number of online players of each vocation )
     knight, druid, paladin, sorcerer, none = 0, 0, 0, 0, 0
-    for i in world_information['online_players']:
-        if i['vocation'] == 'Paladin' or i['vocation'] == 'Royal Paladin':
-            paladin += 1
-        elif i['vocation'] == 'Druid' or i['vocation'] == 'Elder Druid':
-            druid += 1
-        elif i['vocation'] == 'Knight' or i['vocation'] == 'Elite Knight':
-            knight += 1
-        elif i['vocation'] == 'Sorcerer' or i['vocation'] == 'Master Sorcerer':
-            sorcerer += 1
-        else:
-            none += 1
+    if world_information['players_online'] != 0:
+        for i in world_information['online_players']:
+            if i['vocation'] == 'Paladin' or i['vocation'] == 'Royal Paladin':
+                paladin += 1
+            elif i['vocation'] == 'Druid' or i['vocation'] == 'Elder Druid':
+                druid += 1
+            elif i['vocation'] == 'Knight' or i['vocation'] == 'Elite Knight':
+                knight += 1
+            elif i['vocation'] == 'Sorcerer' or i['vocation'] == 'Master Sorcerer':
+                sorcerer += 1
+            else:
+                none += 1
 
     # data to dictionary
     online_counter = {

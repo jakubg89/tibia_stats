@@ -27,9 +27,9 @@ from main.views \
 
 # Error custom view
 handler404 = 'main.views.error404'
-# handler500 = 'mysite.views.my_custom_error_view'
-# handler403 = 'mysite.views.my_custom_permission_denied_view'
-# handler400 = 'mysite.views.my_custom_bad_request_view'
+# handler500 = 'main.views.error404'
+# handler403 = 'main.views.error404'
+# handler400 = 'main.views.error404'
 
 urlpatterns = [
 

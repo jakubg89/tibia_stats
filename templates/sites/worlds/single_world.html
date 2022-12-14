@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
+{% load custom_tags %}
+
 <!-- Title, select menu start -->
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
@@ -122,7 +124,7 @@
                     <dd class="col-sm-6">{{ world.record_players }}</dd>
 
                     <dt class="col-sm-6 text-truncate">Record date</dt>
-                    <dd class="col-sm-6">{{ world.record_date }}</dd>
+                    <dd class="col-sm-6">{{ world.record_date |format_date }}</dd>
 
                     <dt class="col-sm-6 text-truncate">World created</dt>
                     <dd class="col-sm-6">{{ world.creation_date }}</dd>
@@ -135,7 +137,7 @@
 
                     {% if world.battleye_protected %}
                         <dt class="col-sm-6">Protected by battleye since</dt>
-                        <dd class="col-sm-6">{{ world.battleye_date}}</dd>
+                        <dd class="col-sm-6">{{ world.battleye_date }}</dd>
                     {% else %}
                         <dt class="col-sm-6">Protected by battleye</dt>
                         <dd class="col-sm-6">Not yet</dd>
