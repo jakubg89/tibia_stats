@@ -22,7 +22,8 @@ from main.views \
     sign_in,\
     sign_up,\
     about, \
-    worlds_main
+    worlds_main,\
+    single_world
 
 # Error custom view
 handler404 = 'main.views.error404'
@@ -62,7 +63,7 @@ urlpatterns = [
 
     # Worlds menu
     path('worlds/allworlds', worlds_main),
-    path('worlds/world', under_construction),
+    path('worlds/world/<str:name>/', single_world),
     path('worlds/online', under_construction),
 
     # Character menu
