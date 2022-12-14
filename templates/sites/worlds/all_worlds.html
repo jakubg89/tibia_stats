@@ -61,9 +61,6 @@
                 <h6 class="mb-4">Average players online in last 24 hours by location.</h6>
                 <canvas id="online-history"></canvas>
 
-
-                    {% load static %}
-                    <script src="{% static 'root/lib/chart/chart.min.js' %}"></script>
                     <script type="text/javascript">
 
                         Chart.defaults.color = "#6C7293";
@@ -74,7 +71,7 @@
                             data: {
                                 labels: [
                                 {% for key, value in online_history.Europe.items %}
-                                    "{{ key }}",
+                                    "{{ key }}:00 CET",
                                 {% endfor %}],
                                 datasets: [
 
@@ -134,7 +131,7 @@
                             <tr>
                                 <!-- Name -->
                                 <td>
-                                    <a href="#">{{ i.world.name }}</a>
+                                    <a href="/worlds/world/{{ i.world.name }}">{{ i.world.name }}</a>
                                     <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
                                     </a>
