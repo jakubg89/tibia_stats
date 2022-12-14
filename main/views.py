@@ -7,7 +7,7 @@ from pathlib import Path
 import os
 import json
 import pandas as pd
-
+import scripts.tibiadata_API.get_data as dataapi
 
 # Main page
 def main_page(request, *args, **kwargs):
@@ -53,7 +53,9 @@ def sign_up(request, *args, **kwargs):
     return render(request, "sites/sign_up.html")
 
 
-# Worlds
+# # # # # # # # # # # # Worlds # # # # # # # # # # # #
+
+# World main
 def worlds_main(request, *args, **kwargs):
 
     # All worlds
@@ -99,11 +101,60 @@ def worlds_main(request, *args, **kwargs):
     return render(request, "sites/worlds/all_worlds.html", content)
 
 
-# About
-def about(request, *args, **kwargs):
-    return render(request, "sites/about.html")
+# Single world
+def single_world(request, name):
+
+    # get data from api
+    world_information = dataapi.get_world_details(name)
+
+    # data for chart ( number of online players of each vocation )
+    knight, druid, paladin, sorcerer, none = 0, 0, 0, 0, 0
+    for i in world_information['online_players']:
+        if i['vocation'] == 'Paladin' or i['vocation'] == 'Royal Paladin':
+            paladin += 1
+        elif i['vocation'] == 'Druid' or i['vocation'] == 'Elder Druid':
+            druid += 1
+        elif i['vocation'] == 'Knight' or i['vocation'] == 'Elite Knight':
+            knight += 1
+        elif i['vocation'] == 'Sorcerer' or i['vocation'] == 'Master Sorcerer':
+            sorcerer += 1
+        else:
+            none += 1
+
+    # data to dictionary
+    online_counter = {
+        'Knights': knight,
+        'Sorcerers': sorcerer,
+        'Paladins': paladin,
+        'Druids': druid,
+        'None': none
+    }
+
+    # sort by value (highest > lowest)
+    online_counter = {key: value
+                      for key, value in sorted(online_counter.items(),
+                                               key=lambda item: item[1],
+                                               reverse=True)}
+
+    # get world list with id
+    world_list = World.objects.all().values('name', 'name_value')
+
+    content = {
+        'world': world_information,
+        'online': online_counter,
+        'world_list': world_list,
+    }
+    return render(request, "sites/worlds/single_world.html", content)
 
 
 # Discords
 def discord(request, *args, **kwargs):
     return render(request, "sites/discords.html")
+
+
+# About
+def about(request, *args, **kwargs):
+    return render(request, "sites/about.html")
+
+
+
