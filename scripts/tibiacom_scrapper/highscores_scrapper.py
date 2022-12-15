@@ -6,7 +6,8 @@ import data
 import headers
 import time
 # from scripts.proxy_scrapper.proxy_functions import get_proxy_list
-import worlds
+import data_value
+
 
 
 class ScrapHighscores:
