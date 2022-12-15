@@ -148,6 +148,29 @@ def single_world(request, name):
     return render(request, "sites/worlds/single_world.html", content)
 
 
+# # # # # # # # # # # # Worlds # # # # # # # # # # # #
+
+# Search character
+def search_character(request, *args, **kwargs):
+    query = request.GET['q']  # <input name="q"> return dictionary { q : item }
+    print(query)
+
+    # check if its not empty
+
+    # check if its not numbers or special characters
+
+    # check if exist on tibia com
+
+    # check if exist in db
+
+    # show data from tibiacom and db if exist
+
+    content = {
+
+    }
+    return render(request, "sites/characters/search_character.html", content)
+
+
 # Discords
 def discord(request, *args, **kwargs):
     return render(request, "sites/discords.html")

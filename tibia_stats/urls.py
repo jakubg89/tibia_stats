@@ -23,7 +23,8 @@ from main.views \
     sign_up,\
     about, \
     worlds_main,\
-    single_world
+    single_world,\
+    search_character
 
 # Error custom view
 handler404 = 'main.views.error404'
@@ -67,7 +68,7 @@ urlpatterns = [
     path('worlds/online', under_construction),
 
     # Character menu
-    path('character/search', under_construction),
+    path('character/search/', search_character),
     path('character/transfers', under_construction),
     path('character/name_change', under_construction),
 
