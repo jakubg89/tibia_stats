@@ -55,3 +55,18 @@ class WorldOnlineHistory(models.Model):
     class Meta:
         managed = True
         db_table = 'world_online_history'
+
+
+class Highscores(models.Model):
+    category = models.CharField(max_length=45, blank=True, null=True)
+    rank = models.IntegerField(blank=True, null=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    vocation = models.CharField(max_length=45, blank=True, null=True)
+    world_id = models.CharField(max_length=45, blank=True, null=True)
+    level = models.IntegerField(blank=True, null=True)
+    value = models.BigIntegerField(blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'highscores'
