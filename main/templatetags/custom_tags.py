@@ -1,4 +1,5 @@
 from django import template
+from datetime import datetime
 
 
 register = template.Library()
@@ -11,4 +12,4 @@ def put_space(text):
 
 @register.filter(name='format_date')
 def format_date(date):
-    return date[:date.index('T')]
+    return datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
