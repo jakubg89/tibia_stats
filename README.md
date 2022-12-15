@@ -7,10 +7,10 @@ Django project that provides tools and statistics for players of Tibia.
 ## Features
 
 1. **Worlds informations.**
-    - [ ] Basic information.
+    - [x] Basic information.
     - [ ] Online time counter.
 2. **Character information.**
-    - [ ] Basic information.
+    - [x] Basic information.
     - [ ] World transfers.
     - [ ] Name changes.
 3. **Experience change list.**

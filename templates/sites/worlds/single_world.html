@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% load custom_tags %}
+
+<!-- Title, select menu start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <!-- Title start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h1 class="text-center">{{ world.name }}</h1>
+            </div>
+        </div>
+        <!-- Title end -->
+
+        <!-- Select start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded text-center h-100 p-4">
+
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                <form>
+                    <select id="dynamic_select" class="form-select p-3" aria-label="Default select example" >
+                        {% for i in world_list %}
+                            {% if i.name != world.name %}
+                                <option value="/worlds/world/{{ i.name_value }}">{{ i.name }}</option>
+                            {% else %}
+                                <option selected value="/worlds/world/{{ i.value }}">{{ i.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <script>
+                       $(function(){
+                          $('#dynamic_select').on('change', function () {
+                              var url = $(this).val();
+                              if (url) {
+                                  window.location = url;
+                              }
+                              return false;
+                          });
+                        });
+                    </script>
+                </form>
+
+            </div>
+        </div>
+        <!-- Select end -->
+    </div>
+</div>
+<!-- Title, select menu end -->
+
+
+<!-- Information start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <!-- Vocations online start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <p class="text-center mb-4">Vocations online on {{ world.name }}</p>
+                <canvas id="online-voc"></canvas>
+
+                    {% load static %}
+                    <script src="{% static 'root/lib/chart/chart.min.js' %}"></script>
+                    <script type="text/javascript">
+                        Chart.defaults.color = "#6C7293";
+                        Chart.defaults.borderColor = "#000000";
+                        var ctx1 = document.getElementById("online-voc").getContext("2d");
+                        var myChart1 = new Chart(ctx1, {
+                            type: "bar",
+                            data: {
+                                labels: [
+                                {% for key, value in online.items %}
+                                    "{{ key }}",
+                                {% endfor %}
+                                ],
+                                datasets: [{
+                                    backgroundColor: [
+                                        "rgba(235, 22, 22, .7)",
+                                        "rgba(235, 22, 22, .6)",
+                                        "rgba(235, 22, 22, .5)",
+                                        "rgba(235, 22, 22, .4)",
+                                        "rgba(235, 22, 22, .3)"
+                                    ],
+                                    data: [
+                                    {% for key, value in online.items %}
+                                        "{{ value }}",
+                                    {% endfor %}
+                                    ]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                legend: { display: false },
+                                plugins: {
+                                            title: {
+                                                display: false,
+                                                text: 'Vocations online'
+                                            },
+                                            legend: {
+                                                display: false
+                                            }
+                                }
+                            }
+                        });
+                    </script>
+
+            </div>
+        </div>
+        <!-- Vocations online end -->
+
+        <!-- World info start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-2">
+                <dl class="row mb-0 p-3 text-start">
+                    <dt class="col-sm-6">Status</dt>
+                    <dd class="col-sm-6 {% if world.status != 'online' %}text-danger{% else %}text-success{% endif %}">{{ world.status }}</dd>
+
+                    <dt class="col-sm-6">Players online</dt>
+                    <dd class="col-sm-6 {% if world.players_online >= 250 %}text-danger{% else %}text-success{% endif %}">{{ world.players_online }}</dd>
+
+                    <dt class="col-sm-6">Players online record</dt>
+                    <dd class="col-sm-6">{{ world.record_players }}</dd>
+
+                    <dt class="col-sm-6 text-truncate">Record date</dt>
+                    <dd class="col-sm-6">{{ world.record_date |format_date }}</dd>
+
+                    <dt class="col-sm-6 text-truncate">World created</dt>
+                    <dd class="col-sm-6">{{ world.creation_date }}</dd>
+
+                    <dt class="col-sm-6 text-truncate">Location</dt>
+                    <dd class="col-sm-6">{{ world.location }}</dd>
+
+                    <dt class="col-sm-6">PvP type</dt>
+                    <dd class="col-sm-6">{{ world.pvp_type }}</dd>
+
+                    {% if world.battleye_protected %}
+                        <dt class="col-sm-6">Protected by battleye since</dt>
+                        <dd class="col-sm-6">{{ world.battleye_date }}</dd>
+                    {% else %}
+                        <dt class="col-sm-6">Protected by battleye</dt>
+                        <dd class="col-sm-6">Not yet</dd>
+                    {% endif %}
+
+                    <dt class="col-sm-6">World quest titles</dt>
+                    <dd class="col-sm-6">
+                        <ul>
+                        {% for i in world.world_quest_titles %}
+                            <li>{{ i }}</li>
+                        {% endfor %}
+                        </ul>
+                    </dd>
+
+
+                </dl>
+            </div>
+        </div>
+        <!-- World info end -->
+    </div>
+</div>
+<!-- Information end -->
+
+<!-- Player list Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <div class="col-sm-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h4 class="mb-4 text-center">Online players</h4>
+                <div class="table-responsive-xl">
+                    <table id="single-world-table" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Level</th>
+                                <th scope="col">Profession</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in world.online_players %}
+                            <tr>
+                                <!-- Name -->
+                                <td>
+                                    <a href="#">{{ i.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.name }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                                <!-- Level -->
+                                <td>{{ i.level }}</td>
+
+                                <!-- Vocation -->
+                                <td>{{ i.vocation }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Player list Start -->
+
+{% endblock %}

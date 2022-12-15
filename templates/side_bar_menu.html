@@ -13,7 +13,7 @@
             <a href="/home" class="nav-item nav-link {% if request.path == '/home/' %} active {% endif %}"><i class="fas fa-link me-2"></i>Main page</a>
 
             <!-- Experience menu -->
-            <div class="nav-item dropdown">
+            <!--<div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'experience' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Experience</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'experience' in request.path %} show {% endif %}">
                     <a href="/experience/top500" class="dropdown-item {% if 'experience/top500' in request.path %} active {% endif %}">Top 500 yesterday</a>
@@ -21,10 +21,10 @@
                     <a href="/experience/rookgaard" class="dropdown-item {% if 'experience/rookgaard' in request.path %} active {% endif %}">Rookgaard</a>
                     <a href="/experience/stats" class="dropdown-item {% if 'experience/stats' in request.path %} active {% endif %}">Stats</a>
                 </div>
-            </div>
+            </div>-->
 
             <!-- Charms menu -->
-            <div class="nav-item dropdown">
+            <!--<div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'charms' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fas fa-pastafarianism me-2"></i>Charms</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'charms' in request.path %} show {% endif %}">
                     <a href="/charms/top500" class="dropdown-item {% if 'charms/top500' in request.path %} active {% endif %}">Top 500 yesterday</a>
@@ -32,25 +32,25 @@
                     <a href="/charms/rookgaard" class="dropdown-item {% if 'charms/rookgaard' in request.path %} active {% endif %}">Rookgaard</a>
                     <a href="/charms/stats" class="dropdown-item {% if 'charms/stats' in request.path %} active {% endif %}">Stats</a>
                 </div>
-            </div>
+            </div>-->
 
             <!-- Char bazaar menu -->
-            <div class="nav-item dropdown">
+            <!--<div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'bazaar' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fas fa-shopping-basket me-2"></i>Char Bazaar</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'bazaar' in request.path %} show {% endif %}">
                     <a href="/bazaar/active" class="dropdown-item {% if 'bazaar/active' in request.path %} active {% endif %}">Active auctions</a>
                     <a href="/bazaar/history" class="dropdown-item {% if 'bazaar/history' in request.path %} active {% endif %}">History</a>
                     <a href="/bazaar/stats" class="dropdown-item {% if 'bazaar/stats' in request.path %} active {% endif %}">Stats</a>
                 </div>
-            </div>
+            </div>-->
 
             <!-- Worlds menu -->
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'worlds' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fas fa-globe me-2"></i>Worlds</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'worlds' in request.path %} show {% endif %}">
-                    <a href="/worlds/allworlds" class="dropdown-item {% if 'worlds/allworlds' in request.path %} active {% endif %}">All worlds</a>
-                    <a href="/worlds/world" class="dropdown-item {% if 'worlds/world' in request.path %} active {% endif %}">Chose world</a>
-                    <a href="/worlds/online" class="dropdown-item {% if 'worlds/online' in request.path %} active {% endif %}">Online counter</a>
+                    <a href="/worlds/allworlds" class="dropdown-item {% if 'worlds/allworlds' in request.path %} active {% endif %}">World list</a>
+                    <a href="/worlds/world/Adra" class="dropdown-item {% if 'worlds/world' in request.path %} active {% endif %}">Single world</a>
+                    <!--<a href="/worlds/online" class="dropdown-item {% if 'worlds/online' in request.path %} active {% endif %}">Online counter</a>-->
                 </div>
             </div>
 
@@ -58,33 +58,33 @@
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'character' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fas fa-users me-2"></i>Characters</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'character' in request.path %} show {% endif %}">
-                    <a href="/character/search" class="dropdown-item {% if 'character/search' in request.path %} active {% endif %}">Find character</a>
-                    <a href="/character/transfers" class="dropdown-item {% if 'character/transfers' in request.path %} active {% endif %}">World transfers</a>
-                    <a href="/character/name_change" class="dropdown-item {% if 'character/name_change' in request.path %} active {% endif %}">Name change</a>
+                    <a href="/character/search" class="dropdown-item {% if 'character/search' in request.path %} active {% endif %}">Information</a>
+                    <!--<a href="/character/transfers" class="dropdown-item {% if 'character/transfers' in request.path %} active {% endif %}">World transfers</a>-->
+                    <!--<a href="/character/name_change" class="dropdown-item {% if 'character/name_change' in request.path %} active {% endif %}">Name change</a>-->
                 </div>
             </div>
 
             <!-- Boss menu -->
-            <div class="nav-item dropdown">
+            <!--<div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'bosses' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fas fa-crosshairs me-2"></i>Bosses</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'bosses' in request.path %} show {% endif %}">
                     <a href="/bosses/list" class="dropdown-item {% if 'bosses/list' in request.path %} active {% endif %}">List</a>
                     <a href="/bosses/stats" class="dropdown-item {% if 'bosses/stats' in request.path %} active {% endif %}">Stats</a>
                 </div>
-            </div>
+            </div>-->
 
             <!-- Calculators menu -->
-            <div class="nav-item dropdown">
+            <!--<div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'calculator' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fas fa-calculator me-2"></i>Calculators</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'calculator' in request.path %} show {% endif %}">
                     <a href="/calculator/training" class="dropdown-item {% if 'calculator/training' in request.path %} active {% endif %}">Training</a>
                     <a href="/calculator/loot" class="dropdown-item {% if 'calculator/loot' in request.path %} active {% endif %}">Loot</a>
                     <a href="/calculator/stamina" class="dropdown-item {% if 'calculator/stamina' in request.path %} active {% endif %}">Stamina</a>
                 </div>
-            </div>
+            </div>-->
 
             <!-- Other -->
-            <a href="/discord" class="nav-item nav-link {% if 'discord' in request.path %} active {% endif %}"><i class="fab fa-discord me-2"></i>Discords</a>
+            <!--<a href="/discord" class="nav-item nav-link {% if 'discord' in request.path %} active {% endif %}"><i class="fab fa-discord me-2"></i>Discords</a>-->
             <a href="/about" class="nav-item nav-link {% if 'about' in request.path %} active {% endif %}"><i class="fa fa-table me-2"></i>About</a>
         </div>
         <!-- Side bar End -->

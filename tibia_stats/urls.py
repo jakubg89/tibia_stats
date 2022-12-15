@@ -15,13 +15,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import main_page, under_construction, sign_in, sign_up
+from main.views \
+    import \
+    main_page,\
+    under_construction,\
+    sign_in,\
+    sign_up,\
+    about, \
+    worlds_main,\
+    single_world,\
+    search_character
 
 # Error custom view
 handler404 = 'main.views.error404'
-# handler500 = 'mysite.views.my_custom_error_view'
-# handler403 = 'mysite.views.my_custom_permission_denied_view'
-# handler400 = 'mysite.views.my_custom_bad_request_view'
+# handler500 = 'main.views.error404'
+# handler403 = 'main.views.error404'
+# handler400 = 'main.views.error404'
 
 urlpatterns = [
 
@@ -54,12 +63,12 @@ urlpatterns = [
     path('bazaar/stats', under_construction),
 
     # Worlds menu
-    path('worlds/allworlds', under_construction),
-    path('worlds/world', under_construction),
+    path('worlds/allworlds', worlds_main),
+    path('worlds/world/<str:name>/', single_world),
     path('worlds/online', under_construction),
 
     # Character menu
-    path('character/search', under_construction),
+    path('character/search/', search_character),
     path('character/transfers', under_construction),
     path('character/name_change', under_construction),
 
@@ -74,7 +83,7 @@ urlpatterns = [
 
     # Other
     path('discord/', under_construction),
-    path('about/', under_construction),
+    path('about/', about),
 ]
 
 

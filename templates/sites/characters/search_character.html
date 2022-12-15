@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load custom_tags %}
+
+
+{% if char %}
+    {% if exist %}
+        <!-- Character exist start -->
+            <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+
+                <div class="col-sm-12 col-xl-12">
+                    <div class="bg-secondary rounded h-100 p-4">
+                        <h4 class="mb-4 text-center">{{ char.character.name }}</h4>
+
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="general-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-general" type="button" role="tab" aria-controls="nav-general"
+                                    aria-selected="true">General information</button>
+
+                                {% if char.achievements %}
+                                <button class="nav-link" id="achievements-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-achievements" type="button" role="tab"
+                                    aria-controls="nav-achievements" aria-selected="false">Achievements</button>
+                                {% endif %}
+
+                                {% if char.account_information %}
+                                <button class="nav-link" id="account-tab" data-bs-toggle="tab"
+                                    data-bs-target="#nav-account" type="button" role="tab"
+                                    aria-controls="nav-account" aria-selected="false">Account</button>
+                                {% endif %}
+
+                            </div>
+                        </nav>
+
+                        <div class="tab-content pt-3" id="nav-tabContent">
+
+                            <!-- General information start -->
+                                <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="general-tab">
+                                    <div class="bg-secondary rounded h-100 p-4">
+                                        {% for key, value in char.character.items %}
+                                            <dl class="row mb-1 text-start">
+
+                                                <dt class="col-sm-6">
+                                                    {% if key == 'name' or key == 'comment' %}
+                                                    {% else %}
+                                                        {{ key| put_space |title}}
+                                                    {% endif %}
+                                                </dt>
+                                                <dd class="col-sm-6">
+                                                    {% if key == 'name' or key == 'comment' %}
+                                                    {% elif key == 'world' %}
+                                                        {% if 'Tournament' not in i.world %}
+                                                            <a href="/worlds/world/{{ value }}">{{ value }}</a>
+                                                            <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                                                <i class="fas fa-external-link-alt fa-xs"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            {{ value }}
+                                                        {% endif %}
+                                                    {% elif key == 'former_worlds' %}
+                                                        {% for i in value %}
+                                                            <a href="/worlds/world/{{ value }}">{{ i }}</a>
+                                                            <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i }}" class="text-muted" target="_blank">
+                                                                <i class="fas fa-external-link-alt fa-xs"></i>
+                                                            </a>
+                                                        {% endfor %}
+                                                    {% elif key == 'former_names' %}
+                                                        <!-- space holder -->
+                                                    {% elif key == 'guild' %}
+                                                        {{ value.name }}
+                                                    {% elif key == 'last_login' %}
+                                                        {{ value | format_date }}
+                                                    {% elif key == 'houses' %}
+                                                        <ul class="list-unstyled mb-0">
+                                                        {% for i in value %}
+                                                                <li>{{ i.name }}, {{ i.town }}</li>
+                                                        {% endfor %}
+                                                        </ul>
+                                                    {% elif key == 'former_worlds' %}
+                                                        {% for i in value %}
+                                                                <li>{{ i }} </li>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                </dd>
+                                            </dl>
+
+                                        {% endfor %}
+                                </div>
+                            </div>
+                            <!-- General information end -->
+
+                            {% if char.achievements %}
+                                <!-- Achievements start -->
+                                    <div class="tab-pane fade" id="nav-achievements" role="tabpanel" aria-labelledby="achievements-tab">
+                                        <div class="bg-secondary rounded h-100 p-4">
+                                        <ul class="list-group list-group-flush">
+                                        {% for i in char.achievements %}
+                                            <li class="list-group-item bg-transparent text-left">{{ i.name }}</li>
+                                        {% endfor %}
+                                        </ul></div>
+                                    </div>
+                                <!-- Achievements end -->
+                            {% endif %}
+
+                            {% if char.account_information %}
+                            <!-- Account start -->
+                                <div class="tab-pane fade" id="nav-account" role="tabpanel" aria-labelledby="account-tab">
+                                    <div class="bg-secondary rounded h-100 p-4">
+                                        <div class="bg-secondary rounded h-100 p-4">
+                                            {% for key, value in char.account_information.items %}
+                                                <dl class="row mb-1 text-start">
+                                                    <dt class="col-sm-6">
+                                                        {{ key |put_space |title }}
+                                                    </dt>
+                                                    <dd class="col-sm-6">
+                                                        {% if key == 'created' %} {{ value |format_date }}
+                                                        {% else %} {{ value }}
+                                                        {% endif %}
+                                                    </dd>
+                                                </dl>
+
+                                            {% endfor %}
+                                        </div>
+                                        <div class="bg-secondary rounded h-100 p-4">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Level</th>
+                                                        <th scope="col">Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for i in char.other_characters %}
+                                                        <tr>
+                                                            <!-- Name -->
+                                                            <td>
+                                                                <a href="#">{{ i.name }}</a>
+                                                                <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.name }}" class="text-muted" target="_blank">
+                                                                    <i class="fas fa-external-link-alt fa-xs"></i>
+                                                                </a>
+                                                            </td>
+
+                                                            <!-- World -->
+                                                            <td>
+                                                                {% if 'Tournament' not in i.world %}
+                                                                    <a href="/worlds/world/{{ i.world }}">{{ i.world }}</a>
+                                                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world }}" class="text-muted" target="_blank">
+                                                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                                                    </a>
+                                                                {% else %}
+                                                                    {{ i.world }}
+                                                                {% endif %}
+                                                            </td>
+
+                                                            <!-- Status -->
+                                                            <td class="{% if i.status == 'offline' %}text-danger{% else %}text-success{% endif %}">{{ i.status }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            <!-- Account end -->
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Character exist end -->
+    {% else %}
+        <!-- Character does not exist start -->
+            <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+
+                <div class="col-sm-12 col-xl-12">
+                    <div class="bg-secondary rounded h-100 p-4 text-center">
+                        <h5>{{ char }}</h5>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Character does not exist end -->
+    {% endif %}
+{% else %}
+    <!-- Nothing specified start -->
+            <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+
+                <div class="col-sm-12 col-xl-12">
+                    <div class="bg-secondary rounded h-100 p-4 text-center">
+                        <h5>Search character</h5>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Nothing specified end -->
+{% endif %}
+{% endblock %}
