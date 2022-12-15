@@ -99,3 +99,15 @@ def get_highscores(
     return highscores['highscores']
 
 # # # # # # # Experience end # # # # # # #
+
+
+# # # # # # # Character # # # # # # #
+
+def get_character_info(
+        character
+):
+    url = f'https://api.tibiadata.com/v3/character/{character}'
+    character = request(url)
+    return character['characters']
+
+# # # # # # # Character end # # # # # # #

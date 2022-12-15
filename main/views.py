@@ -152,21 +152,35 @@ def single_world(request, name):
 
 # Search character
 def search_character(request, *args, **kwargs):
-    query = request.GET['q']  # <input name="q"> return dictionary { q : item }
-    print(query)
 
-    # check if its not empty
+    # check if it's not empty
+    if request.GET:
+        query = request.GET['q']  # <input name="q"> return dictionary { q : item }
 
-    # check if its not numbers or special characters
+        # check if it's only characters
+        if query.replace(' ', '').isalpha():
+            character_information = dataapi.get_character_info(query)
 
-    # check if exist on tibia com
+            # check if exist on tibia.com
+            if character_information['character']['name'] != '':
+                exist = True
+            else:
+                character_information = f'Character {query} does not exist.'  # if not exist
+                exist = False
 
-    # check if exist in db
 
-    # show data from tibiacom and db if exist
+        else:
+            character_information = f'Character {query} does not exist.'  # if contains numbers or special characters
+            exist = False
+
+        # if there is no data from search request
+    else:
+        character_information = ''
+        exist = False
 
     content = {
-
+        'exist': exist,
+        'char': character_information,
     }
     return render(request, "sites/characters/search_character.html", content)
 
