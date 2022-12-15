@@ -9,6 +9,7 @@ import time
 import data_value
 
 
+
 class ScrapHighscores:
     def __init__(self):
         category = data.category()
