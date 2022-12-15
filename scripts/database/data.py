@@ -1,24 +1,31 @@
-from django.db import connection
+# django
 from tibia_stats.wsgi import *
+from django.db import connection
+from django.db.models import Q
+from main.models import World
 # from os import environ
+
+# custom
+import scripts.tibiadata_API.get_data as dataapi
+
+# other
 import os
 import pandas as pd
-import scripts.tibiadata_API.get_data as dataapi
 from datetime import datetime
 from bs4 import BeautifulSoup
 import json
 from pathlib import Path
-from main.models import World
 
 
 # environ.setdefault('DJANGO_SETTINGS_MODULE', 'tibia_stats.settings')
 
+
 def main():
-    add_news_ticker_to_db()
     add_boss_to_db()
     add_creature_to_db()
     add_world_online_history()
     add_news_to_db()
+    add_news_ticker_to_db()
 
 
 def add_backslashes(text):
@@ -320,7 +327,26 @@ def add_world_online_history():
             )
 
 
+def add_online_players():
+    pass
+
 # # # # # # # Worlds end # # # # # # #
+
+
+# # # # # # # Experience # # # # # # #
+
+def add_experience_highscores():
+    vocations = [
+        'none',
+        'knights',
+        'paladins',
+        'sorcerers',
+        'druids'
+    ]
+
+
+# # # # # # # Experience end # # # # # # #
+
 
 if __name__ == '__main__':
     main()
