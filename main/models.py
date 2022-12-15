@@ -17,7 +17,6 @@ class News(models.Model):
 
 
 class World(models.Model):
-
     world_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     name_value = models.CharField(max_length=45, blank=True, null=True)
