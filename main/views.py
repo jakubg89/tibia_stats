@@ -153,6 +153,7 @@ def single_world(request, name):
 # Search character
 def search_character(request, *args, **kwargs):
 
+    database = True
     # check if it's not empty
     if request.GET:
         query = request.GET['q']  # <input name="q"> return dictionary { q : item }
@@ -180,6 +181,7 @@ def search_character(request, *args, **kwargs):
 
     content = {
         'exist': exist,
+        'database': database,
         'char': character_information,
     }
     return render(request, "sites/characters/search_character.html", content)
