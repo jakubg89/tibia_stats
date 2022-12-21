@@ -535,6 +535,16 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # replace id to track characters even after name change
     # old_highscores_df['name'] = old_highscores_df['id_char'].map(id_to_name).fillna(0).astype('int64')
 
+    # merge data - inner_data contains only existing characters in db
+    inner_data = old_higscores_df.merge(
+        latest_highscores,
+        on='name',
+        how='inner',
+        suffixes=(
+            '_old',
+            '_latest'
+        )
+    )
 
 # # # # # # # Experience end # # # # # # #
 
