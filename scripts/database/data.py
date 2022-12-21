@@ -522,6 +522,20 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # old_highscores_df = pd.DataFrame(data=old_highscores_query)
     #
 
+
+    # swap key, value in dictionary
+    # id_to_name = {}
+    # for key, value in chars_id.items()
+    #       id_to_name.update({value: key})
+
+    # change old names for new ones
+    # for key, value in name_change.items():
+    #     old_highscores_df.loc[old_highscores_df.name == key, 'name'] = value
+
+    # replace id to track characters even after name change
+    # old_highscores_df['name'] = old_highscores_df['id_char'].map(id_to_name).fillna(0).astype('int64')
+
+
 # # # # # # # Experience end # # # # # # #
 
 
