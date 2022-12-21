@@ -421,21 +421,12 @@ def collect_char_id():   # collect data about character from db
     return formatted_characters_data
 
 
-def filter_highscores_data(): # filter and prepare data to put inside db
+def filter_highscores_data():   # filter and prepare data to put inside db
 
-    # collect data about vocation from db
+    # collect data
     vocations_id = collect_voc_id()
-    # do_char["vocation"] = do_char["vocation"].map(test)
-
-    # collect data about worlds from db
     worlds_id = collect_world_id()
-    # do_char["world"] = do_char["world"].map(gotowe)
-
-    # collect data about character from db
     chars_id = collect_char_id()
-    # razem['name_id'] = razem['name'].map(id_charow_do_zmiany).fillna(0).astype('int64')
-
-    # collect latest data from tibia.com by tibiadata API
     latest_highscores = get_highscores()
 
     # collect data from day before from db
