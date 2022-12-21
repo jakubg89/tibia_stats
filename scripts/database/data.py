@@ -562,6 +562,10 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # add date
     # inner_data['date'] = date_now
 
+    # catch world transfers
+    world_transfers = inner_data[inner_data['world_latest'] != inner_data['world_id_old']]
+
+
 # # # # # # # Experience end # # # # # # #
 
 
