@@ -9,6 +9,7 @@ import json
 import pandas as pd
 import scripts.tibiadata_API.get_data as dataapi
 
+
 # Main page
 def main_page(request, *args, **kwargs):
 
@@ -168,7 +169,6 @@ def search_character(request, *args, **kwargs):
             else:
                 character_information = f'Character {query} does not exist.'  # if not exist
                 exist = False
-
 
         else:
             character_information = f'Character {query} does not exist.'  # if contains numbers or special characters
