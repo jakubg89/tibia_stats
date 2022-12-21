@@ -469,6 +469,27 @@ def filter_highscores_data():   # filter and prepare data to put inside db
             new_name = char['character']['name']
             name_change.update({old_name: new_name})
 
+    # === INSERT =============== CHAR =========================
+    # insert new characters to db
+    dont_exist_list = dont_exist['name'].values.tolist()
+    name_change_list = []
+    for key, value in name_change:
+        name_change_list.append(value)
+    to_remove = name_change_list + deleted_characters
+    to_add = [char for char in dont_exist_list if char not in to_remove]
+    new_characters = latest_highscores[latest_highscores['name'].isin(to_add)]
+    new_characters_dict = new_characters.to_dict('index')
+    obj = []
+    for i in new_characters_dict:
+        char = Character(
+            name=new_characters_dict[i]['name'],
+            world_id=new_characters_dict[i]['world_id'],
+            voc_id=new_characters_dict[i]['voc_id']
+        )
+        obj.append(char)
+    Character.objects.bulk_create(obj)
+    # === END INSERT ===========================================
+
 # # # # # # # Experience end # # # # # # #
 
 
