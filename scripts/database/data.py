@@ -565,6 +565,21 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # catch world transfers
     world_transfers = inner_data[inner_data['world_latest'] != inner_data['world_id_old']]
 
+    # # # # # data ready to insert into db # # # # # #
+
+    # === INSERT =============== WORLD ========================
+    # insert all transfers to transfer table
+    world_transfers_dict = world_transfers.todict('records')
+
+    # === INSERT =============== DELETED_CHARACTERS ===========
+    # insert data to deleted table
+
+
+    # === INSERT =============== NAME CHANGE ========================
+    # insert name changes
+
+    # === INSERT =============== HIGHSCORES =========================
+    # insert highscores
 
 # # # # # # # Experience end # # # # # # #
 
