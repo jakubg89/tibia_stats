@@ -546,6 +546,22 @@ def filter_highscores_data():   # filter and prepare data to put inside db
         )
     )
 
+
+    # calculate experience change
+    inner_data['exp_diff'] = (inner_data['value_latest'] - inner_data['exp_value_old']).fillna(0).astype('int64')
+
+    # calculate experience rank change
+    inner_data['exp_rank_change'] = (inner_data['rank_latest'] - inner_data['exp_rank_old']).fillna(0).astype('int64')
+
+    # calculate level change
+    inner_data['level_change'] = (inner_data['level_latest'] - inner_data['level_old']).fillna(0).astype('int64')
+
+    # delte duplicates
+    inner_data = inner_data.drop_duplicates('name')
+
+    # add date
+    # inner_data['date'] = date_now
+
 # # # # # # # Experience end # # # # # # #
 
 
