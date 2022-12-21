@@ -433,6 +433,15 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # levels higher than 20 ( 40k + record difference between 10-20 )
     latest_highscores = latest_highscores[latest_highscores['level'] > 20]
 
+    # add char id from db
+    latest_highscores['name_id_db'] = latest_highscores['name'].map(chars_id).fillna(0).astype('int64')
+
+    # replace world name with db id
+    latest_highscores = latest_highscores['world'].map(worlds_id).fillna(0).astype('int64')
+
+    # replace world name with db id
+    latest_highscores = latest_highscores['vocation'].map(vocations_id).fillna(0).astype('int64')
+
 # # # # # # # Experience end # # # # # # #
 
 
