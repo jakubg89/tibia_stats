@@ -507,6 +507,21 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     chars_id_after_update = collect_char_id()
     latest_highscores['name_id_db'] = latest_highscores['name'].map(chars_id_after_update).fillna(0).astype('int64')
     latest_highscores = latest_highscores[latest_highscores['name_id_db'] != 0]
+
+    # collect data from day before from db from last day
+    # old_highscores_query = Highscores.objects.all().values(
+    # 'exp_rank',
+    # 'id_char',
+    # 'voc_id',
+    # 'world_id',
+    # 'level',
+    # 'exp_value',
+    # 'charm_rank',
+    # 'charm_value'
+    # )
+    # old_highscores_df = pd.DataFrame(data=old_highscores_query)
+    #
+
 # # # # # # # Experience end # # # # # # #
 
 
