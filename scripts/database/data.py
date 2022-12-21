@@ -450,6 +450,10 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # delete db index
     # latest_highscores.drop('name_id_db', axis=1, inplace=True)
 
+    # filter only lvl's above 100 and rank lower than 900
+    dont_exist_filtered = dont_exist[(dont_exist['level'] > 100) & (dont_exist['rank'] < 900)]
+    name_list = dont_exist_filtered['name'].values.tolist()
+
 
 # # # # # # # Experience end # # # # # # #
 
