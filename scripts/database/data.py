@@ -429,7 +429,9 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     chars_id = collect_char_id()
     latest_highscores = get_highscores()
 
-
+    # ============= filter latest data ===============
+    # levels higher than 20 ( 40k + record difference between 10-20 )
+    latest_highscores = latest_highscores[latest_highscores['level'] > 20]
 
 # # # # # # # Experience end # # # # # # #
 
