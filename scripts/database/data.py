@@ -442,6 +442,15 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # replace world name with db id
     latest_highscores = latest_highscores['vocation'].map(vocations_id).fillna(0).astype('int64')
 
+    # collect data about characters that don't exist in db
+    # 0 represent names that don't exist
+
+    dont_exist = latest_highscores[latest_highscores['name_id_db'] == 0]
+
+    # delete db index
+    # latest_highscores.drop('name_id_db', axis=1, inplace=True)
+
+
 # # # # # # # Experience end # # # # # # #
 
 
