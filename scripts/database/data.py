@@ -2,7 +2,7 @@
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
-from main.models import World
+from main.models import World, Vocation, Character, Highscores
 # from os import environ
 
 # custom
@@ -335,14 +335,126 @@ def add_online_players():
 
 # # # # # # # Experience # # # # # # #
 
-def add_experience_highscores():
-    vocations = [
+def get_highscores():
+
+    # charms / expierience will be modified to be more elastic
+    category = 'experience'
+
+    # proffesions names - all proffesions
+    proffesions = [
         'none',
         'knights',
         'paladins',
         'sorcerers',
         'druids'
     ]
+
+    # getting wolrd list ( name = value , for now )
+    world_list_from_db = World.objects.all().values('name_value')
+    world_list_df = pd.DataFrame(data=world_list_from_db)
+    worlds = world_list_df['name_value'].tolist()
+
+    # empty df assignment
+    result_df = pd.DataFrame
+
+    # for loop for each world
+    for world in worlds:
+
+        # for loop for each profession
+        for prof in proffesions:
+
+            # get total site number before executin loop over each site
+            # 1-20 sites are possible
+            request_from_api = dataapi.get_highscores(world, category, prof, 1)
+            site_num = request_from_api['highscore_page']['total_pages']
+
+            # check if there is more than 20 sites
+            if site_num >= 20:
+                site_num = 20
+
+            # perform collecting data from api for each vocation
+            for i in range(1, site_num + 1):
+                request_from_api = dataapi.get_highscores(world, category, prof, i)
+                if i == 1 and world == worlds[0] and prof == proffesions[0]:
+                    result_df = pd.DataFrame(data=request_from_api['highscore_list'])
+                else:
+                    tempdf = pd.DataFrame(data=request_from_api['highscore_list'])
+                    result_df = pd.concat([result_df, tempdf], ignore_index=True)
+
+    # returning collected data in df
+    return result_df
+
+
+def collect_voc_id():   # collect data about vocation from db
+    voc = Vocation.objects.all().values('voc_id', 'name')
+    voc_df = pd.DataFrame(data=voc)
+    formatted_voc_data = {}
+    voc_dict = voc_df.to_dict('records')
+
+    for i in voc_dict:
+        formatted_voc_data.update({i['name']: i['voc_id']})
+
+    return formatted_voc_data
+
+
+def collect_world_id():   # collect data about worlds from db
+    world = World.objects.all().values('world_id', 'name')
+    world_df = pd.DataFrame(data=world)
+    formatted_world_data = {}
+    world_dict = world_df.to_dict('records')
+
+    for i in world_dict:
+        formatted_world_data.update({i['name']: i['world_id']})
+
+    return formatted_world_data
+
+
+def collect_char_id():   # collect data about character from db
+    characters = Character.objects.all().values('id_char', 'name')
+    characters_df = pd.DataFrame(data=characters)
+    formatted_characters_data = {}
+    characters_dict = characters_df.to_dict('records')
+
+    for i in characters_dict:
+        formatted_characters_data.update({i['name']: i['id_char']})
+
+    return formatted_characters_data
+
+
+def filter_highscores_data(): # filter and prepare data to put inside db
+
+    # collect data about vocation from db
+    vocations_id = collect_voc_id()
+    # do_char["vocation"] = do_char["vocation"].map(test)
+
+    # collect data about worlds from db
+    worlds_id = collect_world_id()
+    # do_char["world"] = do_char["world"].map(gotowe)
+
+    # collect data about character from db
+    chars_id = collect_char_id()
+    # razem['name_id'] = razem['name'].map(id_charow_do_zmiany).fillna(0).astype('int64')
+
+    # collect latest data from tibia.com by tibiadata API
+    latest_highscores = get_highscores()
+
+    # collect data from day before from db
+    # old_highscores_query = Highscores.objects.all().values(
+    # 'exp_rank',
+    # 'id_char',
+    # 'voc_id',
+    # 'world_id',
+    # 'level',
+    # 'exp_value',
+    # 'charm_rank',
+    # 'charm_value'
+    # )
+    # old_highscores_df = pd.DataFrame(data=old_highscores_query)
+
+    # filter latest data
+
+    # levels higher than 20 ( 40k + record difference between 10-20 )
+    latest_highscores = latest_highscores[latest_highscores['level'] > 20]
 
 
 # # # # # # # Experience end # # # # # # #
