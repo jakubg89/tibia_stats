@@ -503,7 +503,10 @@ def filter_highscores_data():   # filter and prepare data to put inside db
         # obj.append(char_to_update)
     # Character.objects.bulk_update(obj)
 
-
+    # collect new id's from db
+    chars_id_after_update = collect_char_id()
+    latest_highscores['name_id_db'] = latest_highscores['name'].map(chars_id_after_update).fillna(0).astype('int64')
+    latest_highscores = latest_highscores[latest_highscores['name_id_db'] != 0]
 # # # # # # # Experience end # # # # # # #
 
 
