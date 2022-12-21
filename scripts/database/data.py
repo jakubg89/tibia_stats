@@ -454,6 +454,20 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     dont_exist_filtered = dont_exist[(dont_exist['level'] > 100) & (dont_exist['rank'] < 900)]
     name_list = dont_exist_filtered['name'].values.tolist()
 
+    # creating lists for different options
+    name_change = {}
+    deleted_characters = []
+
+    # perform individual check of each character
+    for i in name_list:
+        char = dataapi.get_character_info(i)
+        if char['character']['name'] == '':
+            # character is deleted
+            deleted_characters.append(i)
+        elif 'former_names' in char['character']:
+            old_name = char['character']['former_names'][0]
+            new_name = char['character']['name']
+            name_change.update({old_name: new_name})
 
 # # # # # # # Experience end # # # # # # #
 
