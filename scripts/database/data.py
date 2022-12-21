@@ -490,6 +490,20 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     Character.objects.bulk_create(obj)
     # === END INSERT ===========================================
 
+    # === UPDATE ===============================================
+    # update character name after name change
+
+    #  for key, value in x.items():
+    # Character.objects.filter(name=key).update(name=value)
+
+    # obj = []
+    for key, value in name_change.items():
+        # char_to_update =
+        Character.objects.filter(name=key).update(name=value)
+        # obj.append(char_to_update)
+    # Character.objects.bulk_update(obj)
+
+
 # # # # # # # Experience end # # # # # # #
 
 
