@@ -429,23 +429,6 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     chars_id = collect_char_id()
     latest_highscores = get_highscores()
 
-    # collect data from day before from db
-    # old_highscores_query = Highscores.objects.all().values(
-    # 'exp_rank',
-    # 'id_char',
-    # 'voc_id',
-    # 'world_id',
-    # 'level',
-    # 'exp_value',
-    # 'charm_rank',
-    # 'charm_value'
-    # )
-    # old_highscores_df = pd.DataFrame(data=old_highscores_query)
-
-    # filter latest data
-
-    # levels higher than 20 ( 40k + record difference between 10-20 )
-    latest_highscores = latest_highscores[latest_highscores['level'] > 20]
 
 
 # # # # # # # Experience end # # # # # # #
