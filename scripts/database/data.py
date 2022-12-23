@@ -81,7 +81,7 @@ def add_news_ticker_to_db():
                 cursor.execute(query)
                 exist = cursor.fetchone()
 
-                # check the result and perform insert if its not in database
+                # check the result and perform insert if it's not in database
                 if exist[0] != 1:
                     single_news = dataapi.get_specific_news(i)
 
@@ -150,7 +150,7 @@ def add_news_to_db():
                 )
                 exist = cursor.fetchone()
 
-                # check the result and perform insert if its not in database
+                # check the result and perform insert if it's not in database
                 if exist[0] != 1:
                     single_news = dataapi.get_specific_news(i)
 
