@@ -2,7 +2,7 @@
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
-from main.models import World, Vocation, Character, Highscores
+from main.models import World, Vocation, Character, Highscores, WorldTransfers, NameChange
 # from os import environ
 
 # custom
@@ -26,6 +26,7 @@ def main():
     add_world_online_history()
     add_news_to_db()
     add_news_ticker_to_db()
+    # filter_highscores_data()
 
 
 def add_backslashes(text):
@@ -422,14 +423,19 @@ def collect_char_id():   # collect data about character from db
 
 
 def filter_highscores_data():   # filter and prepare data to put inside db
-
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', 2000)
     # collect data
     vocations_id = collect_voc_id()
     worlds_id = collect_world_id()
     chars_id = collect_char_id()
+
     latest_highscores = get_highscores()
+    # for development read from file
+    # latest_highscores = pd.read_json('G:\\Python nauka\\django\\strony\\tibia_stats\\ignore\\pandas\\21test1.txt', orient='columns')
 
     # ============= filter latest data ===============
+
     # levels higher than 20 ( 40k + record difference between 10-20 )
     latest_highscores = latest_highscores[latest_highscores['level'] > 20]
 
@@ -437,29 +443,25 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     latest_highscores['name_id_db'] = latest_highscores['name'].map(chars_id).fillna(0).astype('int64')
 
     # replace world name with db id
-    latest_highscores = latest_highscores['world'].map(worlds_id).fillna(0).astype('int64')
+    latest_highscores['world'] = latest_highscores['world'].map(worlds_id).fillna(0).astype('int64')
 
     # replace world name with db id
-    latest_highscores = latest_highscores['vocation'].map(vocations_id).fillna(0).astype('int64')
+    latest_highscores['vocation'] = latest_highscores['vocation'].map(vocations_id).fillna(0).astype('int64')
 
     # collect data about characters that don't exist in db
     # 0 represent names that don't exist
-
     dont_exist = latest_highscores[latest_highscores['name_id_db'] == 0]
 
     # delete db index
-    # latest_highscores.drop('name_id_db', axis=1, inplace=True)
-
-    # filter only lvl's above 100 and rank lower than 900
-    dont_exist_filtered = dont_exist[(dont_exist['level'] > 100) & (dont_exist['rank'] < 900)]
-    name_list = dont_exist_filtered['name'].values.tolist()
-
-    # creating lists for different options
-    name_change = {}
-    deleted_characters = []
+    latest_highscores.drop('name_id_db', axis=1, inplace=True)
 
     # perform individual check of each character
-    for i in name_list:
+    name_change = {}
+    deleted_characters = []
+    new_names = []
+    name_list_dont_exist = dont_exist['name'].values.tolist()
+
+    for i in name_list_dont_exist:
         char = dataapi.get_character_info(i)
         if char['character']['name'] == '':
             # character is deleted
@@ -468,40 +470,46 @@ def filter_highscores_data():   # filter and prepare data to put inside db
             old_name = char['character']['former_names'][0]
             new_name = char['character']['name']
             name_change.update({old_name: new_name})
+            new_names.append(new_name)
 
-    # === INSERT =============== CHAR =========================
+    #
+    # === INSERT =============== CHARACTER ===================
+
     # insert new characters to db
-    dont_exist_list = dont_exist['name'].values.tolist()
-    name_change_list = []
-    for key, value in name_change:
-        name_change_list.append(value)
-    to_remove = name_change_list + deleted_characters
-    to_add = [char for char in dont_exist_list if char not in to_remove]
-    new_characters = latest_highscores[latest_highscores['name'].isin(to_add)]
-    new_characters_dict = new_characters.to_dict('index')
-    obj = []
-    for i in new_characters_dict:
-        char = Character(
-            name=new_characters_dict[i]['name'],
-            world_id=new_characters_dict[i]['world_id'],
-            voc_id=new_characters_dict[i]['voc_id']
-        )
-        obj.append(char)
-    Character.objects.bulk_create(obj)
-    # === END INSERT ===========================================
 
-    # === UPDATE ===============================================
+    name_list = set(name_list_dont_exist).difference(new_names)
+
+    if name_list:
+
+        new_characters = latest_highscores[latest_highscores['name'].isin(name_list)]
+        new_characters_dict = new_characters.to_dict('index')
+
+        obj = []
+        for i in new_characters_dict:
+            char = Character(
+                name=new_characters_dict[i]['name'],
+                world_id=new_characters_dict[i]['world'],
+                voc_id=new_characters_dict[i]['vocation']
+            )
+            obj.append(char)
+        Character.objects.bulk_create(obj)
+
+    # === END INSERT ===========================================
+    #
+
+    #
+    # === UPDATE ================ CHARACTER ====================
     # update character name after name change
 
-    #  for key, value in x.items():
-    # Character.objects.filter(name=key).update(name=value)
+    if name_change:
+        obj = []
 
-    # obj = []
-    for key, value in name_change.items():
-        # char_to_update =
-        Character.objects.filter(name=key).update(name=value)
-        # obj.append(char_to_update)
-    # Character.objects.bulk_update(obj)
+        for key, value in name_change.items():
+            char_to_update = Character.objects.filter(name=key).update(name=value)
+            obj.append(char_to_update)
+
+    # === END UPDATE ============================================
+    #
 
     # collect new id's from db
     chars_id_after_update = collect_char_id()
@@ -509,34 +517,31 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     latest_highscores = latest_highscores[latest_highscores['name_id_db'] != 0]
 
     # collect data from day before from db from last day
-    # old_highscores_query = Highscores.objects.all().values(
-    # 'exp_rank',
-    # 'id_char',
-    # 'voc_id',
-    # 'world_id',
-    # 'level',
-    # 'exp_value',
-    # 'charm_rank',
-    # 'charm_value'
-    # )
-    # old_highscores_df = pd.DataFrame(data=old_highscores_query)
-    #
+    old_highscores_query = Highscores.objects.all().filter(Q(date__gt='2022-12-23 10:15:30')).values(
+                                                'exp_rank',
+                                                'id_char',
+                                                'voc_id',
+                                                'world_id',
+                                                'level',
+                                                'exp_value',
+                                                'charm_rank',
+                                                'charm_value'
+                                                )
+    old_highscores_df = pd.DataFrame(data=old_highscores_query)
 
+    # swap key(name), value(id_char) in dictionary
+    id_to_name = {}
+    for key, value in chars_id_after_update.items():
+        id_to_name.update({value: key})
 
-    # swap key, value in dictionary
-    # id_to_name = {}
-    # for key, value in chars_id.items()
-    #       id_to_name.update({value: key})
+    old_highscores_df['name'] = old_highscores_df['id_char'].map(id_to_name)
 
     # change old names for new ones
-    # for key, value in name_change.items():
-    #     old_highscores_df.loc[old_highscores_df.name == key, 'name'] = value
-
-    # replace id to track characters even after name change
-    # old_highscores_df['name'] = old_highscores_df['id_char'].map(id_to_name).fillna(0).astype('int64')
+    for key, value in name_change.items():
+        old_highscores_df.loc[old_highscores_df.name == key, 'name'] = value
 
     # merge data - inner_data contains only existing characters in db
-    inner_data = old_higscores_df.merge(
+    inner_data = old_highscores_df.merge(
         latest_highscores,
         on='name',
         how='inner',
@@ -546,40 +551,138 @@ def filter_highscores_data():   # filter and prepare data to put inside db
         )
     )
 
-
     # calculate experience change
-    inner_data['exp_diff'] = (inner_data['value_latest'] - inner_data['exp_value_old']).fillna(0).astype('int64')
+    inner_data['exp_diff'] = (inner_data['value'] - inner_data['exp_value']).fillna(0).astype('int64')
 
     # calculate experience rank change
-    inner_data['exp_rank_change'] = (inner_data['rank_latest'] - inner_data['exp_rank_old']).fillna(0).astype('int64')
+    inner_data['exp_rank_change'] = (inner_data['exp_rank'] - inner_data['rank']).fillna(0).astype('int64')
 
     # calculate level change
     inner_data['level_change'] = (inner_data['level_latest'] - inner_data['level_old']).fillna(0).astype('int64')
 
-    # delte duplicates
+    # delete duplicates
     inner_data = inner_data.drop_duplicates('name')
 
-    # add date
-    # inner_data['date'] = date_now
-
     # catch world transfers
-    world_transfers = inner_data[inner_data['world_latest'] != inner_data['world_id_old']]
+    world_transfers = inner_data[inner_data['world_id'] != inner_data['world']]
 
-    # # # # # data ready to insert into db # # # # # #
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    #
     # === INSERT =============== WORLD ========================
     # insert all transfers to transfer table
-    world_transfers_dict = world_transfers.todict('records')
 
+    id_to_world = {}
+    for key, value in worlds_id.items():
+        id_to_world.update({value: key})
+
+    obj_world = []
+    traded = 0      # temp variable
+    world_transfers_dict = world_transfers.to_dict('index')
+    for i in world_transfers_dict:
+        transfer = WorldTransfers(
+            id_char_id=world_transfers_dict[i]['id_char'],
+            old_world=id_to_world[world_transfers_dict[i]['world_id']],
+            oldid=world_transfers_dict[i]['world_id'],
+            new_world=id_to_world[world_transfers_dict[i]['world']],
+            newid=world_transfers_dict[i]['world'],
+            level=world_transfers_dict[i]['level_latest'],
+            traded=traded,
+            date=date
+        )
+        obj_world.append(transfer)
+    WorldTransfers.objects.bulk_create(obj_world)
+
+    # === END INSERT =============== WORLD ====================
+    #
+
+    #
     # === INSERT =============== DELETED_CHARACTERS ===========
-    # insert data to deleted table
 
+    # insert data to deleted table - for future
+    '''print(deleted_characters)
+    deleted_df = inner_data[inner_data['name'].isin(deleted_characters)]
+    print('deleted df')
+    print()
+    print(deleted_df)
+    # Columns: [exp_rank, id_char, voc_id, world_id, level_old, exp_value, charm_rank, charm_value, name, rank, vocation, world, level_latest, value, name_id_db, exp_diff, exp_rank_change, level_change]
+    deleted_dict = deleted_df.to_dict('index')'''
+    # for do bulk
+    #
+    # === END INSERT ========= DELETED_CHARACTERS ==============
+    #
 
-    # === INSERT =============== NAME CHANGE ========================
+    #
+    # === INSERT =============== NAME CHANGE ====================
+
     # insert name changes
+    if name_change:
 
-    # === INSERT =============== HIGHSCORES =========================
+        name_change_list = []
+        for key, value in name_change.items():
+            name_change_list.append(value)
+
+        names_df = pd.DataFrame({'old_name': list(name_change.keys()), 'name': list(name_change.values())})
+        name_change_df = latest_highscores[latest_highscores['name'].isin(name_change_list)]
+
+        name_changes = name_change_df.merge(
+            names_df,
+            on='name',
+            how='inner',
+            suffixes=(
+                '_old',
+                '_latest'
+            )
+        )
+
+        obj_name_change = []
+        traded = 0  # temp variable
+        name_change_dict = name_changes.to_dict('index')
+        for i in name_change_dict:
+            xxx = NameChange(
+                id_char_id=name_change_dict[i]['name_id_db'],
+                old_name=name_change_dict[i]['old_name'],
+                new_name=name_change_dict[i]['name'],
+                level=name_change_dict[i]['level'],
+                traded=traded,
+                date=date
+            )
+            obj_name_change.append(xxx)
+
+        NameChange.objects.bulk_create(obj_name_change)
+
+    # === END INSERT =============== NAME CHANGE =================
+    #
+
+    #
+    # === INSERT =============== HIGHSCORES ======================
     # insert highscores
+
+    charm = 0   # temp variable
+    obj = []
+    inner_data_dict = inner_data.to_dict('index')
+    for i in inner_data_dict:
+        char = Highscores(
+            exp_rank=inner_data_dict[i]['rank'],
+            exp_rank_change=inner_data_dict[i]['exp_rank_change'],
+            id_char_id=inner_data_dict[i]['id_char'],
+            voc_id=inner_data_dict[i]['vocation'],
+            world_id=inner_data_dict[i]['world'],
+            level=inner_data_dict[i]['level_latest'],
+            level_change=inner_data_dict[i]['level_change'],
+            exp_value=inner_data_dict[i]['value'],
+            exp_diff=inner_data_dict[i]['exp_diff'],
+            charm_rank=charm,
+            charm_rank_change=charm,
+            charm_value=charm,
+            charm_diff=charm,
+            date=date
+        )
+        obj.append(char)
+    Highscores.objects.bulk_create(obj)
+
+    #
+    # === END INSERT =============== HIGHSCORES ==================
 
 # # # # # # # Experience end # # # # # # #
 
