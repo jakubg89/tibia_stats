@@ -21,11 +21,11 @@ from pathlib import Path
 
 
 def main():
-    add_boss_to_db()
-    add_creature_to_db()
+    # add_boss_to_db()
+    # add_creature_to_db()
     add_world_online_history()
-    add_news_to_db()
-    add_news_ticker_to_db()
+    # add_news_to_db()
+    # add_news_ticker_to_db()
     # filter_highscores_data()
 
 
@@ -426,13 +426,15 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', 2000)
     # collect data
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     vocations_id = collect_voc_id()
     worlds_id = collect_world_id()
     chars_id = collect_char_id()
 
     latest_highscores = get_highscores()
     # for development read from file
-    # latest_highscores = pd.read_json('G:\\Python nauka\\django\\strony\\tibia_stats\\ignore\\pandas\\21test1.txt', orient='columns')
+    # latest_highscores = pd.read_json
+    # ('G:\\Python nauka\\django\\strony\\tibia_stats\\ignore\\pandas\\21test1.txt', orient='columns')
 
     # ============= filter latest data ===============
 
@@ -565,8 +567,6 @@ def filter_highscores_data():   # filter and prepare data to put inside db
 
     # catch world transfers
     world_transfers = inner_data[inner_data['world_id'] != inner_data['world']]
-
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     #
     # === INSERT =============== WORLD ========================

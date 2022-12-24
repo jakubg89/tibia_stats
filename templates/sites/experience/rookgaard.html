@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Title start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4 text-center">
+                <h2 class="mt-2">Rookgaard</h2>
+                <small class="mb-3">List of players that gained or lost experience yesterday on Rookgaard.</small>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4 text-center">
+                <h2 class="mt-2">blalbalbl</h2>
+                <small class="mb-3">blalbalblab</small>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Title end -->
+
+
+
+<!-- Sign In Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <div class="col-sm-12">
+            <div class="bg-secondary rounded h-100 p-4">
+
+                <div class="table-responsive-xl">
+                    <table id="rookgaard" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Vocation</th>
+                                <th scope="col">Level</th>
+                                <th scope="col">Level change</th>
+                                <th scope="col">Experience</th>
+                                <th scope="col">PvP</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">World</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in top %}
+                            <tr>
+
+                                <!-- Rank -->
+                                <td>{{ forloop.counter }}</td>
+
+                                <!-- Name -->
+                                <td>
+                                    <a href="/character/search/?q={{ i.id_char.name }}">{{ i.id_char.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                                <!-- Vocation -->
+                                <td>{{ i.voc.name }}</td>
+
+                                <!-- Level -->
+                                <td>{{ i.level }}</td>
+
+                                <!-- Level change -->
+                                <td>{{ i.level_change }}</td>
+
+                                <!-- Experience value -->
+                                <td class="{% if i.players_online >= 250 %}text-danger{% else %}text-success{% endif %}">{{ i.exp_diff }}</td>
+
+                                <!-- PvP -->
+                                {% if i.world.pvp_type_value == 0 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 1 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 3 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 4 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% elif i.world.pvp_type_value == 2 %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_hardcore.gif" width="23"> {{ i.world.pvp_type }}</td>
+                                {% endif %}
+
+                                <!-- Location -->
+                                {% if i.world.location_value == 0 %}
+                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_eur.png" width="23"> {{ i.world.location }}</td>
+                                {% elif i.world.location_value == 1 %}
+                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_bra.png" width="23"> {{ i.world.location }}</td>
+                                {% elif i.world.location_value == 2 %}
+                                    <td><img src="https://static.tibia.com/images/global/content/option_server_location_usa.png" width="23"> {{ i.world.location }}</td>
+                                {% endif %}
+
+                                <!-- World name -->
+                                <td>
+                                    <a href="/worlds/world/{{ i.world.name }}">{{ i.world.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Sign In Start -->
+
+{% endblock %}

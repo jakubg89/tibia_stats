@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.db import connection
-from .models import News, Boosted, World, WorldOnlineHistory
-from datetime import datetime
+from .models import News, Boosted, World, WorldOnlineHistory, Highscores
+from datetime import datetime, timedelta
 import datetime
 from pathlib import Path
 import os
 import json
 import pandas as pd
 import scripts.tibiadata_API.get_data as dataapi
+from django.db.models import Q
 
 
 # Main page
@@ -25,11 +26,62 @@ def main_page(request, *args, **kwargs):
     # news
     latest_news = News.objects.filter(type='news').order_by('-news_id')[:4]
 
+    # best exp yesterday on each world
+    now = datetime.datetime.now()
+    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+    date = '2022-12-23 11:11:50'
+
+    # world_types = {
+    #    0: 'Open PvP',
+    #    1: 'Optional PvP',
+    #    3: 'Retro Open PvP',
+    #    4: 'Retro Hardcore PvP'
+    # }
+
+    '''best_exp_open_pvp = Highscores.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=0)
+    ).order_by(
+        '-exp_diff'
+    )[:1]
+
+    best_optional_pvp = Highscores.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=1)
+    ).order_by(
+        '-exp_diff'
+    )[:1]
+
+    best_retro_open_pvp = Highscores.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=3)
+    ).order_by(
+        '-exp_diff'
+    )[:1]
+
+    best_retro_hardcore_pvp = Highscores.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=4)
+    ).order_by(
+        '-exp_diff'
+    )[:1]
+
+    best_exp = best_exp_open_pvp.union(
+        best_optional_pvp,
+        best_retro_open_pvp,
+        best_retro_hardcore_pvp
+    )'''
+
     content = {
         'news_ticker': latest_tickers,
         'boosted_boss': boosted_boss,
         'boosted_creature': boosted_creature,
         'latest_news': latest_news,
+        # 'best_exp': best_exp
     }
     return render(request, "sites/index.html", content)
 
@@ -149,7 +201,82 @@ def single_world(request, name):
     return render(request, "sites/worlds/single_world.html", content)
 
 
-# # # # # # # # # # # # Worlds # # # # # # # # # # # #
+# # # # # # # # # # # # End Worlds # # # # # # # # # # # #
+
+# # # # # # # # # # Experience # # # # # # # # # # #
+
+def top_500(request, *args, **kwargs):
+
+    # now = datetime.datetime.now()
+    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+    date = '2022-12-23 11:11:50'
+
+    top = Highscores.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+    ).order_by(
+        '-exp_diff'
+    )[:500]
+
+    content = {
+        'top': top
+    }
+
+    return render(request, "sites/experience/top500.html", content)
+
+
+def mainland(request, *args, **kwargs):
+
+    # now = datetime.datetime.now()
+    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+    date = '2022-12-23 11:11:50'
+    query = ''
+    # get world list with id
+    world_list = World.objects.all().values('name', 'name_value', 'world_id')
+    main = {}
+    if request.GET:
+        query = request.GET['q']
+
+        worlds_df = pd.DataFrame(data=world_list)
+        worlds_id = worlds_df[worlds_df['name'] == query]['world_id'].item()
+
+        main = Highscores.objects.filter(
+            Q(date__gt=date)
+            & ~Q(exp_diff=0)
+            & Q(world_id=worlds_id)
+        ).order_by(
+            '-exp_diff'
+        )
+
+    content = {
+        'main': main,
+        'world': query,
+        'world_list': world_list
+    }
+
+    return render(request, "sites/experience/mainland.html", content)
+
+
+def rookgaard(request, *args, **kwargs):
+
+    # now = datetime.datetime.now()
+    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+    date = '2022-12-23 11:11:50'
+
+    top = Highscores.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(voc=1)
+    ).order_by(
+        '-exp_diff'
+    )
+
+    content = {
+        'top': top
+    }
+
+    return render(request, "sites/experience/rookgaard.html", content)
+
 
 # Search character
 def search_character(request, *args, **kwargs):

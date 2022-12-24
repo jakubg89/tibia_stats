@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<!-- Title, select menu start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <!-- Title start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4 text-center">
+                <h1 class="display-4">{% if world %}{{ world }}{% else %}Select world{% endif %}</h1>
+                <small>List of players that gained or lost experience yesterday on Mainland on selected world.</small>
+            </div>
+        </div>
+        <!-- Title end -->
+
+        <!-- Select start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded text-center h-100 p-5">
+
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                <form>
+                    <select id="dynamic_select" class="form-select p-3" aria-label="Default select example" >
+                        {% for i in world_list %}
+                            {% if i.name != world %}
+                                <option value="/experience/mainland/?q={{ i.name_value }}">{{ i.name }}</option>
+                            {% else %}
+                                <option selected value="/experience/mainland/?q={{ i.value }}">{{ i.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <script>
+                       $(function(){
+                          $('#dynamic_select').on('change', function () {
+                              var url = $(this).val();
+                              if (url) {
+                                  window.location = url;
+                              }
+                              return false;
+                          });
+                        });
+                    </script>
+                </form>
+
+            </div>
+        </div>
+        <!-- Select end -->
+    </div>
+</div>
+<!-- Title, select menu end -->
+
+
+<!-- Table Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <div class="col-sm-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <div class="table-responsive-xl">
+                    <table id="mainland" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Vocation</th>
+                                <th scope="col">Level</th>
+                                <th scope="col">Level change</th>
+                                <th scope="col">Vocation rank</th>
+                                <th scope="col">Change</th>
+                                <th scope="col">Experience</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in main %}
+                            <tr>
+
+                                <!-- Rank -->
+                                <td>{{ forloop.counter }}</td>
+
+                                <!-- Name -->
+                                <td>
+                                    <a href="/character/search/?q={{ i.id_char.name }}">{{ i.id_char.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                                <!-- Vocation -->
+                                <td>{{ i.voc.name }}</td>
+
+                                <!-- Level -->
+                                <td>{{ i.level }}</td>
+
+                                <!-- Level change -->
+                                <td class="{% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %}">{{ i.level_change }}</td>
+
+                                <!-- Vocation rank -->
+                                <td>{{ i.exp_rank }}</td>
+
+                                <!-- Vocation rank change -->
+                                <td class="{% if i.exp_rank_change < 0 %}text-danger{% elif i.exp_rank_change > 0 %}text-success{% endif %}">{{ i.exp_rank_change }}</td>
+
+                                <!-- Experience value -->
+                                <td class="{% if i.exp_diff < 0 %}text-danger{% elif i.exp_diff > 0 %}text-success{% endif %}">{{ i.exp_diff }}</td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Table End -->
+
+{% endblock %}

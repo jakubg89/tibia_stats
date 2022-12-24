@@ -24,7 +24,10 @@ from main.views \
     about, \
     worlds_main,\
     single_world,\
-    search_character
+    search_character, \
+    top_500,\
+    mainland,\
+    rookgaard
 
 # Error custom view
 handler404 = 'main.views.error404'
@@ -46,9 +49,9 @@ urlpatterns = [
     path('signup/', sign_up),
 
     # Experience menu
-    path('experience/top500', under_construction),
-    path('experience/mainland', under_construction),
-    path('experience/rookgaard', under_construction),
+    path('experience/top500', top_500),
+    path('experience/mainland/', mainland),
+    path('experience/rookgaard', rookgaard),
     path('experience/stats', under_construction),
 
     # Charms menu
