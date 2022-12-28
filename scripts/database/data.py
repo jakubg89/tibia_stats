@@ -1,8 +1,10 @@
 # django
+import pandas
+
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
-from main.models import World, Vocation, Character, Highscores, WorldTransfers, NameChange
+from main.models import World, Vocation, Character, Highscores, WorldTransfers, NameChange, RecordsHistory
 # from os import environ
 
 # custom
@@ -23,10 +25,11 @@ from pathlib import Path
 def main():
     # add_boss_to_db()
     # add_creature_to_db()
-    add_world_online_history()
+    # add_world_online_history()
     # add_news_to_db()
-    # add_news_ticker_to_db()
+    # dd_news_ticker_to_db()
     # filter_highscores_data()
+    get_daily_records()
 
 
 def add_backslashes(text):
@@ -423,8 +426,7 @@ def collect_char_id():   # collect data about character from db
 
 
 def filter_highscores_data():   # filter and prepare data to put inside db
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', 2000)
+
     # collect data
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     vocations_id = collect_voc_id()
@@ -683,6 +685,122 @@ def filter_highscores_data():   # filter and prepare data to put inside db
 
     #
     # === END INSERT =============== HIGHSCORES ==================
+
+
+def get_daily_records():
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', 2000)
+
+    # best exp yesterday on each world
+    # now = datetime.datetime.now()
+    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+    date = '2022-12-23 11:11:50'
+
+    # world_types = {
+    #    0: 'Open PvP',
+    #    1: 'Optional PvP',
+    #    3: 'Retro Open PvP',
+    #    4: 'Retro Hardcore PvP'
+    # }
+
+    # getting world list id
+    world_list_from_db = World.objects.all().values('world_id')
+    world_list_df = pd.DataFrame(data=world_list_from_db)
+    worlds = world_list_df['world_id'].tolist()
+
+    # getting vocation list id
+    vocation_list_from_db = Vocation.objects.all().values('voc_id')
+    vocation_list_df = pd.DataFrame(data=vocation_list_from_db)
+    vocations = vocation_list_df['voc_id'].tolist()
+
+    # getting the best exp (each vocation on every world)
+    best = Highscores.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        | Q(exp_diff__lt=0)
+    ).values(
+        'exp_rank',
+        'exp_rank_change',
+        'id_char',
+        'voc_id',
+        'world_id',
+        'level',
+        'level_change',
+        'exp_value',
+        'exp_diff',
+        'charm_rank',
+        'charm_rank_change',
+        'charm_value',
+        'charm_diff',
+        'date'
+    )
+    db_data_to_df = pd.DataFrame(data=best)
+
+    # best_df[best_df['world_id'] == 1].sort_values(by='exp_diff').tail(1)
+
+    # best experience gained
+    for world in worlds:
+        for vocation in vocations:
+
+            worst_exp = db_data_to_df[
+                (db_data_to_df['world_id'] == world)
+                & (db_data_to_df['voc_id'] == vocation)
+            ].sort_values(
+                by='exp_diff'
+            ).tail(1)
+
+            if world == 1 and vocation == 1:
+                history = worst_exp
+            else:
+                history = pandas.concat(
+                    [worst_exp, history],
+                    ignore_index=True
+                )
+
+    # biggest lost experience
+    for world in worlds:
+        for vocation in vocations:
+
+            worst_exp = db_data_to_df[
+                (db_data_to_df['world_id'] == world)
+                & (db_data_to_df['voc_id'] == vocation)
+                & (db_data_to_df['exp_diff'] < 0)
+                ].sort_values(
+                by='exp_diff'
+            ).head(1)
+
+            history = pandas.concat(
+                [worst_exp, history],
+                ignore_index=True
+            )
+
+    charm = 0
+    record_type = 'exp'
+    event = 'none'
+    obj = []
+    history_dict = history.to_dict('index')
+    for i in history_dict:
+        record = RecordsHistory(
+            exp_rank=history_dict[i]['exp_rank'],
+            exp_rank_change=history_dict[i]['exp_rank_change'],
+            id_char_id=history_dict[i]['id_char'],
+            voc_id=history_dict[i]['voc_id'],
+            world_id=history_dict[i]['world_id'],
+            level=history_dict[i]['level'],
+            level_change=history_dict[i]['level_change'],
+            exp_value=history_dict[i]['exp_value'],
+            exp_diff=history_dict[i]['exp_diff'],
+            charm_rank=charm,
+            charm_rank_change=charm,
+            charm_value=charm,
+            charm_diff=charm,
+            record_type=record_type,
+            event=event,
+            date=date
+        )
+        obj.append(record)
+    RecordsHistory.objects.bulk_create(obj)
+
 
 # # # # # # # Experience end # # # # # # #
 
