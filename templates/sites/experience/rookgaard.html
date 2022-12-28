@@ -9,13 +9,47 @@
             <div class="bg-secondary rounded h-100 p-4 text-center">
                 <h2 class="mt-2">Rookgaard</h2>
                 <small class="mb-3">List of players that gained or lost experience yesterday on Rookgaard.</small>
+                <div class="container-fluid pt-4 px-4 mt-4">
+                    <img src="https://static.tibia.com/images/news/doublexpnskill_small.png" style="filter: grayscale(100%)" height="145">
+                    <img src="https://static.tibia.com/images/news/rapidrespawn_small.png" style="filter: grayscale(100%)" height="145">
+                </div>
             </div>
         </div>
 
         <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded h-100 p-4 text-center">
-                <h2 class="mt-2">blalbalbl</h2>
-                <small class="mb-3">blalbalblab</small>
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="text-center">Top 5 recorded</h6>
+                <table class="table table-borderless">
+                    <thead>
+                        <tr>
+                            <th scope="col">Place</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">World</th>
+                            <th scope="col">Level</th>
+                            <th scope="col">Exp</th>
+                        </tr>
+                    </thead>
+                {% for i in top_5 %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="/character/search/?q={{ i.id_char.name }}">{{ i.id_char.name }}</a>
+                                        <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
+                                            <i class="fas fa-external-link-alt fa-xs"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                    <a href="/worlds/world/{{ i.world.name }}">{{ i.world.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                    </td>
+                                    <td>{{ i.level }}</td>
+                                    <td>{{ i.exp_diff }}</td>
+                                </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
