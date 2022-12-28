@@ -99,6 +99,30 @@ class News(models.Model):
         db_table = 'news'
 
 
+class RecordsHistory(models.Model):
+    exp_rank = models.IntegerField(blank=True, null=True)
+    exp_rank_change = models.IntegerField(blank=True, null=True)
+    id_char = models.ForeignKey(Character, models.DO_NOTHING, db_column='id_char')
+    voc = models.ForeignKey('Vocation', models.DO_NOTHING)
+    world = models.ForeignKey('World', models.DO_NOTHING)
+    level = models.IntegerField(blank=True, null=True)
+    level_change = models.IntegerField(blank=True, null=True)
+    exp_value = models.BigIntegerField(blank=True, null=True)
+    exp_diff = models.BigIntegerField(blank=True, null=True)
+    charm_rank = models.IntegerField(blank=True, null=True)
+    charm_rank_change = models.IntegerField(blank=True, null=True)
+    charm_value = models.IntegerField(blank=True, null=True)
+    charm_diff = models.IntegerField(blank=True, null=True)
+    record_type = models.CharField(max_length=45, blank=True, null=True)
+    event = models.CharField(max_length=20, blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'records_history'
+        unique_together = (('id', 'id_char', 'voc', 'world'),)
+
+
 class Vocation(models.Model):
     voc_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
