@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db import connection
-from .models import News, Boosted, World, WorldOnlineHistory, Highscores
+from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory
 from datetime import datetime, timedelta
 import datetime
 from pathlib import Path
@@ -29,7 +29,7 @@ def main_page(request, *args, **kwargs):
     # best exp yesterday on each world
     now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = '2022-12-23 11:11:50'
+    date = '2022-12-23 11:11:48'
 
     # world_types = {
     #    0: 'Open PvP',
@@ -38,7 +38,7 @@ def main_page(request, *args, **kwargs):
     #    4: 'Retro Hardcore PvP'
     # }
 
-    best_open_pvp = Highscores.objects.filter(
+    best_open_pvp = RecordsHistory.objects.filter(
         Q(date__gt=date)
         & Q(exp_diff__gt=0)
         & Q(world__pvp_type_value=0)
@@ -46,7 +46,7 @@ def main_page(request, *args, **kwargs):
         '-exp_diff'
     ).first()
 
-    best_optional_pvp = Highscores.objects.filter(
+    best_optional_pvp = RecordsHistory.objects.filter(
         Q(date__gt=date)
         & Q(exp_diff__gt=0)
         & Q(world__pvp_type_value=1)
@@ -54,7 +54,7 @@ def main_page(request, *args, **kwargs):
         '-exp_diff'
     ).first()
 
-    best_retro_open_pvp = Highscores.objects.filter(
+    best_retro_open_pvp = RecordsHistory.objects.filter(
         Q(date__gt=date)
         & Q(exp_diff__gt=0)
         & Q(world__pvp_type_value=3)
@@ -62,7 +62,7 @@ def main_page(request, *args, **kwargs):
         '-exp_diff'
     ).first()
 
-    best_retro_hardcore_pvp = Highscores.objects.filter(
+    best_retro_hardcore_pvp = RecordsHistory.objects.filter(
         Q(date__gt=date)
         & Q(exp_diff__gt=0)
         & Q(world__pvp_type_value=4)
