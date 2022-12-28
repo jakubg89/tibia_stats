@@ -38,13 +38,13 @@ def main_page(request, *args, **kwargs):
     #    4: 'Retro Hardcore PvP'
     # }
 
-    '''best_exp_open_pvp = Highscores.objects.filter(
+    best_open_pvp = Highscores.objects.filter(
         Q(date__gt=date)
         & Q(exp_diff__gt=0)
         & Q(world__pvp_type_value=0)
     ).order_by(
         '-exp_diff'
-    )[:1]
+    ).first()
 
     best_optional_pvp = Highscores.objects.filter(
         Q(date__gt=date)
@@ -52,7 +52,7 @@ def main_page(request, *args, **kwargs):
         & Q(world__pvp_type_value=1)
     ).order_by(
         '-exp_diff'
-    )[:1]
+    ).first()
 
     best_retro_open_pvp = Highscores.objects.filter(
         Q(date__gt=date)
@@ -60,7 +60,7 @@ def main_page(request, *args, **kwargs):
         & Q(world__pvp_type_value=3)
     ).order_by(
         '-exp_diff'
-    )[:1]
+    ).first()
 
     best_retro_hardcore_pvp = Highscores.objects.filter(
         Q(date__gt=date)
@@ -68,13 +68,7 @@ def main_page(request, *args, **kwargs):
         & Q(world__pvp_type_value=4)
     ).order_by(
         '-exp_diff'
-    )[:1]
-
-    best_exp = best_exp_open_pvp.union(
-        best_optional_pvp,
-        best_retro_open_pvp,
-        best_retro_hardcore_pvp
-    )'''
+    ).first()
 
     content = {
         'news_ticker': latest_tickers,
@@ -82,6 +76,10 @@ def main_page(request, *args, **kwargs):
         'boosted_creature': boosted_creature,
         'latest_news': latest_news,
         # 'best_exp': best_exp
+        'optional': best_optional_pvp,
+        'open': best_open_pvp,
+        'retro_open': best_retro_open_pvp,
+        'retro_hardcore': best_retro_hardcore_pvp
     }
     return render(request, "sites/index.html", content)
 
