@@ -68,7 +68,7 @@
     </div>
 <!-- News ticker and boosted creatures End -->
 
-<!-- Best yesterday Start
+<!-- Best yesterday Start -->
     <div class="container-fluid pt-4 px-4">
         <div class="row g-4">
             <div class="col-sm-6 col-xl-3">
@@ -76,8 +76,8 @@
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" style="width: 48px; height: 48px;">
                     <div class="ms-3 h-100 text-center">
                         <small>Open PvP</small>
-                        <h6 class="mb-0">{{ best_exp.0.id_char.name }}</h6>
-                        <p class="text-success">{{ best_exp.0.exp_diff }}</p>
+                        <h6 class="mb-0">{{ open.id_char.name }}</h6>
+                        <p class="text-success">{{ open.exp_diff }}</p>
                     </div>
                 </div>
             </div>
@@ -86,8 +86,8 @@
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" style="width: 48px; height: 48px;">
                     <div class="ms-3 text-center">
                         <small>Retro Open PvP</small>
-                        <h6 class="mb-0">{{ best_exp.2.id_char.name }}</h6>
-                        <p class="text-success">{{ best_exp.2.exp_diff }}</p>
+                        <h6 class="mb-0">{{ retro_open.id_char.name }}</h6>
+                        <p class="text-success">{{ retro_open.exp_diff }}</p>
                     </div>
                 </div>
             </div>
@@ -96,8 +96,8 @@
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" style="width: 48px; height: 48px;">
                     <div class="ms-3 text-center">
                         <small>Retro Hardcore PvP</small>
-                        <h6 class="mb-0">{{ best_exp.3.id_char.name }}</h6>
-                        <p class="text-success">{{ best_exp.3.exp_diff }}</p>
+                        <h6 class="mb-0">{{ retro_hardcore.id_char.name }}</h6>
+                        <p class="text-success">{{ retro_hardcore.exp_diff }}</p>
                     </div>
                 </div>
             </div>
@@ -106,14 +106,14 @@
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" style="width: 48px; height: 48px;">
                     <div class="ms-3 text-center">
                         <small>Optional PvP</small>
-                        <h6 class="mb-0">{{ best_exp.1.id_char.name }}</h6>
-                        <p class="text-success">{{ best_exp.1.exp_diff }}</p>
+                        <h6 class="mb-0">{{ optional.id_char.name }}</h6>
+                        <p class="text-success">{{ optional.exp_diff }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
- Best yesterday End -->
+ <!-- Best yesterday End -->
 
 <!-- News Start -->
     <div class="container-fluid pt-4 px-4">
