@@ -207,7 +207,39 @@ def top_500(request, *args, **kwargs):
 
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = '2022-12-23 11:11:50'
+    date = '2022-12-23 11:11:49'
+
+    best_open_pvp = RecordsHistory.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=0)
+    ).order_by(
+        '-exp_diff'
+    ).first()
+
+    best_optional_pvp = RecordsHistory.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=1)
+    ).order_by(
+        '-exp_diff'
+    ).first()
+
+    best_retro_open_pvp = RecordsHistory.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=3)
+    ).order_by(
+        '-exp_diff'
+    ).first()
+
+    best_retro_hardcore_pvp = RecordsHistory.objects.filter(
+        Q(date__gt=date)
+        & Q(exp_diff__gt=0)
+        & Q(world__pvp_type_value=4)
+    ).order_by(
+        '-exp_diff'
+    ).first()
 
     top = Highscores.objects.filter(
         Q(date__gt=date)
@@ -216,8 +248,16 @@ def top_500(request, *args, **kwargs):
         '-exp_diff'
     )[:500]
 
+    best = {
+        'optional': best_optional_pvp,
+        'open': best_open_pvp,
+        'retro': best_retro_open_pvp,
+        'retrohardcore': best_retro_hardcore_pvp
+    }
+
     content = {
-        'top': top
+        'top': top,
+        'best': best
     }
 
     return render(request, "sites/experience/top500.html", content)
@@ -259,7 +299,14 @@ def rookgaard(request, *args, **kwargs):
 
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = '2022-12-23 11:11:50'
+    date = '2022-12-23 11:11:49'
+
+    top_3 = RecordsHistory.objects.filter(
+        Q(exp_diff__gt=0)
+        & Q(voc=1)
+    ).order_by(
+        '-exp_diff'
+    )[:5]
 
     top = Highscores.objects.filter(
         Q(date__gt=date)
@@ -270,7 +317,8 @@ def rookgaard(request, *args, **kwargs):
     )
 
     content = {
-        'top': top
+        'top': top,
+        'top_5': top_3
     }
 
     return render(request, "sites/experience/rookgaard.html", content)
