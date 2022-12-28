@@ -23,13 +23,23 @@ from pathlib import Path
 
 
 def main():
+
+    # after server save and for check around 13-14 cet
     # add_boss_to_db()
     # add_creature_to_db()
-    # add_world_online_history()
+
+    # will see
+    add_world_online_history()
+
+    # every 12 hours
     # add_news_to_db()
-    # dd_news_ticker_to_db()
+
+    # every 2 hours
+    # add_news_ticker_to_db()
+
+    # once a day (every 24h)
     # filter_highscores_data()
-    get_daily_records()
+    # get_daily_records()
 
 
 def add_backslashes(text):
