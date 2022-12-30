@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+
 from main.views \
     import \
     main_page,\
@@ -27,7 +28,8 @@ from main.views \
     search_character, \
     top_500,\
     mainland,\
-    rookgaard
+    rookgaard,\
+    explore_highscores
 
 # Error custom view
 handler404 = 'main.views.error404'
@@ -52,6 +54,7 @@ urlpatterns = [
     path('experience/top500', top_500),
     path('experience/mainland/', mainland),
     path('experience/rookgaard', rookgaard),
+    path('experience/explore/', explore_highscores),
     path('experience/stats', under_construction),
 
     # Charms menu
