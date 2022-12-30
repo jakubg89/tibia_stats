@@ -16,7 +16,8 @@
         </div>
 
         <div class="col-sm-12 col-xl-6">
-            <div class="bg-secondary rounded text-center h-100 p-4 d-flex justify-content-center">
+            <div class="bg-secondary rounded text-center h-100 p-4">
+                <h6 class="text-center">Top yesterday</h6>
                 <table class="table table-borderless ">
                     <thead>
                         <tr>
@@ -37,7 +38,7 @@
                                         </a>
                                     </td>
                                     <td>{{ value.level }}</td>
-                                    <td>{{ value.exp_diff }}</td>
+                                    <td class="text-success">{{ value.exp_diff }}</td>
                                 </tr>
                         {% endfor %}
                     </tbody>
