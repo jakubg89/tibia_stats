@@ -9,7 +9,7 @@
         <!-- Title start -->
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary rounded h-100 p-4 text-center">
-                <h1 class="display-4">Explore highscores</h1>
+                <h1 class="display-4 mt-4">Explore highscores</h1>
                 <small>Here you can explore whole highscores of experience based on any condition you need.</small>
                 <p><small>Keep in mind that showing all records may take a bit longer to load.</small></p>
             </div>
@@ -36,111 +36,128 @@
                             {% endfor %}
                         </select>
 
-                    <div class="row g-4">
-                        <!-- Vocations -->
-                        <div class="col-sm-12 col-xl-4">
-                            <h6 class="mb-3">Vocation</h6>
-                                <div class="btn-group-vertical" role="group">
-                                    <input type="checkbox" class="btn-check" id="vocation" autocomplete="off" onclick="eventCheckBoxvocation()">
-                                    <label class="btn btn-outline-light" for="vocation">Select all</label>
-                                    {% for i in vocation %}
-                                        <input {% if i.voc_id in selected.vocation %}checked {% endif %} type="checkbox" name="vocation" class="btn-check" id="vocation{{ forloop.counter }}" autocomplete="off" value="{{ i.voc_id }}">
-                                        <label class="btn btn-outline-light" for="vocation{{ forloop.counter }}">
-                                            {{ i.name }}
-                                        </label>
-                                    {% endfor %}
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseOne" aria-expanded="true"
+                                    aria-controls="collapseOne">
+                                    Show filters
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse"
+                            aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <div class="row g-4">
+                                        <!-- Battleye -->
+                                        <div class="col-sm-6 col-xl-6">
+                                            <h6 class="mb-3 mt-4">Battleye</h6>
+                                                <div class="btn-group-vertical w-75" role="group">
+                                                    <input type="checkbox" class="btn-check" id="be" autocomplete="off" onclick="eventCheckBoxBE()">
+                                                    <label class="btn btn-outline-light" for="be">Select all</label>
+                                                    {% for i in worlds.be %}
+                                                        <input {% if i in selected.battleye %}checked {% endif %}type="checkbox" name="be" class="btn-check" id="be{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
+                                                        <label class="btn btn-outline-light" for="be{{ forloop.counter }}">
+                                                            {% if i == 2%}
+                                                                Initially protected
+                                                            {% elif i == 1%}
+                                                                Protected
+                                                            {% elif i == 0%}
+                                                                Unprotected
+                                                            {% endif %}
+                                                        </label>
+                                                    {% endfor %}
+                                                </div>
+                                            <script>
+                                                function eventCheckBoxBE() {
+                                                  let be = document.getElementsByName("be");
+                                                  for(let i = 0; i < be.length; i++) {
+                                                    be[i].checked = !be[i].checked;
+                                                  }
+                                                }
+                                            </script>
+                                        </div>
+                                        <!-- Location -->
+                                        <div class="col-sm-6 col-xl-6">
+                                            <h6 class="mb-3 mt-4">Location</h6>
+                                                <div class="btn-group-vertical w-75" role="group">
+                                                    <input type="checkbox" class="btn-check" id="location" autocomplete="off" onclick="eventCheckBoxLocation()">
+                                                    <label class="btn btn-outline-light" for="location">Select all</label>
+                                                    {% for i in worlds.location %}
+                                                        <input {% if i in selected.location %}checked {% endif %}type="checkbox" name="location" class="btn-check" id="location{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
+                                                        <label class="btn btn-outline-light" for="location{{ forloop.counter }}">
+                                                            {% if i == 2%}
+                                                                North America
+                                                            {% elif i == 1%}
+                                                                South America
+                                                            {% elif i == 0%}
+                                                                Europe
+                                                            {% endif %}
+                                                        </label>
+                                                    {% endfor %}
+                                                </div>
+                                            <script>
+                                                function eventCheckBoxLocation() {
+                                                  let location = document.getElementsByName("location");
+                                                  for(let i = 0; i < location.length; i++) {
+                                                    location[i].checked = !location[i].checked;
+                                                  }
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-4">
+                                        <!-- PvP Type -->
+                                        <div class="col-sm-6 col-xl-6">
+                                            <h6 class="mb-3 mt-4">PvP Type</h6>
+                                                <div class="btn-group-vertical w-75" role="group">
+                                                    <input type="checkbox" class="btn-check" id="selectallpvp" autocomplete="off" onclick="eventCheckBoxPvP()">
+                                                    <label class="btn btn-outline-light" for="selectallpvp">Select all</label>
+                                                    {% for key, value in worlds.pvp_type.items %}
+                                                        <input {% if value.pvp_type_value in selected.pvp %}checked {% endif %}type="checkbox" name="pvp" class="btn-check" id="pvp{{ forloop.counter }}" autocomplete="off" value="{{ value.pvp_type_value }}">
+                                                        <label class="btn btn-outline-light" for="pvp{{ forloop.counter }}">{{ value.pvp_type }}</label>
+                                                    {% endfor %}
+                                                </div>
+                                            <script>
+                                                function eventCheckBoxPvP() {
+                                                  let pvp = document.getElementsByName("pvp");
+                                                  for(let i = 0; i < pvp.length; i++) {
+                                                    pvp[i].checked = !pvp[i].checked;
+                                                  }
+                                                }
+                                            </script>
+                                        </div>
+                                        <!-- Vocation -->
+                                        <div class="col-sm-6 col-xl-6">
+                                            <h6 class="mb-3 mt-4">Vocation</h6>
+                                                <div class="btn-group-vertical w-75" role="group">
+                                                    <input type="checkbox" class="btn-check" id="vocation" autocomplete="off" onclick="eventCheckBoxvocation()">
+                                                    <label class="btn btn-outline-light" for="vocation">Select all</label>
+                                                    {% for i in vocation %}
+                                                        <input {% if i.voc_id in selected.vocation %}checked {% endif %} type="checkbox" name="vocation" class="btn-check" id="vocation{{ forloop.counter }}" autocomplete="off" value="{{ i.voc_id }}">
+                                                        <label class="btn btn-outline-light" for="vocation{{ forloop.counter }}">
+                                                            {{ i.name }}
+                                                        </label>
+                                                    {% endfor %}
+                                                </div>
+                                            <script>
+                                                function eventCheckBoxvocation() {
+                                                  let vocation = document.getElementsByName("vocation");
+                                                  for(let i = 0; i < vocation.length; i++) {
+                                                    vocation[i].checked = !vocation[i].checked;
+                                                  }
+                                                }
+                                            </script>
+                                        </div>
+
+                                    </div>
                                 </div>
-                            <script>
-                                function eventCheckBoxvocation() {
-                                  let vocation = document.getElementsByName("vocation");
-                                  for(let i = 0; i < vocation.length; i++) {
-                                    vocation[i].checked = !vocation[i].checked;
-                                  }
-                                }
-                            </script>
+                            </div>
                         </div>
-
-                        <!-- PvP -->
-                        <div class="col-sm-12 col-xl-4">
-                            <h6 class="mb-3">PvP Type</h6>
-                                <div class="btn-group-vertical" role="group">
-                                    <input type="checkbox" class="btn-check" id="selectallpvp" autocomplete="off" onclick="eventCheckBoxPvP()">
-                                    <label class="btn btn-outline-light" for="selectallpvp">Select all</label>
-                                    {% for key, value in worlds.pvp_type.items %}
-                                        <input {% if value.pvp_type_value in selected.pvp %}checked {% endif %}type="checkbox" name="pvp" class="btn-check" id="pvp{{ forloop.counter }}" autocomplete="off" value="{{ value.pvp_type_value }}">
-                                        <label class="btn btn-outline-light" for="pvp{{ forloop.counter }}">{{ value.pvp_type }}</label>
-                                    {% endfor %}
-                                </div>
-                            <script>
-                                function eventCheckBoxPvP() {
-                                  let pvp = document.getElementsByName("pvp");
-                                  for(let i = 0; i < pvp.length; i++) {
-                                    pvp[i].checked = !pvp[i].checked;
-                                  }
-                                }
-                            </script>
-
-                        </div>
-
-                        <!-- Battleye -->
-                        <div class="col-sm-12 col-xl-4">
-                            <h6 class="mb-3">Battleye</h6>
-                                <div class="btn-group-vertical" role="group">
-                                    <input type="checkbox" class="btn-check" id="be" autocomplete="off" onclick="eventCheckBoxBE()">
-                                    <label class="btn btn-outline-light" for="be">Select all</label>
-                                    {% for i in worlds.be %}
-                                        <input {% if i in selected.battleye %}checked {% endif %}type="checkbox" name="be" class="btn-check" id="be{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
-                                        <label class="btn btn-outline-light" for="be{{ forloop.counter }}">
-                                            {% if i == 2%}
-                                                Initially protected
-                                            {% elif i == 1%}
-                                                Protected
-                                            {% elif i == 0%}
-                                                Unprotected
-                                            {% endif %}
-                                        </label>
-                                    {% endfor %}
-                                </div>
-                            <script>
-                                function eventCheckBoxBE() {
-                                  let be = document.getElementsByName("be");
-                                  for(let i = 0; i < be.length; i++) {
-                                    be[i].checked = !be[i].checked;
-                                  }
-                                }
-                            </script>
-
-                            <h6 class="mb-3 mt-5">Location</h6>
-                                <div class="btn-group-vertical" role="group">
-                                    <input type="checkbox" class="btn-check" id="location" autocomplete="off" onclick="eventCheckBoxLocation()">
-                                    <label class="btn btn-outline-light" for="location">Select all</label>
-                                    {% for i in worlds.location %}
-                                        <input {% if i in selected.location %}checked {% endif %}type="checkbox" name="location" class="btn-check" id="location{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
-                                        <label class="btn btn-outline-light" for="location{{ forloop.counter }}">
-                                            {% if i == 2%}
-                                                North America
-                                            {% elif i == 1%}
-                                                South America
-                                            {% elif i == 0%}
-                                                Europe
-                                            {% endif %}
-                                        </label>
-                                    {% endfor %}
-                                </div>
-                            <script>
-                                function eventCheckBoxLocation() {
-                                  let location = document.getElementsByName("location");
-                                  for(let i = 0; i < location.length; i++) {
-                                    location[i].checked = !location[i].checked;
-                                  }
-                                }
-                            </script>
-                        </div>
-
-
                     </div>
 
-                    <button type="submit" class="btn btn-light rounded-pill mt-4">Show list</button>
+                    <button type="submit" class="btn btn-light w-100 mt-3">Show list</button>
 
                 </form>
 
