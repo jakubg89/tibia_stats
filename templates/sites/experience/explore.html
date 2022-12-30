@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<!-- Title, select menu start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <!-- Title start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4 text-center">
+                <h1 class="display-4">Explore highscores</h1>
+                <small>Here you can explore whole highscores of experience based on any condition you need.</small>
+                <p><small>Keep in mind that showing all records may take a bit longer to load.</small></p>
+            </div>
+        </div>
+        <!-- Title end -->
+
+        <!-- Form start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded text-center h-100 p-5">
+
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                <form method="post" action="/experience/explore/">
+                    {% csrf_token %}
+
+                    <!-- World -->
+                    <select id="select" name="world" class="form-select mb-3" >
+                            <option value="">Select world...</option>
+                            <option name="world" value="">All worlds</option>
+                            {% for i in worlds_obj %}
+                                {% if i.name != result.0.world.name %}
+                                    <option name="world" value="{{ i.world_id }}">{{ i.name }}</option>
+                                {% else %}
+                                    <option selected name="world" value="{{ i.world_id }}">{{ i.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+
+                    <div class="row g-4">
+                        <!-- Vocations -->
+                        <div class="col-sm-12 col-xl-4">
+                            <h6 class="mb-3">Vocation</h6>
+                                <div class="btn-group-vertical" role="group">
+                                    <input type="checkbox" class="btn-check" id="vocation" autocomplete="off" onclick="eventCheckBoxvocation()">
+                                    <label class="btn btn-outline-light" for="vocation">Select all</label>
+                                    {% for i in vocation %}
+                                        <input type="checkbox" name="vocation" class="btn-check" id="vocation{{ forloop.counter }}" autocomplete="off" value="{{ i.voc_id }}">
+                                        <label class="btn btn-outline-light" for="vocation{{ forloop.counter }}">
+                                            {{ i.name }}
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            <script>
+                                function eventCheckBoxvocation() {
+                                  let vocation = document.getElementsByName("vocation");
+                                  for(let i = 0; i < vocation.length; i++) {
+                                    vocation[i].checked = !vocation[i].checked;
+                                  }
+                                }
+                            </script>
+                        </div>
+
+                        <!-- PvP -->
+                        <div class="col-sm-12 col-xl-4">
+                            <h6 class="mb-3">PvP Type</h6>
+                                <div class="btn-group-vertical" role="group">
+                                    <input type="checkbox" class="btn-check" id="selectallpvp" autocomplete="off" onclick="eventCheckBoxPvP()">
+                                    <label class="btn btn-outline-light" for="selectallpvp">Select all</label>
+                                    {% for key, value in worlds.pvp_type.items %}
+                                        <input type="checkbox" name="pvp" class="btn-check" id="pvp{{ forloop.counter }}" autocomplete="off" value="{{ value.pvp_type_value }}">
+                                        <label class="btn btn-outline-light" for="pvp{{ forloop.counter }}">{{ value.pvp_type }}</label>
+                                    {% endfor %}
+                                </div>
+                            <script>
+                                function eventCheckBoxPvP() {
+                                  let pvp = document.getElementsByName("pvp");
+                                  for(let i = 0; i < pvp.length; i++) {
+                                    pvp[i].checked = !pvp[i].checked;
+                                  }
+                                }
+                            </script>
+
+                        </div>
+
+                        <!-- Battleye -->
+                        <div class="col-sm-12 col-xl-4">
+                            <h6 class="mb-3">Battleye</h6>
+                                <div class="btn-group-vertical" role="group">
+                                    <input type="checkbox" class="btn-check" id="be" autocomplete="off" onclick="eventCheckBoxBE()">
+                                    <label class="btn btn-outline-light" for="be">Select all</label>
+                                    {% for i in worlds.be %}
+                                        <input type="checkbox" name="be" class="btn-check" id="be{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
+                                        <label class="btn btn-outline-light" for="be{{ forloop.counter }}">
+                                            {% if i == 2%}
+                                                Initially protected
+                                            {% elif i == 1%}
+                                                Protected
+                                            {% elif i == 0%}
+                                                Unprotected
+                                            {% endif %}
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            <script>
+                                function eventCheckBoxBE() {
+                                  let be = document.getElementsByName("be");
+                                  for(let i = 0; i < be.length; i++) {
+                                    be[i].checked = !be[i].checked;
+                                  }
+                                }
+                            </script>
+
+                            <h6 class="mb-3 mt-5">Location</h6>
+                                <div class="btn-group-vertical" role="group">
+                                    <input type="checkbox" class="btn-check" id="location" autocomplete="off" onclick="eventCheckBoxLocation()">
+                                    <label class="btn btn-outline-light" for="location">Select all</label>
+                                    {% for i in worlds.location %}
+                                        <input type="checkbox" name="location" class="btn-check" id="location{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
+                                        <label class="btn btn-outline-light" for="location{{ forloop.counter }}">
+                                            {% if i == 2%}
+                                                North America
+                                            {% elif i == 1%}
+                                                South America
+                                            {% elif i == 0%}
+                                                Europe
+                                            {% endif %}
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            <script>
+                                function eventCheckBoxLocation() {
+                                  let location = document.getElementsByName("location");
+                                  for(let i = 0; i < location.length; i++) {
+                                    location[i].checked = !location[i].checked;
+                                  }
+                                }
+                            </script>
+                        </div>
+
+
+                    </div>
+
+                    <button type="submit" class="btn btn-light rounded-pill mt-4">Show list</button>
+
+                </form>
+
+            </div>
+        </div>
+        <!-- Form end -->
+    </div>
+</div>
+<!-- Title, select menu end -->
+
+
+<!-- Table Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <div class="col-sm-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <div class="table-responsive-xl">
+                    <table id="explore" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Vocation</th>
+                                <th scope="col">Level</th>
+                                <th scope="col">Level change</th>
+                                <th scope="col">Vocation rank</th>
+                                <th scope="col">Change</th>
+                                <th scope="col">Experience</th>
+                                <th scope="col">World</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in result %}
+                            <tr>
+
+                                <!-- Rank -->
+                                <td>{{ forloop.counter }}</td>
+
+                                <!-- Name -->
+                                <td>
+                                    <a href="/character/search/?q={{ i.id_char.name }}">{{ i.id_char.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                                <!-- Vocation -->
+                                <td>{{ i.voc.name }}</td>
+
+                                <!-- Level -->
+                                <td>{{ i.level }}</td>
+
+                                <!-- Level change -->
+                                <td class="{% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %}">{{ i.level_change }}</td>
+
+                                <!-- Vocation rank -->
+                                <td>{{ i.exp_rank }}</td>
+
+                                <!-- Vocation rank change -->
+                                <td class="{% if i.exp_rank_change < 0 %}text-danger{% elif i.exp_rank_change > 0 %}text-success{% endif %}">{{ i.exp_rank_change }}</td>
+
+                                <!-- Experience value -->
+                                <td class="{% if i.exp_diff < 0 %}text-danger{% elif i.exp_diff > 0 %}text-success{% endif %}">{{ i.exp_diff }}</td>
+
+                                <!-- World -->
+                                <td>
+                                    <a href="/worlds/world/{{ i.world.name }}">{{ i.world.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Table End -->
+
+{% endblock %}
