@@ -27,9 +27,8 @@
                     <!-- World -->
                     <select id="select" name="world" class="form-select mb-3" >
                             <option value="">Select world...</option>
-                            <option name="world" value="">All worlds</option>
                             {% for i in worlds_obj %}
-                                {% if i.name != result.0.world.name %}
+                                {% if i.world_id != selected.world %}
                                     <option name="world" value="{{ i.world_id }}">{{ i.name }}</option>
                                 {% else %}
                                     <option selected name="world" value="{{ i.world_id }}">{{ i.name }}</option>
@@ -45,7 +44,7 @@
                                     <input type="checkbox" class="btn-check" id="vocation" autocomplete="off" onclick="eventCheckBoxvocation()">
                                     <label class="btn btn-outline-light" for="vocation">Select all</label>
                                     {% for i in vocation %}
-                                        <input type="checkbox" name="vocation" class="btn-check" id="vocation{{ forloop.counter }}" autocomplete="off" value="{{ i.voc_id }}">
+                                        <input {% if i.voc_id in selected.vocation %}checked {% endif %} type="checkbox" name="vocation" class="btn-check" id="vocation{{ forloop.counter }}" autocomplete="off" value="{{ i.voc_id }}">
                                         <label class="btn btn-outline-light" for="vocation{{ forloop.counter }}">
                                             {{ i.name }}
                                         </label>
@@ -68,7 +67,7 @@
                                     <input type="checkbox" class="btn-check" id="selectallpvp" autocomplete="off" onclick="eventCheckBoxPvP()">
                                     <label class="btn btn-outline-light" for="selectallpvp">Select all</label>
                                     {% for key, value in worlds.pvp_type.items %}
-                                        <input type="checkbox" name="pvp" class="btn-check" id="pvp{{ forloop.counter }}" autocomplete="off" value="{{ value.pvp_type_value }}">
+                                        <input {% if value.pvp_type_value in selected.pvp %}checked {% endif %}type="checkbox" name="pvp" class="btn-check" id="pvp{{ forloop.counter }}" autocomplete="off" value="{{ value.pvp_type_value }}">
                                         <label class="btn btn-outline-light" for="pvp{{ forloop.counter }}">{{ value.pvp_type }}</label>
                                     {% endfor %}
                                 </div>
@@ -90,7 +89,7 @@
                                     <input type="checkbox" class="btn-check" id="be" autocomplete="off" onclick="eventCheckBoxBE()">
                                     <label class="btn btn-outline-light" for="be">Select all</label>
                                     {% for i in worlds.be %}
-                                        <input type="checkbox" name="be" class="btn-check" id="be{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
+                                        <input {% if i in selected.battleye %}checked {% endif %}type="checkbox" name="be" class="btn-check" id="be{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
                                         <label class="btn btn-outline-light" for="be{{ forloop.counter }}">
                                             {% if i == 2%}
                                                 Initially protected
@@ -116,7 +115,7 @@
                                     <input type="checkbox" class="btn-check" id="location" autocomplete="off" onclick="eventCheckBoxLocation()">
                                     <label class="btn btn-outline-light" for="location">Select all</label>
                                     {% for i in worlds.location %}
-                                        <input type="checkbox" name="location" class="btn-check" id="location{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
+                                        <input {% if i in selected.location %}checked {% endif %}type="checkbox" name="location" class="btn-check" id="location{{ forloop.counter }}" autocomplete="off" value="{{ i }}">
                                         <label class="btn btn-outline-light" for="location{{ forloop.counter }}">
                                             {% if i == 2%}
                                                 North America
@@ -169,7 +168,7 @@
                                 <th scope="col">Level</th>
                                 <th scope="col">Level change</th>
                                 <th scope="col">Vocation rank</th>
-                                <th scope="col">Change</th>
+                                <th scope="col">Rank Change</th>
                                 <th scope="col">Experience</th>
                                 <th scope="col">World</th>
                             </tr>
