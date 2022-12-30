@@ -13,15 +13,16 @@
             <a href="/home" class="nav-item nav-link {% if request.path == '/home/' %} active {% endif %}"><i class="fas fa-link me-2"></i>Main page</a>
 
             <!-- Experience menu -->
-            <!--<div class="nav-item dropdown">
+            <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle {% if 'experience' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Experience</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'experience' in request.path %} show {% endif %}">
-                    <a href="/experience/top500" class="dropdown-item {% if 'experience/top500' in request.path %} active {% endif %}">Top 500 yesterday</a>
+                    <a href="/experience/top500" class="dropdown-item {% if 'experience/top500' in request.path %} active {% endif %}">Top 500 Mainland</a>
                     <a href="/experience/mainland" class="dropdown-item {% if 'experience/mainland' in request.path %} active {% endif %}">Mainland</a>
                     <a href="/experience/rookgaard" class="dropdown-item {% if 'experience/rookgaard' in request.path %} active {% endif %}">Rookgaard</a>
+                    <a href="/experience/explore" class="dropdown-item {% if 'experience/explore' in request.path %} active {% endif %}">Explore highscores</a>
                     <a href="/experience/stats" class="dropdown-item {% if 'experience/stats' in request.path %} active {% endif %}">Stats</a>
                 </div>
-            </div>-->
+            </div>
 
             <!-- Charms menu -->
             <!--<div class="nav-item dropdown">
@@ -59,8 +60,8 @@
                 <a href="#" class="nav-link dropdown-toggle {% if 'character' in request.path %} active {% endif %}" data-bs-toggle="dropdown"><i class="fas fa-users me-2"></i>Characters</a>
                 <div class="dropdown-menu bg-transparent border-0 {% if 'character' in request.path %} show {% endif %}">
                     <a href="/character/search" class="dropdown-item {% if 'character/search' in request.path %} active {% endif %}">Information</a>
-                    <!--<a href="/character/transfers" class="dropdown-item {% if 'character/transfers' in request.path %} active {% endif %}">World transfers</a>-->
-                    <!--<a href="/character/name_change" class="dropdown-item {% if 'character/name_change' in request.path %} active {% endif %}">Name change</a>-->
+                    <a href="/character/transfers" class="dropdown-item {% if 'character/transfers' in request.path %} active {% endif %}">World transfers</a>
+                    <a href="/character/name_change" class="dropdown-item {% if 'character/name_change' in request.path %} active {% endif %}">Name change</a>
                 </div>
             </div>
 

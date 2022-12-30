@@ -39,8 +39,10 @@
                             <!-- Boosted creature -->
                             <div class="col-sm-12 mb-2">
                                 <div class="bg-secondary rounded d-flex align-items-center justify-content-between h-100 p-4">
-                                    <img src="{{ boosted_boss.0.image_url }}">
-                                    <div class="ms-3">
+                                    <div class="col-sm-5 align-items-center">
+                                        <img src="{{ boosted_boss.0.image_url }}">
+                                    </div>
+                                    <div class="col-sm-7 ms-3 text-center">
                                         <p class="mb-2">Boosted boss</p>
                                         <h6 class="mb-0">{{ boosted_boss.0.name }}</h6>
                                     </div>
@@ -50,8 +52,10 @@
                             <!-- Boosted boss -->
                             <div class="col-sm-12 mt-2">
                                 <div class="bg-secondary rounded d-flex align-items-center justify-content-between h-100 p-4">
-                                    <img src="{{ boosted_creature.0.image_url }}">
-                                    <div class="ms-1">
+                                    <div class="col-sm-5">
+                                        <img src="{{ boosted_creature.0.image_url }}">
+                                    </div>
+                                    <div class="col-sm-7 ms-1 text-center">
                                         <p class="mb-2">Boosted creature</p>
                                         <h6 class="mb-0">{{ boosted_creature.0.name }}</h6>
                                     </div>
@@ -68,44 +72,68 @@
     <div class="container-fluid pt-4 px-4">
         <div class="row g-4">
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3 h-100">
+                    <div class="ms-3 h-100 text-center">
                         <small>Open PvP</small>
-                        <h6 class="mb-0">123 456 777 777</h6>
+                        <h6 class="mb-0">
+                            <a href="/character/search/?q={{ open.id_char.name }}">{{ open.id_char.name }}</a>
+                            <a href="https://www.tibia.com/community/?subtopic=characters&name={{ open.id_char.name }}" class="text-muted" target="_blank">
+                                <i class="fas fa-external-link-alt fa-xs"></i>
+                            </a>
+                        </h6>
+                        <p class="text-success">{{ open.exp_diff }}</p>
                     </div>
                 </div>
             </div>
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3">
+                    <div class="ms-3 text-center">
                         <small>Retro Open PvP</small>
-                        <h6 class="mb-0">123 456 777 777</h6>
+                        <h6 class="mb-0">
+                            <a href="/character/search/?q={{ retro_open.id_char.name }}">{{ retro_open.id_char.name }}</a>
+                            <a href="https://www.tibia.com/community/?subtopic=characters&name={{ retro_open.id_char.name }}" class="text-muted" target="_blank">
+                                <i class="fas fa-external-link-alt fa-xs"></i>
+                            </a>
+                        </h6>
+                        <p class="text-success">{{ retro_open.exp_diff }}</p>
                     </div>
                 </div>
             </div>
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3">
+                    <div class="ms-3 text-center">
                         <small>Retro Hardcore PvP</small>
-                        <h6 class="mb-0">123 456 777 777</h6>
+                        <h6 class="mb-0">
+                            <a href="/character/search/?q={{ retro_hardcore.id_char.name }}">{{ retro_hardcore.id_char.name }}</a>
+                            <a href="https://www.tibia.com/community/?subtopic=characters&name={{ retro_hardcore.id_char.name }}" class="text-muted" target="_blank">
+                                <i class="fas fa-external-link-alt fa-xs"></i>
+                            </a>
+                        </h6>
+                        <p class="text-success">{{ retro_hardcore.exp_diff }}</p>
                     </div>
                 </div>
             </div>
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3">
+                    <div class="ms-3 text-center">
                         <small>Optional PvP</small>
-                        <h6 class="mb-0">123 456 777 777</h6>
+                        <h6 class="mb-0">
+                            <a href="/character/search/?q={{ optional.id_char.name }}">{{ optional.id_char.name }}</a>
+                            <a href="https://www.tibia.com/community/?subtopic=characters&name={{ optional.id_char.name }}" class="text-muted" target="_blank">
+                                <i class="fas fa-external-link-alt fa-xs"></i>
+                            </a>
+                        </h6>
+                        <p class="text-success">{{ optional.exp_diff }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-<!-- Best yesterday End -->
+ <!-- Best yesterday End -->
 
 <!-- News Start -->
     <div class="container-fluid pt-4 px-4">
