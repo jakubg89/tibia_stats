@@ -14,7 +14,6 @@ from django.views.decorators.csrf import csrf_protect
 
 # Main page
 def main_page(request, *args, **kwargs):
-
     # news ticker
     latest_tickers = News.objects.filter(type='ticker').order_by('-news_id')[:3]
 
@@ -109,10 +108,9 @@ def sign_up(request, *args, **kwargs):
 
 # World main
 def worlds_main(request, *args, **kwargs):
-
     # All worlds
-    all_worlds = WorldOnlineHistory.objects\
-        .select_related('world')\
+    all_worlds = WorldOnlineHistory.objects \
+        .select_related('world') \
         .filter(date__gte=datetime.datetime.now() - datetime.timedelta(seconds=260))
 
     # Load data for creation chart from json
@@ -155,7 +153,6 @@ def worlds_main(request, *args, **kwargs):
 
 # Single world
 def single_world(request, name):
-
     # get data from api
     world_information = dataapi.get_world_details(name)
 
@@ -205,7 +202,6 @@ def single_world(request, name):
 # # # # # # # # # # Experience # # # # # # # # # # #
 
 def top_500(request, *args, **kwargs):
-
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = '2022-12-23 11:11:49'
@@ -265,7 +261,6 @@ def top_500(request, *args, **kwargs):
 
 
 def mainland(request, *args, **kwargs):
-
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = '2022-12-23 11:11:50'
@@ -304,7 +299,6 @@ def mainland(request, *args, **kwargs):
 
 
 def rookgaard(request, *args, **kwargs):
-
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = '2022-12-23 11:11:49'
@@ -357,49 +351,168 @@ def explore_highscores(request, *args, **kwargs):
     location = list(set(location))
     result = ''
 
+    pvp_selected = []
+    be_selected = []
+    location_selected = []
+    vocation_selected = []
+    world_selected = ''
+
     if request.POST:
 
         pvp_request = request.POST.getlist('pvp')
-
         pvp_selected = str_to_int_list(pvp_request)
-
-        if not pvp_selected:
-            pvp_selected = pvp_type_q.values_list('pvp_type_value', flat=True)
-            pvp_selected = list(set(pvp_selected))
-
+        pvp_all_values = pvp_type_q.values_list('pvp_type_value', flat=True)
+        pvp_all_values = list(set(pvp_all_values))
+        if len(pvp_selected) == len(pvp_all_values):
+            pvp_selected = []
 
         be_request = request.POST.getlist('be')
         be_selected = str_to_int_list(be_request)
-        if not be_selected:
-            be_selected = battleye_type
+        if len(be_selected) == len(battleye_type):
+            be_selected = []
 
         location_request = request.POST.getlist('location')
         location_selected = str_to_int_list(location_request)
-
-        if not location_selected:
-            location_selected = location
+        if len(location_selected) == len(location):
+            location_selected = []
 
         vocation_request = request.POST.getlist('vocation')
         vocation_selected = str_to_int_list(vocation_request)
-
-        if not vocation_selected:
-            vocation_selected = vocations.values_list('voc_id', flat=True)
-            vocation_selected = list(vocation_selected)
+        vocation_all = vocations.values_list('voc_id', flat=True)
+        vocation_all = list(vocation_all)
+        if all(vocation_selected) == len(vocation_all):
+            vocation_selected = []
 
         world_request = request.POST.getlist('world')
-
-        if world_request[0]:
-
+        if world_request[0] and vocation_selected:
+            world_selected = world_request[0]
+            print(world_selected)
             result = Highscores.objects.filter(world__in=world_request,
                                                voc__in=vocation_selected,
                                                date__gt=date).order_by('-level')
-        
-        else:
-            result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
-                                               world__battleye_value__in=be_selected,
-                                               world__location_value__in=location_selected,
-                                               voc__in=vocation_selected,
+        elif world_request[0] and not vocation_selected:
+            world_selected = world_request[0]
+            result = Highscores.objects.filter(world__in=world_request,
                                                date__gt=date).order_by('-level')
+        elif (not vocation_selected
+              and not pvp_selected
+              and not be_selected
+              and not location_selected
+              and not world_request[0]):
+            result = ''
+        else:
+            if (vocation_selected
+                    and pvp_selected
+                    and be_selected
+                    and location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   world__battleye_value__in=be_selected,
+                                                   world__location_value__in=location_selected,
+                                                   voc__in=vocation_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (vocation_selected
+                  and pvp_selected
+                  and be_selected
+                  and not location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   world__battleye_value__in=be_selected,
+                                                   voc__in=vocation_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (vocation_selected
+                  and pvp_selected
+                  and not be_selected
+                  and not location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   voc__in=vocation_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (vocation_selected
+                  and not pvp_selected
+                  and not be_selected
+                  and not location_selected):
+
+                result = Highscores.objects.filter(voc__in=vocation_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (not vocation_selected
+                  and pvp_selected
+                  and be_selected
+                  and location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   world__battleye_value__in=be_selected,
+                                                   world__location_value__in=location_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (not vocation_selected
+                  and pvp_selected
+                  and be_selected
+                  and not location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   world__battleye_value__in=be_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (not vocation_selected
+                  and pvp_selected
+                  and not be_selected
+                  and not location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (vocation_selected
+                  and not pvp_selected
+                  and be_selected
+                  and location_selected):
+
+                result = Highscores.objects.filter(world__battleye_value__in=be_selected,
+                                                   world__location_value__in=location_selected,
+                                                   voc__in=vocation_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (not vocation_selected
+                  and not pvp_selected
+                  and be_selected
+                  and location_selected):
+
+                result = Highscores.objects.filter(world__battleye_value__in=be_selected,
+                                                   world__location_value__in=location_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (not vocation_selected
+                  and not pvp_selected
+                  and not be_selected
+                  and location_selected):
+
+                result = Highscores.objects.filter(world__location_value__in=location_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (vocation_selected
+                  and pvp_selected
+                  and not be_selected
+                  and location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   world__location_value__in=location_selected,
+                                                   voc__in=vocation_selected,
+                                                   date__gt=date).order_by('-level')
+
+            elif (vocation_selected
+                  and pvp_selected
+                  and not be_selected
+                  and not location_selected):
+
+                result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                                   voc__in=vocation_selected,
+                                                   date__gt=date).order_by('-level')
+
+
 
     content = {
         'worlds_obj': worlds,
@@ -409,7 +522,14 @@ def explore_highscores(request, *args, **kwargs):
             'be': battleye_type,
             'location': location
         },
-        'result': result
+        'result': result,
+        'selected': {
+            'vocation': vocation_selected,
+            'battleye': be_selected,
+            'world': world_selected,
+            'pvp': pvp_selected,
+            'location': location_selected
+        }
     }
 
     return render(request, "sites/experience/explore.html", content)
@@ -420,7 +540,6 @@ def explore_highscores(request, *args, **kwargs):
 
 # Search character
 def search_character(request, *args, **kwargs):
-
     database = True
     # check if it's not empty
     if request.GET:
@@ -462,6 +581,3 @@ def discord(request, *args, **kwargs):
 # About
 def about(request, *args, **kwargs):
     return render(request, "sites/about.html")
-
-
-
