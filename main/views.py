@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db import connection
-from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory
+from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory, Vocation
 from datetime import datetime, timedelta
 import datetime
 from pathlib import Path
@@ -9,6 +9,7 @@ import json
 import pandas as pd
 import scripts.tibiadata_API.get_data as dataapi
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_protect
 
 
 # Main page
@@ -270,7 +271,14 @@ def mainland(request, *args, **kwargs):
     date = '2022-12-23 11:11:50'
     query = ''
     # get world list with id
-    world_list = World.objects.all().values('name', 'name_value', 'world_id')
+    world_list = World.objects.all(
+
+    ).values(
+        'name',
+        'name_value',
+        'world_id'
+
+    )
     main = {}
     if request.GET:
         query = request.GET['q']
@@ -308,13 +316,10 @@ def rookgaard(request, *args, **kwargs):
         '-exp_diff'
     )[:5]
 
-    top = Highscores.objects.filter(
-        Q(date__gt=date)
-        & Q(exp_diff__gt=0)
-        & Q(voc=1)
-    ).order_by(
-        '-exp_diff'
-    )
+    top = Highscores.objects.filter(Q(date__gt=date)
+                                    & Q(exp_diff__gt=0)
+                                    & Q(voc=1)
+                                    ).order_by('-exp_diff')
 
     content = {
         'top': top,
@@ -322,6 +327,95 @@ def rookgaard(request, *args, **kwargs):
     }
 
     return render(request, "sites/experience/rookgaard.html", content)
+
+
+# Explore
+def str_to_int_list(request):
+    list_of_items = map(int, request)
+    return list(list_of_items)
+
+
+@csrf_protect
+def explore_highscores(request, *args, **kwargs):
+    date = '2022-12-23 11:12:49'
+    # Basic view
+    # get vocation list with id / names
+    vocations = Vocation.objects.all()
+
+    # get world list with id / names
+    worlds = World.objects.all()
+
+    pvp_type_q = worlds.values('pvp_type', 'pvp_type_value')
+    pvp_type = pd.DataFrame(data=pvp_type_q)
+    pvp_type = pvp_type.drop_duplicates('pvp_type')
+    pvp_type = pvp_type.to_dict('index')
+
+    battleye_type = worlds.values_list('battleye_value', flat=True)
+    battleye_type = list(set(battleye_type))
+
+    location = worlds.values_list('location_value', flat=True)
+    location = list(set(location))
+    result = ''
+
+    if request.POST:
+
+        pvp_request = request.POST.getlist('pvp')
+
+        pvp_selected = str_to_int_list(pvp_request)
+
+        if not pvp_selected:
+            pvp_selected = pvp_type_q.values_list('pvp_type_value', flat=True)
+            pvp_selected = list(set(pvp_selected))
+
+
+        be_request = request.POST.getlist('be')
+        be_selected = str_to_int_list(be_request)
+        if not be_selected:
+            be_selected = battleye_type
+
+        location_request = request.POST.getlist('location')
+        location_selected = str_to_int_list(location_request)
+
+        if not location_selected:
+            location_selected = location
+
+        vocation_request = request.POST.getlist('vocation')
+        vocation_selected = str_to_int_list(vocation_request)
+
+        if not vocation_selected:
+            vocation_selected = vocations.values_list('voc_id', flat=True)
+            vocation_selected = list(vocation_selected)
+
+        world_request = request.POST.getlist('world')
+
+        if world_request[0]:
+
+            result = Highscores.objects.filter(world__in=world_request,
+                                               voc__in=vocation_selected,
+                                               date__gt=date).order_by('-level')
+        
+        else:
+            result = Highscores.objects.filter(world__pvp_type_value__in=pvp_selected,
+                                               world__battleye_value__in=be_selected,
+                                               world__location_value__in=location_selected,
+                                               voc__in=vocation_selected,
+                                               date__gt=date).order_by('-level')
+
+    content = {
+        'worlds_obj': worlds,
+        'vocation': vocations,
+        'worlds': {
+            'pvp_type': pvp_type,
+            'be': battleye_type,
+            'location': location
+        },
+        'result': result
+    }
+
+    return render(request, "sites/experience/explore.html", content)
+
+
+# # # # # # # # End Experience # # # # # # # # #
 
 
 # Search character
