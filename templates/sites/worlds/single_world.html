@@ -10,7 +10,7 @@
         <!-- Title start -->
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary rounded h-100 p-4">
-                <h1 class="text-center">{{ world.name }}</h1>
+                <h1 class="text-center display-4">{{ world.name }}</h1>
             </div>
         </div>
         <!-- Title end -->
@@ -22,6 +22,8 @@
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
                 <form>
                     <select id="dynamic_select" class="form-select p-3" aria-label="Default select example" >
+                        <option>Select world...</option>
+
                         {% for i in world_list %}
                             {% if i.name != world.name %}
                                 <option value="/worlds/world/{{ i.name_value }}">{{ i.name }}</option>
@@ -182,7 +184,7 @@
                             <tr>
                                 <!-- Name -->
                                 <td>
-                                    <a href="#">{{ i.name }}</a>
+                                    <a href="/character/search/?q={{ i.name }}">{{ i.name }}</a>
                                     <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.name }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
                                     </a>

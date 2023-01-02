@@ -24,7 +24,12 @@ from main.views \
     about, \
     worlds_main,\
     single_world,\
-    search_character
+    search_character, \
+    top_500,\
+    mainland,\
+    rookgaard,\
+    explore_highscores,\
+    world_transfers, name_changes
 
 # Error custom view
 handler404 = 'main.views.error404'
@@ -46,9 +51,10 @@ urlpatterns = [
     path('signup/', sign_up),
 
     # Experience menu
-    path('experience/top500', under_construction),
-    path('experience/mainland', under_construction),
-    path('experience/rookgaard', under_construction),
+    path('experience/top500', top_500),
+    path('experience/mainland/', mainland),
+    path('experience/rookgaard', rookgaard),
+    path('experience/explore/', explore_highscores),
     path('experience/stats', under_construction),
 
     # Charms menu
@@ -69,8 +75,8 @@ urlpatterns = [
 
     # Character menu
     path('character/search/', search_character),
-    path('character/transfers', under_construction),
-    path('character/name_change', under_construction),
+    path('character/transfers', world_transfers),
+    path('character/name_change', name_changes),
 
     # Boss menu
     path('bosses/list', under_construction),
