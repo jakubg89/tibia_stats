@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load custom_tags %}
+
+<!-- Charts start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <!-- Title -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded text-center h-100 p-4">
+                 <h1 class="display-4">World transfers</h1>
+                <small class="mb-5">World transfers list from last week</small>
+                <div class="mt-5">
+                    <table class="table table-borderless table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Transfers</th>
+                                        <th scope="col">Minimum coins amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for key, value in stats.items %}
+                                    <tr>
+                                        <td>{{ key|put_space }}</td>
+                                        <td>{{ value }}</td>
+                                        <td>{{ value|tc_amount}}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                </div>
+
+            </div>
+        </div>
+        <!-- Title end -->
+
+        <!-- 7 day history start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">Last week transfers</h6>
+                <canvas id="transfer-count"></canvas>
+
+                    {% load static %}
+                    <script src="{% static 'root/lib/chart/chart.min.js' %}"></script>
+                    <script type="text/javascript">
+                        Chart.defaults.color = "#6C7293";
+                        Chart.defaults.borderColor = "#000000";
+                        var ctx1 = document.getElementById("transfer-count").getContext("2d");
+                        var myChart1 = new Chart(ctx1, {
+                            type: "bar",
+                            data: {
+                                labels: [
+                                {% for key, value in amount_chart.items %}
+                                    "{{ key|date:"d/m/Y" }}",
+                                {% endfor %}
+                                ],
+                                datasets: [{
+                                    backgroundColor: [
+                                        "rgba(235, 22, 22, .7)",
+                                        "rgba(235, 22, 22, .6)",
+                                        "rgba(235, 22, 22, .5)",
+                                        "rgba(235, 22, 22, .4)",
+                                        "rgba(235, 22, 22, .3)"
+                                    ],
+                                    data: [
+                                    {% for key, value in amount_chart.items %}
+                                        "{{ value }}",
+                                    {% endfor %}
+                                    ]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                legend: { display: false },
+                                plugins: {
+                                            title: {
+                                                display: false,
+                                                text: 'Vocations online'
+                                            },
+                                            legend: {
+                                                display: false
+                                            }
+                                }
+                            }
+                        });
+                    </script>
+            </div>
+        </div>
+        <!-- 7 dayhistory end -->
+
+    </div>
+</div>
+<!-- Charts end -->
+
+<!-- Transfer table Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <div class="col-sm-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h2 class="mb-4 text-center">World Transfers</h2>
+                <div class="table-responsive-xl">
+                    <table id="transfers_table" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Level</th>
+                                <th scope="col">Vocation</th>
+                                <th scope="col">PvP</th>
+                                <th scope="col">From</th>
+                                <th scope="col"></th>
+                                <th scope="col">To</th>
+                                <th scope="col">Pvp</th>
+                                <th scope="col">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in transfers %}
+                            <tr>
+                                <!-- Name -->
+                                <td>
+                                    <a href="/character/search/?q={{ i.id_char.name }}">{{ i.id_char.name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.name }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                                <!-- Level -->
+                                <td>{{ i.level }}</td>
+
+                                <!-- Vocation -->
+                                <td>{{ i.id_char.voc.name }}</td>
+
+                                <!-- PvP -->
+                                {% if world_pvp|get_value:i.old_world == "Open PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
+                                {% elif world_pvp|get_value:i.old_world == "Optional PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
+                                {% elif world_pvp|get_value:i.old_world == "Retro Open PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
+                                {% elif world_pvp|get_value:i.old_world == "Retro Hardcore PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
+                                {% elif world_pvp|get_value:i.old_world == "Hardcore PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_hardcore.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
+                                {% endif %}
+
+                                <!-- Old world -->
+                                <td>
+                                    <a href="/worlds/world/{{ i.old_world }}">{{ i.old_world }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                                <!-- Arrow -->
+                                <td><i class="fas fa-arrow-right fa-lg"></i></td>
+
+                                <!-- New world -->
+                                <td>
+                                    <a href="/worlds/world/{{ i.new_world }}">{{ i.new_world }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                        <i class="fas fa-external-link-alt fa-xs"></i>
+                                    </a>
+                                </td>
+
+                                <!-- PvP -->
+                                {% if world_pvp|get_value:i.new_world == "Open PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
+                                {% elif world_pvp|get_value:i.new_world == "Optional PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
+                                {% elif world_pvp|get_value:i.new_world == "Retro Open PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
+                                {% elif world_pvp|get_value:i.new_world == "Retro Hardcore PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
+                                {% elif world_pvp|get_value:i.new_world == "Hardcore PvP" %}
+                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_hardcore.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
+                                {% endif %}
+
+                                <!-- Date -->
+                                <td>{{ i.date|date:"d/m/Y" }}</td>
+
+
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Transfer table Start -->
+
+{% endblock %}
