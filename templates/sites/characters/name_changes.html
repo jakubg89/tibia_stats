@@ -9,14 +9,14 @@
         <!-- Title -->
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary rounded text-center h-100 p-4">
-                 <h1 class="display-4">World transfers</h1>
-                <small class="mb-5">World transfers list from last week</small>
+                 <h1 class="display-4">Name changes</h1>
+                <small class="mb-5">Name changes list from last week</small>
                 <div class="mt-5">
                     <table class="table table-borderless table-hover">
                                 <thead>
                                     <tr>
                                         <th scope="col"></th>
-                                        <th scope="col">Transfers</th>
+                                        <th scope="col">Name changes</th>
                                         <th scope="col">Minimum coins amount</th>
                                     </tr>
                                 </thead>
@@ -25,7 +25,7 @@
                                     <tr>
                                         <td>{{ key|put_space }}</td>
                                         <td>{{ value }}</td>
-                                        <td>{{ value|tc_amount_transfer}}</td>
+                                        <td>{{ value|tc_amount_name}}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -100,56 +100,25 @@
 
         <div class="col-sm-12">
             <div class="bg-secondary rounded h-100 p-4">
-                <h2 class="mb-4 text-center">World Transfers</h2>
+                <h2 class="mb-4 text-center">Name changes</h2>
                 <div class="table-responsive-xl">
-                    <table id="transfers_table" class="table table-hover">
+                    <table id="name_change_table" class="table table-hover">
                         <thead>
                             <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">Level</th>
-                                <th scope="col">Vocation</th>
-                                <th scope="col">PvP</th>
-                                <th scope="col">From</th>
+                                <th scope="col">Old name</th>
                                 <th scope="col"></th>
-                                <th scope="col">To</th>
-                                <th scope="col">Pvp</th>
+                                <th scope="col">New name</th>
+                                <th scope="col">Level</th>
                                 <th scope="col">Date</th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for i in transfers %}
                             <tr>
-                                <!-- Name -->
+                                <!-- Old name -->
                                 <td>
-                                    <a href="/character/search/?q={{ i.id_char.name }}">{{ i.id_char.name }}</a>
-                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.name }}" class="text-muted" target="_blank">
-                                        <i class="fas fa-external-link-alt fa-xs"></i>
-                                    </a>
-                                </td>
-
-                                <!-- Level -->
-                                <td>{{ i.level }}</td>
-
-                                <!-- Vocation -->
-                                <td>{{ i.id_char.voc.name }}</td>
-
-                                <!-- PvP -->
-                                {% if world_pvp|get_value:i.old_world == "Open PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
-                                {% elif world_pvp|get_value:i.old_world == "Optional PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
-                                {% elif world_pvp|get_value:i.old_world == "Retro Open PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
-                                {% elif world_pvp|get_value:i.old_world == "Retro Hardcore PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
-                                {% elif world_pvp|get_value:i.old_world == "Hardcore PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_hardcore.gif" width="23"> {{ world_pvp|get_value:i.old_world }}</td>
-                                {% endif %}
-
-                                <!-- Old world -->
-                                <td>
-                                    <a href="/worlds/world/{{ i.old_world }}">{{ i.old_world }}</a>
-                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                    <a href="/character/search/?q={{ i.id_char.name }}">{{ i.old_name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
                                     </a>
                                 </td>
@@ -157,31 +126,19 @@
                                 <!-- Arrow -->
                                 <td><i class="fas fa-arrow-right fa-lg"></i></td>
 
-                                <!-- New world -->
+                                <!-- New name -->
                                 <td>
-                                    <a href="/worlds/world/{{ i.new_world }}">{{ i.new_world }}</a>
-                                    <a href="https://www.tibia.com/community/?subtopic=worlds&world={{ i.world.name_value }}" class="text-muted" target="_blank">
+                                    <a href="/character/search/?q={{ i.id_char.name }}">{{ i.new_name }}</a>
+                                    <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
                                     </a>
                                 </td>
 
-                                <!-- PvP -->
-                                {% if world_pvp|get_value:i.new_world == "Open PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
-                                {% elif world_pvp|get_value:i.new_world == "Optional PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
-                                {% elif world_pvp|get_value:i.new_world == "Retro Open PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
-                                {% elif world_pvp|get_value:i.new_world == "Retro Hardcore PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
-                                {% elif world_pvp|get_value:i.new_world == "Hardcore PvP" %}
-                                     <td><img src="https://static.tibia.com/images/global/content/option_server_pvp_type_hardcore.gif" width="23"> {{ world_pvp|get_value:i.new_world }}</td>
-                                {% endif %}
+                                <!-- Level -->
+                                <td>{{ i.level }}</td>
 
                                 <!-- Date -->
                                 <td>{{ i.date|date:"d/m/Y" }}</td>
-
-
 
                             </tr>
                         {% endfor %}

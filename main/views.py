@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db import connection
-from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory, Vocation, WorldTransfers
+from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory, Vocation, WorldTransfers, NameChange
 from datetime import datetime, timedelta
 import datetime
 from pathlib import Path
@@ -577,7 +577,6 @@ def search_character(request, *args, **kwargs):
 def world_transfers(request, *args, **kwargs):
     date = '2022-12-23 10:18:00'
 
-
     transfers = WorldTransfers.objects.all()
 
     worlds = World.objects.all().values('name', 'pvp_type')
@@ -608,6 +607,37 @@ def world_transfers(request, *args, **kwargs):
     }
 
     return render(request, "sites/characters/worldtransfers.html", content)
+
+
+# Name Changes
+def name_changes(request, *args, **kwargs):
+    date = '2022-12-23 10:18:00'
+
+    name_change = NameChange.objects.all()
+
+    chart = name_change.values()
+    chart_df = pd.DataFrame(data=chart)
+    name_changes_count = chart_df['date'].value_counts()
+    name_changes_sorted = name_changes_count.sort_index().head(7)
+    name_changes_dict = name_changes_sorted.to_dict()
+
+    yesterday_changes = name_change.filter(date__gt='2022-12-23 11:12:49').count()
+    # last_7_days_changes = transfers.filter(date__gt=date).count()
+    # last_30_days_changes = transfers.filter(date__gt=date).count()
+    all_changes = name_change.count()
+
+    content = {
+        'transfers': name_change,
+        'amount_chart': name_changes_dict,
+        'stats': {
+            'Yesterday': yesterday_changes,
+            # 'Last_7_days': last_7_days_changes,
+            # 'Last_30_days': last_30_days_changes,
+            'Total_recorded': all_changes
+        }
+    }
+
+    return render(request, "sites/characters/name_changes.html", content)
 
 
 # Discords
