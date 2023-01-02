@@ -20,6 +20,11 @@ def get_value(my_dict, key):
     return my_dict[key]
 
 
-@register.filter(name='tc_amount')
+@register.filter(name='tc_amount_transfer')
 def get_value(transfers):
     return transfers * 750
+
+
+@register.filter(name='tc_amount_name')
+def get_value(name_change):
+    return name_change * 250
