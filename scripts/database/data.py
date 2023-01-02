@@ -5,6 +5,7 @@ from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
 from main.models import World, Vocation, Character, Highscores, WorldTransfers, NameChange, RecordsHistory
+
 # from os import environ
 
 # custom
@@ -40,6 +41,7 @@ def main():
     # once a day (every 24h)
     # filter_highscores_data()
     # get_daily_records()
+
 
 
 def add_backslashes(text):
@@ -164,6 +166,7 @@ def add_news_to_db():
                 exist = cursor.fetchone()
 
                 # check the result and perform insert if it's not in database
+
                 if exist[0] != 1:
                     single_news = dataapi.get_specific_news(i)
 

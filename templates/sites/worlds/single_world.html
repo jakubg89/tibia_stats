@@ -23,6 +23,7 @@
                 <form>
                     <select id="dynamic_select" class="form-select p-3" aria-label="Default select example" >
                         <option>Select world...</option>
+
                         {% for i in world_list %}
                             {% if i.name != world.name %}
                                 <option value="/worlds/world/{{ i.name_value }}">{{ i.name }}</option>
@@ -184,6 +185,7 @@
                                 <!-- Name -->
                                 <td>
                                     <a href="/character/search/?q={{ i.name }}">{{ i.name }}</a>
+
                                     <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.name }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
                                     </a>

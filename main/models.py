@@ -134,7 +134,6 @@ class Vocation(models.Model):
 
 
 class World(models.Model):
-
     world_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     name_value = models.CharField(max_length=45, blank=True, null=True)
@@ -163,6 +162,7 @@ class WorldOnlineHistory(models.Model):
         db_table = 'world_online_history'
 
 
+
 class WorldTransfers(models.Model):
     world_transfer_id = models.AutoField(primary_key=True)
     id_char = models.ForeignKey(Character, models.DO_NOTHING, db_column='id_char')
@@ -178,3 +178,4 @@ class WorldTransfers(models.Model):
         managed = True
         db_table = 'world_transfers'
         unique_together = (('world_transfer_id', 'id_char'),)
+

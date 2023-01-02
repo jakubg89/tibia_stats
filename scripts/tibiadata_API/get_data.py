@@ -94,10 +94,10 @@ def get_highscores(
         profession,
         site_num
 ):  # https://api.tibiadata.com/v3/highscores/Antica/experience/knights/3
+
     url = f'https://api.tibiadata.com/v3/highscores/{world}/{category}/{profession}/{site_num}'
     highscores = request(url)
     return highscores['highscores']
-
 
 # # # # # # # Experience end # # # # # # #
 
