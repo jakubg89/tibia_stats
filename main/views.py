@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.db import connection
-from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory, Vocation
+from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory, Vocation, WorldTransfers
 from datetime import datetime, timedelta
 import datetime
 from pathlib import Path
@@ -181,10 +181,9 @@ def single_world(request, name):
     }
 
     # sort by value (highest > lowest)
-    online_counter = {key: value
-                      for key, value in sorted(online_counter.items(),
-                                               key=lambda item: item[1],
-                                               reverse=True)}
+    online_counter = {key: value for key, value in sorted(online_counter.items(),
+                                                          key=lambda item: item[1],
+                                                          reverse=True)}
 
     # get world list with id
     world_list = World.objects.all().values('name', 'name_value')
@@ -400,7 +399,7 @@ def explore_highscores(request, *args, **kwargs):
               and not be_selected
               and not location_selected
               and not world_request[0]):
-            result = ''
+            result = []
 
         else:
             if (vocation_selected
@@ -510,7 +509,8 @@ def explore_highscores(request, *args, **kwargs):
                 result = result.filter(world__battleye_value__in=be_selected)
 
         # values?
-        result = result.order_by('-level')
+        if result:
+            result = result.order_by('-level')
 
     content = {
         'worlds_obj': worlds,
@@ -535,6 +535,8 @@ def explore_highscores(request, *args, **kwargs):
 
 # # # # # # # # End Experience # # # # # # # # #
 
+
+# # # # # # # # Characters # # # # # # # # # # #
 
 # Search character
 def search_character(request, *args, **kwargs):
@@ -569,6 +571,43 @@ def search_character(request, *args, **kwargs):
         'char': character_information,
     }
     return render(request, "sites/characters/search_character.html", content)
+
+
+# World Transfers
+def world_transfers(request, *args, **kwargs):
+    date = '2022-12-23 10:18:00'
+
+
+    transfers = WorldTransfers.objects.all()
+
+    worlds = World.objects.all().values('name', 'pvp_type')
+    worlds_df = pd.DataFrame(data=worlds)
+    worlds_dict = dict(zip(worlds_df.name, worlds_df.pvp_type))
+
+    chart = transfers.values()
+    chart_df = pd.DataFrame(data=chart)
+    transfers_count = chart_df['date'].value_counts()
+    transfers_count_sorted = transfers_count.sort_index().head(7)
+    transfers_count_dict = transfers_count_sorted.to_dict()
+
+    yesterday_transfers = transfers.filter(date__gt='2022-12-23 11:12:49').count()
+    # last_7_days_transfers = transfers.filter(date__gt=date).count()
+    # last_30_days_transfers = transfers.filter(date__gt=date).count()
+    all_transfers = transfers.count()
+
+    content = {
+        'transfers': transfers,
+        'world_pvp': worlds_dict,
+        'amount_chart': transfers_count_dict,
+        'stats': {
+            'Yesterday': yesterday_transfers,
+            # 'Last_7_days': last_7_days_transfers,
+            # 'Last_30_days': last_30_days_transfers,
+            'Total_recorded': all_transfers
+        }
+    }
+
+    return render(request, "sites/characters/worldtransfers.html", content)
 
 
 # Discords
