@@ -5,7 +5,6 @@ from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
 from main.models import World, Vocation, Character, Highscores, WorldTransfers, NameChange, RecordsHistory
-
 # from os import environ
 
 # custom
@@ -24,7 +23,6 @@ from pathlib import Path
 
 
 def main():
-
     # after server save and for check around 13-14 cet
     # add_boss_to_db()
     # add_creature_to_db()
@@ -97,6 +95,7 @@ def add_news_ticker_to_db():
                 exist = cursor.fetchone()
 
                 # check the result and perform insert if it's not in database
+
                 if exist[0] != 1:
                     single_news = dataapi.get_specific_news(i)
 
@@ -166,7 +165,6 @@ def add_news_to_db():
                 exist = cursor.fetchone()
 
                 # check the result and perform insert if it's not in database
-
                 if exist[0] != 1:
                     single_news = dataapi.get_specific_news(i)
 
@@ -780,7 +778,6 @@ def get_daily_records():
         )
         obj.append(record)
     RecordsHistory.objects.bulk_create(obj)
-
 
 # # # # # # # Experience end # # # # # # #
 

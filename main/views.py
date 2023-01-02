@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.db import connection
 from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory, Vocation, WorldTransfers, NameChange
 from datetime import datetime, timedelta
-
 import datetime
 from pathlib import Path
 import os
@@ -644,7 +643,6 @@ def name_changes(request, *args, **kwargs):
     }
 
     return render(request, "sites/characters/name_changes.html", content)
-
 
 
 # Discords

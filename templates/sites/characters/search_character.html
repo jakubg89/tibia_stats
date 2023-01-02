@@ -11,7 +11,6 @@
                 <div class="col-sm-12 col-xl-{% if database %}6{% else %}12{% endif %}">
                     <div class="bg-secondary rounded h-100 p-4">
                         <h1 class="mb-4 text-center display-4">{{ char.character.name }}</h1>
-
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                 <button class="nav-link active" id="general-tab" data-bs-toggle="tab"
@@ -35,7 +34,6 @@
                                     data-bs-target="#nav-death" type="button" role="tab"
                                     aria-controls="nav-death" aria-selected="false">Deaths</button>
                                 {% endif %}
-
                             </div>
                         </nav>
 
@@ -114,6 +112,7 @@
                                     </div>
                                 </div>
 
+
                             <!-- General information end -->
 
                             {% if char.achievements %}
@@ -128,7 +127,6 @@
                                                 </ul>
                                             </div>
                                         </div>
-
                                     </div>
                                 <!-- Achievements end -->
                             {% endif %}
@@ -198,7 +196,6 @@
                                 </div>
                             <!-- Account end -->
                             {% endif %}
-
 
                             {% if char.deaths %}
                             <!-- Deaths start -->
@@ -291,5 +288,6 @@
         </div>
     </div>
     <!-- Nothing specified end -->
+
 {% endif %}
 {% endblock %}
