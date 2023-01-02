@@ -11,11 +11,11 @@ Django project that provides tools and statistics for players of Tibia.
     - [ ] Online time counter.
 2. **Character information.**
     - [x] Basic information.
-    - [ ] World transfers.
-    - [ ] Name changes.
+    - [x] World transfers.
+    - [x] Name changes.
 3. **Experience change list.**
-    - [ ] Mainland.
-    - [ ] Rookgaard.
+    - [x] Mainland.
+    - [x] Rookgaard.
 4. **Charm change list.**
     - [ ] Mainland.
     - [ ] Rookgaard.
