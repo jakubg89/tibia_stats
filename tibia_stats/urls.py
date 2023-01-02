@@ -29,7 +29,8 @@ from main.views \
     top_500,\
     mainland,\
     rookgaard,\
-    explore_highscores
+    explore_highscores,\
+    world_transfers
 
 # Error custom view
 handler404 = 'main.views.error404'
@@ -75,7 +76,7 @@ urlpatterns = [
 
     # Character menu
     path('character/search/', search_character),
-    path('character/transfers', under_construction),
+    path('character/transfers', world_transfers),
     path('character/name_change', under_construction),
 
     # Boss menu
