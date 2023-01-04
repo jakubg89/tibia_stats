@@ -47,6 +47,14 @@ def add_backslashes(text):
     return text
 
 
+def date_with_seconds():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def date_with_day():
+    return datetime.now().strftime("%Y-%m-%d")
+
+
 def format_content(raw_html):
     formatted_html = BeautifulSoup(raw_html, 'html.parser')
 
@@ -99,7 +107,7 @@ def add_news_ticker_to_db():
                     single_news = dataapi.get_specific_news(i)
 
                     # prepare data
-                    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    date = date_with_seconds()
                     content = add_backslashes(single_news['content'])
                     content_html = add_backslashes(single_news['content_html'])
 
@@ -168,7 +176,7 @@ def add_news_to_db():
                     single_news = dataapi.get_specific_news(i)
 
                     # prepare data
-                    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    date = date_with_seconds()
                     content = add_backslashes(single_news['content'])
                     content_html = add_backslashes(single_news['content_html'])
                     formatted_content = add_backslashes(format_content(content_html))
@@ -224,7 +232,7 @@ def add_boss_to_db():
 
     # check if list is not empty
     if boss_info:
-        date = datetime.now().strftime("%Y-%m-%d")
+        date = date_with_day()
         with connection.cursor() as cursor:
             # execute query
             cursor.execute(
@@ -240,7 +248,7 @@ def add_creature_to_db():
 
     # check if list is not empty
     if creature_info:
-        date = datetime.now().strftime("%Y-%m-%d")
+        date = date_with_day()
         with connection.cursor() as cursor:
             # execute query
             cursor.execute(
@@ -326,7 +334,7 @@ def add_world_online_history():
         )
         query_result = cursor.fetchall()
 
-        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date = date_with_seconds()
         for i in query_result:
             worlds_id.update({i[0]: i[1]})
 
@@ -436,7 +444,7 @@ def collect_char_id():   # collect data about character from db
 def filter_highscores_data():   # filter and prepare data to put inside db
 
     # collect data
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    date = date_with_seconds()
     vocations_id = collect_voc_id()
     worlds_id = collect_world_id()
     chars_id = collect_char_id()
@@ -529,7 +537,7 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     latest_highscores = latest_highscores[latest_highscores['name_id_db'] != 0]
 
     # collect data from day before from db from last day
-    old_highscores_query = Highscores.objects.all().filter(Q(date__gt='2022-12-23 10:15:30')).values(
+    old_highscores_query = Highscores.objects.all().filter(Q(date__gt='2022-12-23 11:12:49')).values(
                                                 'exp_rank',
                                                 'id_char',
                                                 'voc_id',
@@ -689,7 +697,7 @@ def get_daily_records():
     # best exp yesterday on each world
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = '2022-12-23 11:11:50'
+    date = '2023-01-01 11:11:50'
 
     # world_types = {
     #    0: 'Open PvP',
