@@ -11,7 +11,9 @@ from main.models import (World,
                          WorldTransfers,
                          NameChange,
                          RecordsHistory,
-                         News)
+                         News,
+                         Boosted,
+                         WorldOnlineHistory)
 # from os import environ
 
 # custom
@@ -132,7 +134,6 @@ def add_news_ticker_to_db():
                           date_added=date)
             tickers.append(ticker)
         News.objects.bulk_create(tickers)
-        print(f'Added: {len(tickers)} items')
 
 # # # # # # # News ticker end # # # # # # #
 
@@ -197,12 +198,11 @@ def add_boss_to_db():
     # check if list is not empty
     if boss_info:
         date = date_with_day()
-        with connection.cursor() as cursor:
-            # execute query
-            cursor.execute(
-                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date_time) "
-                f"VALUES (NULL, '{boss_info['name']}', '{boss_info['image_url']}', '{category}', '{date}');"
-            )
+        boss = Boosted(name=boss_info['name'],
+                       image_url=boss_info['image_url'],
+                       type=category,
+                       date_time=date)
+        boss.save()
 
 
 # adds boosted creature to database
@@ -213,13 +213,11 @@ def add_creature_to_db():
     # check if list is not empty
     if creature_info:
         date = date_with_day()
-        with connection.cursor() as cursor:
-            # execute query
-            cursor.execute(
-                f"INSERT INTO Boosted (boosted_id, name, image_url, type, date_time) "
-                f"VALUES (NULL, '{creature_info['name']}', '{creature_info['image_url']}', '{category}', '{date}');"
-            )
-
+        creature = Boosted(name=creature_info['name'],
+                           image_url=creature_info['image_url'],
+                           type=category,
+                           date_time=date)
+        creature.save()
 
 # # # # # # # Boosted creature/boss end # # # # # # #
 
@@ -289,28 +287,19 @@ def add_worlds_information_to_db():
 
 def add_world_online_history():
     worlds_information_api = dataapi.get_worlds_information()
-    worlds_id = {}
 
-    with connection.cursor() as cursor:
-        # check if database already has that id return 1 or 0
-        cursor.execute(
-            f"SELECT name, world_id FROM world;"
-        )
-        query_result = cursor.fetchall()
+    world_id = World.objects.all().values('name', 'world_id')
+    world_id_df = pd.DataFrame(data=world_id)
+    worlds_id_dict = world_id_df.set_index('name')['world_id'].to_dict()
 
-        date = date_with_seconds()
-        for i in query_result:
-            worlds_id.update({i[0]: i[1]})
-
-        for world in worlds_information_api:
-
-            # execute query
-            cursor.execute(
-                f"INSERT INTO world_online_history () VALUES (NULL, "
-                f"'{worlds_id[world['name']]}', "  # world id
-                f"'{world['players_online']}', "  # online players
-                f"'{date}');"  # date_time
-            )
+    date = date_with_seconds()
+    obj = []
+    for world in worlds_information_api:
+        players_online = WorldOnlineHistory(world_id=worlds_id_dict[world['name']],
+                                            players_online=world['players_online'],
+                                            date=date)
+        obj.append(players_online)
+    WorldOnlineHistory.objects.bulk_create(obj)
 
 
 def add_online_players():
