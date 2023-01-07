@@ -51,6 +51,7 @@ def main():
     # get_daily_records()
 
 
+
 def add_backslashes(text):
     text = text.replace("'", "\\'")
     return text
@@ -142,6 +143,7 @@ def add_news_ticker_to_db():
 
 # adding news to database if it not exists
 def add_news_to_db():
+
 
     # get all tibia.com id from database
     db_news = News.objects.all().values('id_on_tibiacom', 'type')

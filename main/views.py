@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.db import connection
 from .models import News, Boosted, World, WorldOnlineHistory, Highscores, RecordsHistory, Vocation, WorldTransfers, NameChange
 from datetime import datetime, timedelta
+
 import datetime
 from pathlib import Path
 import os
@@ -14,6 +15,7 @@ from django.views.decorators.csrf import csrf_protect
 
 # Main page
 def main_page(request, *args, **kwargs):
+
     # news ticker
     latest_tickers = News.objects.filter(type='ticker').order_by('-news_id')[:3]
 
@@ -25,6 +27,7 @@ def main_page(request, *args, **kwargs):
 
     # news
     latest_news = News.objects.filter(type='news').order_by('-news_id')[:4]
+
 
     # best exp yesterday on each world
     now = datetime.datetime.now()
@@ -80,6 +83,7 @@ def main_page(request, *args, **kwargs):
         'open': best_open_pvp,
         'retro_open': best_retro_open_pvp,
         'retro_hardcore': best_retro_hardcore_pvp
+
     }
     return render(request, "sites/index.html", content)
 
@@ -153,6 +157,7 @@ def worlds_main(request, *args, **kwargs):
 
 # Single world
 def single_world(request, name):
+
     # get data from api
     world_information = dataapi.get_world_details(name)
 
@@ -184,6 +189,7 @@ def single_world(request, name):
     online_counter = {key: value for key, value in sorted(online_counter.items(),
                                                           key=lambda item: item[1],
                                                           reverse=True)}
+
 
     # get world list with id
     world_list = World.objects.all().values('name', 'name_value')
@@ -541,6 +547,7 @@ def explore_highscores(request, *args, **kwargs):
 # Search character
 def search_character(request, *args, **kwargs):
     database = True
+
     # check if it's not empty
     if request.GET:
         query = request.GET['q']  # <input name="q"> return dictionary { q : item }
@@ -555,7 +562,6 @@ def search_character(request, *args, **kwargs):
             else:
                 character_information = f'Character {query} does not exist.'  # if not exist
                 exist = False
-
         else:
             character_information = f'Character {query} does not exist.'  # if contains numbers or special characters
             exist = False
@@ -638,6 +644,7 @@ def name_changes(request, *args, **kwargs):
     }
 
     return render(request, "sites/characters/name_changes.html", content)
+
 
 
 # Discords
