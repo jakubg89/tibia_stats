@@ -4,7 +4,14 @@ import pandas
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
-from main.models import World, Vocation, Character, Highscores, WorldTransfers, NameChange, RecordsHistory
+from main.models import (World,
+                         Vocation,
+                         Character,
+                         Highscores,
+                         WorldTransfers,
+                         NameChange,
+                         RecordsHistory,
+                         News)
 # from os import environ
 
 # custom
@@ -79,8 +86,8 @@ def format_content(raw_html):
         paragraphs_in_news[i]['id'] = i
 
     # deleting last paragraph
-    if len(paragraphs_in_news) > 1:
-        formatted_html.find('p', {'id': (len(paragraphs_in_news) - 1)}).decompose()
+    # if len(paragraphs_in_news) > 1:
+    #    formatted_html.find('p', {'id': (len(paragraphs_in_news) - 1)}).decompose()
     return str(formatted_html)
 
 
@@ -88,66 +95,44 @@ def format_content(raw_html):
 
 # adding news to database if it not exists
 def add_news_ticker_to_db():
-    # get latest id list
-    id_list = get_latest_news_ticker_id()
+
+    # get all tibia.com id from database
+    db_news = News.objects.all().values('id_on_tibiacom', 'type')
+    db_news_df = pd.DataFrame(data=db_news)
+    db_news_df = db_news_df[db_news_df['type'] == 'ticker']
+
+    # get 90 day history from tibia.com (news and article)
+    all_ticker = dataapi.get_ticker_history()
+    all_ticker_df = pd.DataFrame(data=all_ticker)
+    all_ticker_df.rename(columns={'id': 'id_on_tibiacom'}, inplace=True)
+    all_ticker_df.drop(columns=['date', 'news', 'category', 'url'], inplace=True)
+    not_existing_id = db_news_df.merge(all_ticker_df,
+                                       on='id_on_tibiacom',
+                                       how='right',
+                                       indicator=True).query('_merge == "right_only"')
+
+    id_list = not_existing_id['id_on_tibiacom'].values.tolist()
 
     # check if list is not empty, if yes we just skip that part. All news tickers are up to date.
     if id_list:
+        tickers = []
         for i in id_list:
-            with connection.cursor() as cursor:
+            single_news = dataapi.get_specific_news(i)
 
-                # check if database already has that id return 1 or 0
-                query = f"SELECT EXISTS" \
-                        f"(SELECT id_on_tibiacom FROM news WHERE id_on_tibiacom = {i} AND (type='ticker')) as truth;"
-                cursor.execute(query)
-                exist = cursor.fetchone()
+            # prepare data
+            date = date_with_seconds()
+            content = add_backslashes(single_news['content'])
+            content_html = add_backslashes(single_news['content_html'])
 
-                # check the result and perform insert if it's not in database
-                if exist[0] != 1:
-                    single_news = dataapi.get_specific_news(i)
-
-                    # prepare data
-                    date = date_with_seconds()
-                    content = add_backslashes(single_news['content'])
-                    content_html = add_backslashes(single_news['content_html'])
-
-                    # execute query
-                    cursor.execute(
-                        f"INSERT INTO News "
-                        f"(news_id, id_on_tibiacom, url_tibiacom, type, content, content_html, date_added) "
-                        f"VALUES (NULL,"
-                        f" {single_news['id']}, "
-                        f"'{single_news['url']}', "
-                        f"'{single_news['type']}', "
-                        f"'{content}', "
-                        f"'{content_html}', "
-                        f"'{date}');"
-                    )
-
-
-# compare list of latest 90 days history of news from tibia.com to existing ones in database
-def get_latest_news_ticker_id():
-    # getting dictionary from tibia.com with all news from last 90 days
-    all_tickers = dataapi.get_ticker_history()
-    all_id_tibia_com = []
-    all_id_db = []
-
-    # assign id to list
-    for row in all_tickers:
-        all_id_tibia_com.append(row['id'])
-
-    # getting list of id from db which are not older than 90 days
-    with connection.cursor() as cursor:
-        cursor.execute(
-            'SELECT id_on_tibiacom FROM news WHERE date_added >= (NOW() - INTERVAL 90 DAY) AND (type="ticker");'
-        )
-        query_result = cursor.fetchall()
-    for row in query_result:
-        all_id_db.append(row[0])
-
-    # return list of unique id that are not included in db
-    return list(set(all_id_tibia_com) - set(all_id_db))
-
+            ticker = News(id_on_tibiacom=single_news['id'],
+                          url_tibiacom=single_news['url'],
+                          type=single_news['type'],
+                          content=content,
+                          content_html=content_html,
+                          date_added=date)
+            tickers.append(ticker)
+        News.objects.bulk_create(tickers)
+        print(f'Added: {len(tickers)} items')
 
 # # # # # # # News ticker end # # # # # # #
 
@@ -156,69 +141,48 @@ def get_latest_news_ticker_id():
 
 # adding news to database if it not exists
 def add_news_to_db():
-    # get latest id list
-    id_list = get_latest_news_id()
+
+    # get all tibia.com id from database
+    db_news = News.objects.all().values('id_on_tibiacom', 'type')
+    db_news_df = pd.DataFrame(data=db_news)
+    db_news_df = db_news_df[db_news_df['type'] == 'news']
+
+    # get 90 day history from tibia.com (news and article)
+    all_news = dataapi.get_news_history()
+    all_news_df = pd.DataFrame(data=all_news)
+    all_news_df = all_news_df[all_news_df['type'] == 'news']
+    all_news_df.rename(columns={'id': 'id_on_tibiacom'}, inplace=True)
+    all_news_df.drop(columns=['date', 'news', 'category', 'url'], inplace=True)
+
+    not_existing_id = db_news_df.merge(all_news_df,
+                                       on='id_on_tibiacom',
+                                       how='right',
+                                       indicator=True).query('_merge == "right_only"')
+
+    id_list = not_existing_id['id_on_tibiacom'].values.tolist()
 
     # check if list is not empty, if yes we just skip that part. All news tickers are up to date.
     if id_list:
+        obj = []
         for i in id_list:
-            with connection.cursor() as cursor:
+            single_news = dataapi.get_specific_news(i)
 
-                # check if database already has that id return 1 or 0
-                cursor.execute(
-                    f"SELECT EXISTS(SELECT id_on_tibiacom FROM news "
-                    f"WHERE id_on_tibiacom = {i} AND (type='news')) as truth;"
-                )
-                exist = cursor.fetchone()
+            # prepare data
+            date = date_with_seconds()
+            content = add_backslashes(single_news['content'])
+            content_html = add_backslashes(single_news['content_html'])
+            formatted_content = add_backslashes(format_content(content_html))
+            title = add_backslashes(single_news['title'])
 
-                # check the result and perform insert if it's not in database
-                if exist[0] != 1:
-                    single_news = dataapi.get_specific_news(i)
-
-                    # prepare data
-                    date = date_with_seconds()
-                    content = add_backslashes(single_news['content'])
-                    content_html = add_backslashes(single_news['content_html'])
-                    formatted_content = add_backslashes(format_content(content_html))
-                    title = add_backslashes(single_news['title'])
-
-                    # execute query
-                    cursor.execute(
-                        f"INSERT INTO News "
-                        f"(news_id, id_on_tibiacom, url_tibiacom, type, content, content_html, date_added, news_title) "
-                        f"VALUES (NULL, "
-                        f"{single_news['id']}, "
-                        f"'{single_news['url']}', "
-                        f"'news', "
-                        f"'{content}', "
-                        f"'{formatted_content}', "
-                        f"'{date}', "
-                        f"'{title}');"
-                    )
-
-
-def get_latest_news_id():
-    # getting dictionary from tibia.com with all news from last 90 days
-    all_news = dataapi.get_news_history()
-    all_id_tibia_com = []
-    all_id_db = []
-
-    # assign id to list
-    for row in all_news:
-        all_id_tibia_com.append(row['id'])
-
-    # getting list of id from db which are not older than 90 days
-    with connection.cursor() as cursor:
-        cursor.execute(
-            'SELECT id_on_tibiacom FROM news WHERE date_added >= (NOW() - INTERVAL 90 DAY) AND (type="news");'
-        )
-        query_result = cursor.fetchall()
-    for row in query_result:
-        all_id_db.append(row[0])
-
-    # return list of unique id that are not included in db
-    return list(set(all_id_tibia_com) - set(all_id_db))
-
+            news = News(id_on_tibiacom=single_news['id'],
+                        url_tibiacom=single_news['url'],
+                        type='news',
+                        content=content,
+                        content_html=formatted_content,
+                        date_added=date,
+                        news_title=title)
+            obj.append(news)
+        News.objects.bulk_create(obj)
 
 # # # # # # # News end # # # # # # #
 
@@ -369,7 +333,7 @@ def get_highscores():
                    'sorcerers',
                    'druids']
 
-    # getting wolrd list ( name = value , for now )
+    # getting world list ( name = value , for now )
     world_list_from_db = World.objects.all().values('name_value')
     world_list_df = pd.DataFrame(data=world_list_from_db)
     worlds = world_list_df['name_value'].tolist()
@@ -383,7 +347,7 @@ def get_highscores():
         # for loop for each profession
         for prof in proffesions:
 
-            # get total site number before executin loop over each site
+            # get total site number before execution loop over each site
             # 1-20 sites are possible
             request_from_api = dataapi.get_highscores(world, category, prof, 1)
             site_num = request_from_api['highscore_page']['total_pages']
@@ -405,7 +369,8 @@ def get_highscores():
     return result_df
 
 
-def collect_voc_id():   # collect data about vocation from db
+# collect data about vocation from db
+def collect_voc_id():
     voc = Vocation.objects.all().values('voc_id', 'name')
     voc_df = pd.DataFrame(data=voc)
     formatted_voc_data = {}
@@ -417,7 +382,8 @@ def collect_voc_id():   # collect data about vocation from db
     return formatted_voc_data
 
 
-def collect_world_id():   # collect data about worlds from db
+# collect data about worlds from db
+def collect_world_id():
     world = World.objects.all().values('world_id', 'name')
     world_df = pd.DataFrame(data=world)
     formatted_world_data = {}
@@ -429,7 +395,8 @@ def collect_world_id():   # collect data about worlds from db
     return formatted_world_data
 
 
-def collect_char_id():   # collect data about character from db
+# collect data about character from db
+def collect_char_id():
     characters = Character.objects.all().values('id_char', 'name')
     characters_df = pd.DataFrame(data=characters)
     formatted_characters_data = {}
@@ -441,7 +408,8 @@ def collect_char_id():   # collect data about character from db
     return formatted_characters_data
 
 
-def filter_highscores_data():   # filter and prepare data to put inside db
+# filter and prepare data to put inside db
+def filter_highscores_data():
 
     # collect data
     date = date_with_seconds()
@@ -498,19 +466,15 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # insert new characters to db
 
     name_list = set(name_list_dont_exist).difference(new_names)
-
     if name_list:
-
         new_characters = latest_highscores[latest_highscores['name'].isin(name_list)]
         new_characters_dict = new_characters.to_dict('index')
-
         obj = []
         for i in new_characters_dict:
-            char = Character(
-                name=new_characters_dict[i]['name'],
-                world_id=new_characters_dict[i]['world'],
-                voc_id=new_characters_dict[i]['vocation']
-            )
+            char = Character(name=new_characters_dict[i]['name'],
+                             world_id=new_characters_dict[i]['world'],
+                             voc_id=new_characters_dict[i]['vocation']
+                             )
             obj.append(char)
         Character.objects.bulk_create(obj)
 
@@ -537,16 +501,14 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     latest_highscores = latest_highscores[latest_highscores['name_id_db'] != 0]
 
     # collect data from day before from db from last day
-    old_highscores_query = Highscores.objects.all().filter(Q(date__gt='2022-12-23 11:12:49')).values(
-                                                'exp_rank',
-                                                'id_char',
-                                                'voc_id',
-                                                'world_id',
-                                                'level',
-                                                'exp_value',
-                                                'charm_rank',
-                                                'charm_value'
-                                                )
+    old_highscores_query = Highscores.objects.all().filter(Q(date__gt='2022-12-23 11:12:49')).values('exp_rank',
+                                                                                                     'id_char',
+                                                                                                     'voc_id',
+                                                                                                     'world_id',
+                                                                                                     'level',
+                                                                                                     'exp_value',
+                                                                                                     'charm_rank',
+                                                                                                     'charm_value')
     old_highscores_df = pd.DataFrame(data=old_highscores_query)
 
     # swap key(name), value(id_char) in dictionary
@@ -612,13 +574,15 @@ def filter_highscores_data():   # filter and prepare data to put inside db
     # === INSERT =============== DELETED_CHARACTERS ===========
 
     # insert data to deleted table - for future
-    '''print(deleted_characters)
-    deleted_df = inner_data[inner_data['name'].isin(deleted_characters)]
-    print('deleted df')
-    print()
-    print(deleted_df)
-    # Columns: [exp_rank, id_char, voc_id, world_id, level_old, exp_value, charm_rank, charm_value, name, rank, vocation, world, level_latest, value, name_id_db, exp_diff, exp_rank_change, level_change]
-    deleted_dict = deleted_df.to_dict('index')'''
+    # future develop
+    # print(deleted_characters)
+    # deleted_df = inner_data[inner_data['name'].isin(deleted_characters)]
+    # print('deleted df')
+    # print()
+    # print(deleted_df)
+    # Columns: [exp_rank, id_char, voc_id, world_id, level_old, exp_value, charm_rank, charm_value,
+    # name, rank, vocation, world, level_latest, value, name_id_db, exp_diff, exp_rank_change, level_change]
+    # deleted_dict = deleted_df.to_dict('index')
     # for do bulk
     #
     # === END INSERT ========= DELETED_CHARACTERS ==============
@@ -655,7 +619,6 @@ def filter_highscores_data():   # filter and prepare data to put inside db
                              traded=traded,
                              date=date)
             obj_name_change.append(xxx)
-
         NameChange.objects.bulk_create(obj_name_change)
 
     # === END INSERT =============== NAME CHANGE =================
@@ -663,8 +626,8 @@ def filter_highscores_data():   # filter and prepare data to put inside db
 
     #
     # === INSERT =============== HIGHSCORES ======================
-    # insert highscores
 
+    # insert highscores
     charm = 0   # temp variable
     obj = []
     inner_data_dict = inner_data.to_dict('index')
@@ -765,24 +728,22 @@ def get_daily_records():
     obj = []
     history_dict = history.to_dict('index')
     for i in history_dict:
-        record = RecordsHistory(
-            exp_rank=history_dict[i]['exp_rank'],
-            exp_rank_change=history_dict[i]['exp_rank_change'],
-            id_char_id=history_dict[i]['id_char'],
-            voc_id=history_dict[i]['voc_id'],
-            world_id=history_dict[i]['world_id'],
-            level=history_dict[i]['level'],
-            level_change=history_dict[i]['level_change'],
-            exp_value=history_dict[i]['exp_value'],
-            exp_diff=history_dict[i]['exp_diff'],
-            charm_rank=charm,
-            charm_rank_change=charm,
-            charm_value=charm,
-            charm_diff=charm,
-            record_type=record_type,
-            event=event,
-            date=date
-        )
+        record = RecordsHistory(exp_rank=history_dict[i]['exp_rank'],
+                                exp_rank_change=history_dict[i]['exp_rank_change'],
+                                id_char_id=history_dict[i]['id_char'],
+                                voc_id=history_dict[i]['voc_id'],
+                                world_id=history_dict[i]['world_id'],
+                                level=history_dict[i]['level'],
+                                level_change=history_dict[i]['level_change'],
+                                exp_value=history_dict[i]['exp_value'],
+                                exp_diff=history_dict[i]['exp_diff'],
+                                charm_rank=charm,
+                                charm_rank_change=charm,
+                                charm_value=charm,
+                                charm_diff=charm,
+                                record_type=record_type,
+                                event=event,
+                                date=date)
         obj.append(record)
     RecordsHistory.objects.bulk_create(obj)
 
