@@ -26,3 +26,5 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
+      run: |
+        rsync -a /root/actions-runner/test/tibia_stats/tibia_stats/. /django-projects/testowykatalog/
