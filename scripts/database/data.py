@@ -151,7 +151,7 @@ def add_news_to_db():
     db_news = News.objects.all().values('id_on_tibiacom', 'type')
     db_news_df = pd.DataFrame(data=db_news)
     db_news_df = db_news_df[db_news_df['type'] == 'news']
-
+    
     # get 90 day history from tibia.com (news and article)
     all_news = dataapi.get_news_history()
     all_news_df = pd.DataFrame(data=all_news)
@@ -201,7 +201,9 @@ def add_boss_to_db():
 
     # check if list is not empty
     if boss_info:
+
         date = date_with_seconds()
+
         boss = Boosted(name=boss_info['name'],
                        image_url=boss_info['image_url'],
                        type=category,
@@ -217,6 +219,7 @@ def add_creature_to_db():
     # check if list is not empty
     if creature_info:
         date = date_with_seconds()
+
         creature = Boosted(name=creature_info['name'],
                            image_url=creature_info['image_url'],
                            type=category,
