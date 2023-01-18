@@ -118,7 +118,7 @@ class RecordsHistory(models.Model):
     date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'records_history'
         unique_together = (('id', 'id_char', 'voc', 'world'),)
 
@@ -151,18 +151,6 @@ class World(models.Model):
         db_table = 'world'
 
 
-class Boosted(models.Model):
-    boosted_id = models.AutoField(db_column='Boosted_id', primary_key=True)  # Field name made lowercase.
-    name = models.CharField(max_length=50, blank=True, null=True)
-    image_url = models.CharField(max_length=100, blank=True, null=True)
-    type = models.CharField(max_length=15, blank=True, null=True)
-    date_time = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'boosted'
-
-
 class WorldOnlineHistory(models.Model):
     id_online = models.AutoField(primary_key=True)
     world = models.ForeignKey(World, models.DO_NOTHING)
@@ -189,5 +177,4 @@ class WorldTransfers(models.Model):
         managed = True
         db_table = 'world_transfers'
         unique_together = (('world_transfer_id', 'id_char'),)
-
 

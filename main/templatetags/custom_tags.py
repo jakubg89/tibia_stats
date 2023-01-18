@@ -28,4 +28,3 @@ def get_value(transfers):
 @register.filter(name='tc_amount_name')
 def get_value(name_change):
     return name_change * 250
-
