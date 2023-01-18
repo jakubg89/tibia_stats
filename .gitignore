@@ -1,5 +1,4 @@
 .idea
-manage.py
 tibia_stats/settings.py
 ignore/
 static/root/
