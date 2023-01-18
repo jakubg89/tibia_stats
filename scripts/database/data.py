@@ -34,11 +34,11 @@ from pathlib import Path
 def main():
 
     # after server save and for check around 13-14 cet
-    # add_boss_to_db()
-    # add_creature_to_db()
+    add_boss_to_db()
+    add_creature_to_db()
 
     # will see
-    add_world_online_history()
+    # add_world_online_history()
 
     # every 12 hours
     # add_news_to_db()
@@ -49,7 +49,10 @@ def main():
     # once a day (every 24h)
     # filter_highscores_data()
     # get_daily_records()
-
+    # TODO clean highscores table and move only active players to history
+    # move_active_players_to_history
+    # delete_records_from_highscores
+    # add_worlds_information_to_db
 
 
 def add_backslashes(text):
@@ -144,7 +147,6 @@ def add_news_ticker_to_db():
 # adding news to database if it not exists
 def add_news_to_db():
 
-
     # get all tibia.com id from database
     db_news = News.objects.all().values('id_on_tibiacom', 'type')
     db_news_df = pd.DataFrame(data=db_news)
@@ -199,7 +201,7 @@ def add_boss_to_db():
 
     # check if list is not empty
     if boss_info:
-        date = date_with_day()
+        date = date_with_seconds()
         boss = Boosted(name=boss_info['name'],
                        image_url=boss_info['image_url'],
                        type=category,
@@ -214,7 +216,7 @@ def add_creature_to_db():
 
     # check if list is not empty
     if creature_info:
-        date = date_with_day()
+        date = date_with_seconds()
         creature = Boosted(name=creature_info['name'],
                            image_url=creature_info['image_url'],
                            type=category,
