@@ -34,6 +34,7 @@ def main_page(request, *args, **kwargs):
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = '2022-12-23 11:11:51'
 
+
     # world_types = {
     #    0: 'Open PvP',
     #    1: 'Optional PvP',
@@ -211,6 +212,7 @@ def top_500(request, *args, **kwargs):
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = '2023-01-01 11:11:49'
 
+
     best_open_pvp = RecordsHistory.objects.filter(
         Q(date__gt=date)
         & Q(exp_diff__gt=0)
@@ -337,6 +339,7 @@ def str_to_int_list(request):
 @csrf_protect
 def explore_highscores(request, *args, **kwargs):
     date = '2023-01-01 11:12:49'
+    
     # Basic view
     # get vocation list with id / names
     vocations = Vocation.objects.all()
@@ -627,7 +630,9 @@ def name_changes(request, *args, **kwargs):
     name_changes_sorted = name_changes_count.sort_index().head(7)
     name_changes_dict = name_changes_sorted.to_dict()
 
+
     yesterday_changes = name_change.filter(date__gt='2023-01-01 11:12:49').count()
+
     # last_7_days_changes = transfers.filter(date__gt=date).count()
     # last_30_days_changes = transfers.filter(date__gt=date).count()
     all_changes = name_change.count()
@@ -644,7 +649,6 @@ def name_changes(request, *args, **kwargs):
     }
 
     return render(request, "sites/characters/name_changes.html", content)
-
 
 
 # Discords

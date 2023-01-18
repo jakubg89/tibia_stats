@@ -14,8 +14,8 @@ Django project that provides tools and statistics for players of Tibia.
     - [ ] World transfers.
     - [ ] Name changes.
 3. **Experience change list.**
-    - [ ] Mainland.
-    - [ ] Rookgaard.
+    - [x] Mainland.
+    - [x] Rookgaard.
 4. **Charm change list.**
     - [ ] Mainland.
     - [ ] Rookgaard.

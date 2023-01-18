@@ -118,7 +118,7 @@ class RecordsHistory(models.Model):
     date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'records_history'
         unique_together = (('id', 'id_char', 'voc', 'world'),)
 
@@ -160,7 +160,6 @@ class WorldOnlineHistory(models.Model):
     class Meta:
         managed = True
         db_table = 'world_online_history'
-
 
 
 class WorldTransfers(models.Model):

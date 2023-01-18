@@ -31,7 +31,6 @@ from main.views \
     explore_highscores,\
     world_transfers, name_changes
 
-
 # Error custom view
 handler404 = 'main.views.error404'
 # handler500 = 'main.views.error404'
@@ -78,7 +77,6 @@ urlpatterns = [
     path('character/search/', search_character),
     path('character/transfers', world_transfers),
     path('character/name_change', name_changes),
-
 
     # Boss menu
     path('bosses/list', under_construction),

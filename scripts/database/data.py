@@ -94,6 +94,7 @@ def format_content(raw_html):
     # deleting last paragraph
     # if len(paragraphs_in_news) > 1:
     #    formatted_html.find('p', {'id': (len(paragraphs_in_news) - 1)}).decompose()
+
     return str(formatted_html)
 
 
@@ -138,6 +139,7 @@ def add_news_ticker_to_db():
                           date_added=date)
             tickers.append(ticker)
         News.objects.bulk_create(tickers)
+
 
 # # # # # # # News ticker end # # # # # # #
 
@@ -201,7 +203,6 @@ def add_boss_to_db():
 
     # check if list is not empty
     if boss_info:
-
         date = date_with_seconds()
 
         boss = Boosted(name=boss_info['name'],
@@ -225,6 +226,7 @@ def add_creature_to_db():
                            type=category,
                            date_time=date)
         creature.save()
+
 
 # # # # # # # Boosted creature/boss end # # # # # # #
 
@@ -342,8 +344,8 @@ def get_highscores():
 
         # for loop for each profession
         for prof in proffesions:
-
             # get total site number before execution loop over each site
+
             # 1-20 sites are possible
             request_from_api = dataapi.get_highscores(world, category, prof, 1)
             site_num = request_from_api['highscore_page']['total_pages']
@@ -367,6 +369,7 @@ def get_highscores():
 
 # collect data about vocation from db
 def collect_voc_id():
+
     voc = Vocation.objects.all().values('voc_id', 'name')
     voc_df = pd.DataFrame(data=voc)
     formatted_voc_data = {}
@@ -380,6 +383,7 @@ def collect_voc_id():
 
 # collect data about worlds from db
 def collect_world_id():
+
     world = World.objects.all().values('world_id', 'name')
     world_df = pd.DataFrame(data=world)
     formatted_world_data = {}
@@ -393,6 +397,7 @@ def collect_world_id():
 
 # collect data about character from db
 def collect_char_id():
+
     characters = Character.objects.all().values('id_char', 'name')
     characters_df = pd.DataFrame(data=characters)
     formatted_characters_data = {}
@@ -409,6 +414,7 @@ def filter_highscores_data():
 
     # collect data
     date = date_with_seconds()
+
     vocations_id = collect_voc_id()
     worlds_id = collect_world_id()
     chars_id = collect_char_id()
@@ -505,6 +511,7 @@ def filter_highscores_data():
                                                                                                      'exp_value',
                                                                                                      'charm_rank',
                                                                                                      'charm_value')
+
     old_highscores_df = pd.DataFrame(data=old_highscores_query)
 
     # swap key(name), value(id_char) in dictionary
@@ -579,6 +586,7 @@ def filter_highscores_data():
     # Columns: [exp_rank, id_char, voc_id, world_id, level_old, exp_value, charm_rank, charm_value,
     # name, rank, vocation, world, level_latest, value, name_id_db, exp_diff, exp_rank_change, level_change]
     # deleted_dict = deleted_df.to_dict('index')
+
     # for do bulk
     #
     # === END INSERT ========= DELETED_CHARACTERS ==============
@@ -624,6 +632,7 @@ def filter_highscores_data():
     # === INSERT =============== HIGHSCORES ======================
 
     # insert highscores
+
     charm = 0   # temp variable
     obj = []
     inner_data_dict = inner_data.to_dict('index')
@@ -657,6 +666,7 @@ def get_daily_records():
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = '2023-01-01 11:11:50'
+
 
     # world_types = {
     #    0: 'Open PvP',
