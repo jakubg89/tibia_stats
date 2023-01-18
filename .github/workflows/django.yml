@@ -29,3 +29,4 @@ jobs:
     - name: Deploy
       run: |
         rsync -a /root/actions-runner/test/tibia_stats/tibia_stats/. /django-projects/testowykatalog/
+        sudo service apache2 restart
