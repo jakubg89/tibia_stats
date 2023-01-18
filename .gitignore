@@ -1,8 +1,7 @@
 .idea
-tibia_stats/settings.py
+tibia_stats/.env
 ignore/
 static/root/
 scripts/proxy_scrapper/proxy_list.csv
 scripts/tibiacom_scrapper/temp
 main/migrations/
-
