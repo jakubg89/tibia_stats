@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     environment: Tibia-stats
+
     runs-on: self-hosted
     strategy:
       max-parallel: 4
@@ -21,6 +22,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
+        source /django-projects/tibia-stats/venv-tibia-stats/bin/activate
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run Tests

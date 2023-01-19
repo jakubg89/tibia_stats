@@ -33,7 +33,6 @@ def main_page(request, *args, **kwargs):
     date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     # date = '2022-12-23 11:11:51'
 
-
     # world_types = {
     #    0: 'Open PvP',
     #    1: 'Optional PvP',

@@ -5,6 +5,7 @@ import sys
 import dotenv
 
 
+
 def main():
     """Run administrative tasks."""
 
@@ -12,7 +13,6 @@ def main():
     dotenv.load_dotenv(
         os.path.join(os.path.dirname(__file__), '.env')
     )
-
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tibia_stats.settings')
     try:
