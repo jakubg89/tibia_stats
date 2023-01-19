@@ -3,13 +3,11 @@ name: Django CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       max-parallel: 4
       matrix:
@@ -23,8 +21,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
+        source /django-projects/tibia-stats/venv-tibia-stats/bin/activate
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run Tests
       run: |
         python manage.py test
+    - name: Deploy
+      run: |
+        deactivate
+        rsync -a /root/actions-runner/test/tibia_stats/tibia_stats/. /django-projects/tibia-stats
+        sudo service apache2 restart
