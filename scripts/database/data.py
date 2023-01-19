@@ -1,6 +1,3 @@
-# django
-import pandas
-
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
@@ -14,7 +11,6 @@ from main.models import (World,
                          News,
                          Boosted,
                          WorldOnlineHistory)
-# from os import environ
 
 # custom
 import scripts.tibiadata_API.get_data as dataapi
@@ -26,16 +22,17 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import json
 from pathlib import Path
+import sys
 
-
+sys.path.append('/django-projects/tibia-stats/')
 # environ.setdefault('DJANGO_SETTINGS_MODULE', 'tibia_stats.settings')
 
 
 def main():
-
+    pass
     # after server save and for check around 13-14 cet
-    add_boss_to_db()
-    add_creature_to_db()
+    # add_boss_to_db()
+    # add_creature_to_db()
 
     # will see
     # add_world_online_history()
@@ -652,7 +649,7 @@ def filter_highscores_data():
                           charm_diff=charm,
                           date=date)
         obj.append(char)
-    Highscores.objects.bulk_create(obj)
+    Highscores.objects.bulk_create(obj, 1000)
 
     #
     # === END INSERT =============== HIGHSCORES ==================
@@ -666,7 +663,6 @@ def get_daily_records():
     # now = datetime.datetime.now()
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = '2023-01-01 11:11:50'
-
 
     # world_types = {
     #    0: 'Open PvP',
