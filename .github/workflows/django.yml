@@ -25,14 +25,15 @@ jobs:
         pip install -r requirements.txt
     - name: Get secrets
         run: |
-          SECRET_KEY=${{ secrets.SECRET_KEY }}
-          ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
-          DEBUG=${{ secrets.DEBUG }}
-          DB_NAME=${{ secrets.DB_NAME }}
-          DB_USER=${{ secrets.DB_USER }}
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_HOST=${{ secrets.DB_HOST }}
-          DB_PORT=${{ secrets.DB_PORT }}
+          env:
+            SECRET_KEY:${{ secrets.SECRET_KEY }}
+            ALLOWED_HOSTS:${{ secrets.ALLOWED_HOSTS }}
+            DEBUG=${{ secrets.DEBUG }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_USER=${{ secrets.DB_USER }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
     - name: Run Tests
       run: |
         python manage.py test
