@@ -417,9 +417,6 @@ def filter_highscores_data():
     chars_id = collect_char_id()
 
     latest_highscores = get_highscores()
-    # for development read from file
-    # latest_highscores = pd.read_json
-    # ('G:\\Python nauka\\django\\strony\\tibia_stats\\ignore\\pandas\\21test1.txt', orient='columns')
 
     # ============= filter latest data ===============
 
@@ -712,7 +709,7 @@ def get_daily_records():
             if world == 1 and vocation == 1:
                 history = worst_exp
             else:
-                history = pandas.concat([worst_exp, history], ignore_index=True)
+                history = pd.concat([worst_exp, history], ignore_index=True)
 
     # biggest lost experience
     for world in worlds:
@@ -722,7 +719,7 @@ def get_daily_records():
                                       & (db_data_to_df['voc_id'] == vocation)
                                       & (db_data_to_df['exp_diff'] < 0)].sort_values(by='exp_diff').head(1)
 
-            history = pandas.concat([worst_exp, history], ignore_index=True)
+            history = pd.concat([worst_exp, history], ignore_index=True)
 
     charm = 0
     record_type = 'exp'
