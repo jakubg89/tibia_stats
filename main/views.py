@@ -28,12 +28,10 @@ def main_page(request, *args, **kwargs):
     # news
     latest_news = News.objects.filter(type='news').order_by('-news_id')[:4]
 
-
     # best exp yesterday on each world
     now = datetime.datetime.now()
-    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = '2022-12-23 11:11:51'
-
+    date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+    # date = '2022-12-23 11:11:51'
 
     # world_types = {
     #    0: 'Open PvP',
