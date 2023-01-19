@@ -30,6 +30,7 @@ sys.path.append('/django-projects/tibia-stats/')
 
 def main():
     pass
+
     # after server save and for check around 13-14 cet
     # add_boss_to_db()
     # add_creature_to_db()
@@ -293,7 +294,6 @@ def add_worlds_information_to_db():
 
 def add_world_online_history():
     worlds_information_api = dataapi.get_worlds_information()
-
     world_id = World.objects.all().values('name', 'world_id')
     world_id_df = pd.DataFrame(data=world_id)
     worlds_id_dict = world_id_df.set_index('name')['world_id'].to_dict()
