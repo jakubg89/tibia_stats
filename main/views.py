@@ -19,6 +19,11 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_protect
 
 
+# Date for highscores table
+def date_highscores():
+    return datetime.datetime.now() - timedelta(days=1, hours=2)
+
+
 # Main page
 def main_page(request, *args, **kwargs):
 
@@ -35,9 +40,7 @@ def main_page(request, *args, **kwargs):
     latest_news = News.objects.filter(type="news").order_by("-news_id")[:4]
 
     # best exp yesterday on each world
-    now = datetime.datetime.now()
-    date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    # date = '2022-12-23 11:11:51'
+    date = date_highscores()
 
     # world_types = {
     #    0: 'Open PvP',
@@ -214,9 +217,7 @@ def single_world(request, name):
 
 
 def top_500(request, *args, **kwargs):
-    # now = datetime.datetime.now()
-    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = "2023-01-01 11:11:49"
+    date = date_highscores()
 
     best_retro_hardcore_pvp = (
         RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=4))
@@ -257,9 +258,8 @@ def top_500(request, *args, **kwargs):
 
 
 def mainland(request, *args, **kwargs):
-    # now = datetime.datetime.now()
-    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = "2023-01-01 11:11:50"
+    date = date_highscores()
+
     query = ""
     # get world list with id
     world_list = World.objects.all().values("name", "name_value", "world_id")
@@ -280,15 +280,13 @@ def mainland(request, *args, **kwargs):
 
 
 def rookgaard(request, *args, **kwargs):
-    # now = datetime.datetime.now()
-    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = "2023-01-01 11:11:49"
+    date = date_highscores()
 
-    top_3 = RecordsHistory.objects.filter(Q(exp_diff__gt=0) & Q(voc=1)).order_by("-exp_diff")[:5]
+    top_5 = RecordsHistory.objects.filter(Q(exp_diff__gt=0) & Q(voc=1)).order_by("-exp_diff")[:5]
 
     top = Highscores.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(voc=1)).order_by("-exp_diff")
 
-    content = {"top": top, "top_5": top_3}
+    content = {"top": top, "top_5": top_5}
 
     return render(request, "sites/experience/rookgaard.html", content)
 
@@ -301,7 +299,7 @@ def str_to_int_list(request):
 
 @csrf_protect
 def explore_highscores(request, *args, **kwargs):
-    date = "2023-01-01 11:12:49"
+    date = date_highscores()
 
     # Basic view
     # get vocation list with id / names
@@ -513,7 +511,10 @@ def search_character(request, *args, **kwargs):
 
 # World Transfers
 def world_transfers(request, *args, **kwargs):
-    date = "2022-12-23 10:18:00"
+    now = datetime.datetime.now()
+    date = (now - timedelta(days=1, hours=1))
+    last_7_days = (now - timedelta(days=7, hours=1))
+    last_30_days = (now - timedelta(days=30, hours=1))
 
     transfers = WorldTransfers.objects.all()
 
@@ -527,9 +528,9 @@ def world_transfers(request, *args, **kwargs):
     transfers_count_sorted = transfers_count.sort_index().head(7)
     transfers_count_dict = transfers_count_sorted.to_dict()
 
-    yesterday_transfers = transfers.filter(date__gt="2023-01-01 11:12:49").count()
-    # last_7_days_transfers = transfers.filter(date__gt=date).count()
-    # last_30_days_transfers = transfers.filter(date__gt=date).count()
+    yesterday_transfers = transfers.filter(date__gt=date).count()
+    last_7_days_transfers = transfers.filter(date__gt=last_7_days).count()
+    last_30_days_transfers = transfers.filter(date__gt=last_30_days).count()
     all_transfers = transfers.count()
 
     content = {
@@ -538,8 +539,8 @@ def world_transfers(request, *args, **kwargs):
         "amount_chart": transfers_count_dict,
         "stats": {
             "Yesterday": yesterday_transfers,
-            # 'Last_7_days': last_7_days_transfers,
-            # 'Last_30_days': last_30_days_transfers,
+            'Last_7_days': last_7_days_transfers,
+            'Last_30_days': last_30_days_transfers,
             "Total_recorded": all_transfers,
         },
     }
@@ -549,7 +550,10 @@ def world_transfers(request, *args, **kwargs):
 
 # Name Changes
 def name_changes(request, *args, **kwargs):
-    date = "2022-12-23 10:18:00"
+    now = datetime.datetime.now()
+    date = (now - timedelta(days=1, hours=1))
+    last_7_days = (now - timedelta(days=1, hours=1))
+    last_30_days = (now - timedelta(days=1, hours=1))
 
     name_change = NameChange.objects.all()
 
@@ -559,10 +563,9 @@ def name_changes(request, *args, **kwargs):
     name_changes_sorted = name_changes_count.sort_index().head(7)
     name_changes_dict = name_changes_sorted.to_dict()
 
-    yesterday_changes = name_change.filter(date__gt="2023-01-01 11:12:49").count()
-
-    # last_7_days_changes = transfers.filter(date__gt=date).count()
-    # last_30_days_changes = transfers.filter(date__gt=date).count()
+    yesterday_changes = name_change.filter(date__gt=date).count()
+    last_7_days_changes = name_change.filter(date__gt=last_7_days).count()
+    last_30_days_changes = name_change.filter(date__gt=last_30_days).count()
     all_changes = name_change.count()
 
     content = {
@@ -570,8 +573,8 @@ def name_changes(request, *args, **kwargs):
         "amount_chart": name_changes_dict,
         "stats": {
             "Yesterday": yesterday_changes,
-            # 'Last_7_days': last_7_days_changes,
-            # 'Last_30_days': last_30_days_changes,
+            'Last_7_days': last_7_days_changes,
+            'Last_30_days': last_30_days_changes,
             "Total_recorded": all_changes,
         },
     }
