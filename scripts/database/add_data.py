@@ -51,9 +51,10 @@ def main():
     # once a day (every 24h)
     # filter_highscores_data()
     # get_daily_records()
-    # TODO clean highscores table and move only active players to history
     # move_active_players_to_history
     # delete_records_from_highscores
+
+    # once a week
     # add_worlds_information_to_db
 
 
@@ -233,6 +234,7 @@ def add_creature_to_db():
 
 
 def add_worlds_information_to_db():
+    # TODO reformat whole function
     worlds_information = dataapi.get_worlds_information()
     path_to_json = Path(__file__).resolve().parent.parent
     values = json.load(open(os.path.join(path_to_json, "tibiacom_scrapper\\temp\\data_value\\data.json")))
@@ -317,13 +319,7 @@ def add_online_players():
 # # # # # # # Experience # # # # # # #
 
 
-def get_highscores():
-
-    # charms / expierience will be modified to be more elastic
-    category = "experience"
-
-    # proffesions names - all proffesions
-    proffesions = ["none", "knights", "paladins", "sorcerers", "druids"]
+def get_highscores(category: str, proffesions: list):
 
     # getting world list ( name = value , for now )
     world_list_from_db = World.objects.all().values("name_value")
@@ -413,7 +409,13 @@ def filter_highscores_data():
     worlds_id = collect_world_id()
     chars_id = collect_char_id()
 
-    latest_highscores = get_highscores()
+    category_exp = "experience"
+    prof_for_exp = ["none", "knights", "paladins", "sorcerers", "druids"]
+    latest_highscores = get_highscores(category_exp, prof_for_exp)
+
+    category_charms = "charmpoints"
+    prof_for_charms = ["knights", "paladins", "sorcerers", "druids"]
+    latest_charms = get_highscores(category_charms, prof_for_charms)
 
     # ============= filter latest data ===============
 
@@ -495,7 +497,7 @@ def filter_highscores_data():
     latest_highscores = latest_highscores[latest_highscores["name_id_db"] != 0]
 
     # collect data from day before from db from last day
-    yesterday = (date - timedelta(days=1, hours=2))
+    yesterday = date - timedelta(days=1, hours=2)
     old_highscores_query = (
         Highscores.objects.all()
         .filter(Q(date__gt=yesterday))
@@ -518,6 +520,8 @@ def filter_highscores_data():
     # merge data - inner_data contains only existing characters in db
     inner_data = old_highscores_df.merge(latest_highscores, on="name", how="inner", suffixes=("_old", "_latest"))
 
+    # # # EXP # # #
+
     # calculate experience change
     inner_data["exp_diff"] = (inner_data["value"] - inner_data["exp_value"]).fillna(0).astype("int64")
 
@@ -526,6 +530,18 @@ def filter_highscores_data():
 
     # calculate level change
     inner_data["level_change"] = (inner_data["level_latest"] - inner_data["level_old"]).fillna(0).astype("int64")
+
+    # # # CHARMS # # #
+
+    inner_data = inner_data.merge(latest_charms, on="name", how="inner", suffixes=("_old", "_latest_charm"))
+
+    # calculate charm change
+    inner_data["charm_diff"] = (inner_data["value_latest_charm"] - inner_data["charm_value"]).fillna(0).astype("int64")
+
+    # calculate charm rank change
+    inner_data["charm_rank_change"] = (
+        (inner_data["charm_rank"] - inner_data["rank_latest_charm"]).fillna(0).astype("int64")
+    )
 
     # delete duplicates
     inner_data = inner_data.drop_duplicates("name")
@@ -616,9 +632,6 @@ def filter_highscores_data():
     #
     # === INSERT =============== HIGHSCORES ======================
 
-    # insert highscores
-
-    charm = 0  # temp variable
     obj = []
     inner_data_dict = inner_data.to_dict("index")
     for i in inner_data_dict:
@@ -632,10 +645,10 @@ def filter_highscores_data():
             level_change=inner_data_dict[i]["level_change"],
             exp_value=inner_data_dict[i]["value"],
             exp_diff=inner_data_dict[i]["exp_diff"],
-            charm_rank=charm,
-            charm_rank_change=charm,
-            charm_value=charm,
-            charm_diff=charm,
+            charm_rank=inner_data_dict[i]["rank_latest_charm"],
+            charm_rank_change=inner_data_dict[i]["charm_rank_change"],
+            charm_value=inner_data_dict[i]["value_latest_charm"],
+            charm_diff=inner_data_dict[i]["charm_diff"],
             date=date,
         )
         obj.append(char)
@@ -651,7 +664,7 @@ def get_daily_records():
 
     # best exp yesterday on each world
     now = datetime.datetime.now()
-    date = (now - timedelta(days=1, hours=2))
+    date = now - timedelta(days=1, hours=2)
 
     # world_types = {
     #    0: 'Open PvP',
@@ -752,7 +765,7 @@ def get_daily_records():
 
 def move_only_active_players():
     now = datetime.datetime.now()
-    date = (now - timedelta(days=1, hours=2))
+    date = now - timedelta(days=1, hours=2)
 
     only_active = Highscores.objects.filter(
         Q(date__gte=date) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
@@ -784,9 +797,8 @@ def move_only_active_players():
 
 
 def delete_old_highscores_date():
-    # add delta older than 3 days.
     now = datetime.datetime.now()
-    date = (now - timedelta(days=3, hours=2))
+    date = now - timedelta(days=3, hours=2)
 
     clear_data_query = Highscores.objects.filter(date__lte=date)
     clear_data_query._raw_delete(clear_data_query.db)
