@@ -33,9 +33,9 @@ from main.views \
 
 # Error custom view
 handler404 = 'main.views.error404'
-# handler500 = 'main.views.error404'
-# handler403 = 'main.views.error404'
-# handler400 = 'main.views.error404'
+handler500 = 'main.views.error500'
+handler403 = 'main.views.error403'
+handler400 = 'main.views.error400'
 
 urlpatterns = [
 
