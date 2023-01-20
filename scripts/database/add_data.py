@@ -753,6 +753,36 @@ def get_daily_records():
     RecordsHistory.objects.bulk_create(obj)
 
 
+def move_only_active_players():
+    only_active = Highscores.objects.filter(
+        Q(date__gte="2023-01-04 06:11:50") & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
+    ).values()
+    only_active_df = pd.DataFrame(data=only_active)
+
+    # charm = 0  # temp variable
+    obj = []
+    only_active_dict = only_active_df.to_dict("index")
+    for i in only_active_dict:
+        char = HighscoresHistory(
+            exp_rank=only_active_dict[i]["exp_rank"],
+            exp_rank_change=only_active_dict[i]["exp_rank_change"],
+            id_char_id=only_active_dict[i]["id_char_id"],
+            voc_id=only_active_dict[i]["voc_id"],
+            world_id=only_active_dict[i]["world_id"],
+            level=only_active_dict[i]["level"],
+            level_change=only_active_dict[i]["level_change"],
+            exp_value=only_active_dict[i]["exp_value"],
+            exp_diff=only_active_dict[i]["exp_diff"],
+            charm_rank=only_active_dict[i]["charm_rank"],
+            charm_rank_change=only_active_dict[i]["charm_rank_change"],
+            charm_value=only_active_dict[i]["charm_value"],
+            charm_diff=only_active_dict[i]["charm_diff"],
+            date="2023-01-19 10:18:01",
+        )
+        obj.append(char)
+    HighscoresHistory.objects.bulk_create(obj, 500)
+
+
 def delete_old_highscores_date():
     # add delta older than 3 days.
     date = '2022-12-23 10:18:01'
