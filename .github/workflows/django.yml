@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     environment: Tibia-stats
-
     runs-on: self-hosted
     strategy:
       max-parallel: 4
