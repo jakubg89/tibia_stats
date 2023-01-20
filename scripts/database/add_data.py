@@ -753,6 +753,12 @@ def get_daily_records():
     RecordsHistory.objects.bulk_create(obj)
 
 
+def delete_old_highscores_date():
+    # add delta older than 3 days.
+    date = '2022-12-23 10:18:01'
+    clear_data_query = Highscores.objects.filter(date__lte=date)
+    clear_data_query._raw_delete(clear_data_query.db)
+
 # # # # # # # Experience end # # # # # # #
 
 
