@@ -52,14 +52,14 @@ def main_page(request, *args, **kwargs):
         .first()
     )
 
-    best_retro_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=3))
+    best_optional_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=1))
         .order_by("-exp_diff")
         .first()
     )
 
-    best_retro_hardcore_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=4))
+    best_retro_open_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=3))
         .order_by("-exp_diff")
         .first()
     )
@@ -218,9 +218,8 @@ def top_500(request, *args, **kwargs):
     # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
     date = "2023-01-01 11:11:49"
 
-
-    best_optional_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=1))
+    best_retro_hardcore_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=4))
         .order_by("-exp_diff")
         .first()
     )
@@ -233,6 +232,12 @@ def top_500(request, *args, **kwargs):
 
     best_retro_open_pvp = (
         RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=3))
+        .order_by("-exp_diff")
+        .first()
+    )
+
+    best_open_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=0))
         .order_by("-exp_diff")
         .first()
     )
@@ -250,11 +255,6 @@ def top_500(request, *args, **kwargs):
 
     return render(request, "sites/experience/top500.html", content)
 
-    best_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=0))
-        .order_by("-exp_diff")
-        .first()
-    )
 
 def mainland(request, *args, **kwargs):
     # now = datetime.datetime.now()
