@@ -744,7 +744,7 @@ def get_daily_records():
             charm_diff=charm,
             record_type=record_type,
             event=event,
-            date=date,
+            date=now,
         )
         obj.append(record)
     RecordsHistory.objects.bulk_create(obj)
@@ -777,7 +777,7 @@ def move_only_active_players():
             charm_rank_change=only_active_dict[i]["charm_rank_change"],
             charm_value=only_active_dict[i]["charm_value"],
             charm_diff=only_active_dict[i]["charm_diff"],
-            date=only_active_dict[i]["date"],
+            date=now,
         )
         obj.append(char)
     HighscoresHistory.objects.bulk_create(obj, 500)
