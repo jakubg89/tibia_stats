@@ -12,6 +12,7 @@ from main.models import (
     News,
     Boosted,
     WorldOnlineHistory,
+    HighscoresHistory,
 )
 
 # custom
@@ -499,7 +500,7 @@ def filter_highscores_data():
     # collect data from day before from db from last day
     old_highscores_query = (
         Highscores.objects.all()
-        .filter(Q(date__gt=" 2023-01-17 08:43:47"))
+        .filter(Q(date__gt="2023-01-17 08:43:47.00000"))
         .values("exp_rank", "id_char", "voc_id", "world_id", "level", "exp_value", "charm_rank", "charm_value")
     )
 
@@ -557,7 +558,7 @@ def filter_highscores_data():
             date=date,
         )
         obj_world.append(transfer)
-    WorldTransfers.objects.bulk_create(obj_world)
+    WorldTransfers.objects.bulk_create(obj_world, 500)
 
     # === END INSERT =============== WORLD ====================
     #
@@ -609,7 +610,7 @@ def filter_highscores_data():
                 date=date,
             )
             obj_name_change.append(xxx)
-        NameChange.objects.bulk_create(obj_name_change)
+        NameChange.objects.bulk_create(obj_name_change, 500)
 
     # === END INSERT =============== NAME CHANGE =================
     #
@@ -640,7 +641,7 @@ def filter_highscores_data():
             date=date,
         )
         obj.append(char)
-    Highscores.objects.bulk_create(obj, 1000)
+    Highscores.objects.bulk_create(obj, 500)
 
     #
     # === END INSERT =============== HIGHSCORES ==================
