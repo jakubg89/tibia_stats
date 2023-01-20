@@ -15,81 +15,69 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views \
-    import \
-    main_page,\
-    under_construction,\
-    sign_in,\
-    sign_up,\
-    about, \
-    worlds_main,\
-    single_world,\
-    search_character, \
-    top_500,\
-    mainland,\
-    rookgaard,\
-    explore_highscores,\
-    world_transfers, name_changes
+from main.views import (
+    main_page,
+    under_construction,
+    sign_in,
+    sign_up,
+    about,
+    worlds_main,
+    single_world,
+    search_character,
+    top_500,
+    mainland,
+    rookgaard,
+    explore_highscores,
+    world_transfers,
+    name_changes,
+)
 
 # Error custom view
-handler404 = 'main.views.error404'
-# handler500 = 'main.views.error404'
-# handler403 = 'main.views.error404'
-# handler400 = 'main.views.error404'
+handler404 = "main.views.error404"
+handler500 = "main.views.error500"
+handler403 = "main.views.error403"
+handler400 = "main.views.error400"
 
 urlpatterns = [
-
     # Admin
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     # Home page
-    path('', main_page),
-    path('home/', main_page),
-
+    path("", main_page),
+    path("home/", main_page),
     # Sign in / Sign up
-    path('signin/', sign_in),
-    path('signup/', sign_up),
-
+    path("signin/", sign_in),
+    path("signup/", sign_up),
     # Experience menu
-    path('experience/top500', top_500),
-    path('experience/mainland/', mainland),
-    path('experience/rookgaard', rookgaard),
-    path('experience/explore/', explore_highscores),
-    path('experience/stats', under_construction),
-
+    path("experience/top500", top_500),
+    path("experience/mainland/", mainland),
+    path("experience/rookgaard", rookgaard),
+    path("experience/explore/", explore_highscores),
+    path("experience/stats", under_construction),
     # Charms menu
-    path('charms/top500', under_construction),
-    path('charms/mainland', under_construction),
-    path('charms/rookgaard', under_construction),
-    path('charms/stats', under_construction),
-
+    path("charms/top500", under_construction),
+    path("charms/mainland", under_construction),
+    path("charms/rookgaard", under_construction),
+    path("charms/stats", under_construction),
     # Char bazaar menu
-    path('bazaar/active', under_construction),
-    path('bazaar/history', under_construction),
-    path('bazaar/stats', under_construction),
-
+    path("bazaar/active", under_construction),
+    path("bazaar/history", under_construction),
+    path("bazaar/stats", under_construction),
     # Worlds menu
-    path('worlds/allworlds', worlds_main),
-    path('worlds/world/<str:name>/', single_world),
-    path('worlds/online', under_construction),
-
+    path("worlds/allworlds", worlds_main),
+    path("worlds/world/<str:name>/", single_world),
+    path("worlds/online", under_construction),
     # Character menu
-    path('character/search/', search_character),
-    path('character/transfers', world_transfers),
-    path('character/name_change', name_changes),
-
+    path("character/search/", search_character),
+    path("character/transfers", world_transfers),
+    path("character/name_change", name_changes),
     # Boss menu
-    path('bosses/list', under_construction),
-    path('bosses/stats', under_construction),
-
+    path("bosses/list", under_construction),
+    path("bosses/stats", under_construction),
     # Calculators menu
-    path('calculator/training', under_construction),
-    path('calculator/loot', under_construction),
-    path('calculator/stamina', under_construction),
-
+    path("calculator/training", under_construction),
+    path("calculator/loot", under_construction),
+    path("calculator/stamina", under_construction),
     # Other
-    path('discord/', under_construction),
-    path('about/', about),
+    path("discord/", under_construction),
+    path("about/", about),
 ]
-
-
