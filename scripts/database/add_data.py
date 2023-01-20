@@ -21,7 +21,8 @@ import scripts.tibiadata_API.get_data as dataapi
 # other
 import os
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
+import datetime
 from bs4 import BeautifulSoup
 import json
 from pathlib import Path
@@ -62,11 +63,7 @@ def add_backslashes(text):
 
 
 def date_with_seconds():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-
-
-def date_with_day():
-    return datetime.now().strftime("%Y-%m-%d")
+    return datetime.datetime.now()
 
 
 def format_content(raw_html):
@@ -498,9 +495,10 @@ def filter_highscores_data():
     latest_highscores = latest_highscores[latest_highscores["name_id_db"] != 0]
 
     # collect data from day before from db from last day
+    yesterday = (date - timedelta(days=1, hours=2))
     old_highscores_query = (
         Highscores.objects.all()
-        .filter(Q(date__gt="2023-01-17 08:43:47.00000"))
+        .filter(Q(date__gt=yesterday))
         .values("exp_rank", "id_char", "voc_id", "world_id", "level", "exp_value", "charm_rank", "charm_value")
     )
 
@@ -652,9 +650,8 @@ def get_daily_records():
     pd.set_option("display.width", 2000)
 
     # best exp yesterday on each world
-    # now = datetime.datetime.now()
-    # date = (now - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
-    date = "2023-01-01 11:11:50"
+    now = datetime.datetime.now()
+    date = (now - timedelta(days=1, hours=2))
 
     # world_types = {
     #    0: 'Open PvP',
@@ -754,8 +751,11 @@ def get_daily_records():
 
 
 def move_only_active_players():
+    now = datetime.datetime.now()
+    date = (now - timedelta(days=1, hours=2))
+
     only_active = Highscores.objects.filter(
-        Q(date__gte="2023-01-04 06:11:50") & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
+        Q(date__gte=date) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
     ).values()
     only_active_df = pd.DataFrame(data=only_active)
 
@@ -777,7 +777,7 @@ def move_only_active_players():
             charm_rank_change=only_active_dict[i]["charm_rank_change"],
             charm_value=only_active_dict[i]["charm_value"],
             charm_diff=only_active_dict[i]["charm_diff"],
-            date="2023-01-19 10:18:01",
+            date=only_active_dict[i]["date"],
         )
         obj.append(char)
     HighscoresHistory.objects.bulk_create(obj, 500)
@@ -785,7 +785,9 @@ def move_only_active_players():
 
 def delete_old_highscores_date():
     # add delta older than 3 days.
-    date = '2022-12-23 10:18:01'
+    now = datetime.datetime.now()
+    date = (now - timedelta(days=3, hours=2))
+
     clear_data_query = Highscores.objects.filter(date__lte=date)
     clear_data_query._raw_delete(clear_data_query.db)
 
