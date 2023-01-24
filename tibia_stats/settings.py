@@ -17,9 +17,8 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 import logging
 from sentry_sdk.integrations.logging import LoggingIntegration
-from sentry_sdk import set_level
 
-set_level("info")
+
 # All of this is already happening by default!
 sentry_logging = LoggingIntegration(
     level=logging.INFO,        # Capture info and above as breadcrumbs
