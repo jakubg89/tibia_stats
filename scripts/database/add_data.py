@@ -365,6 +365,7 @@ def add_online_players():
 
 
 def get_highscores(category: str, proffesions: list):
+
     # getting world list ( name = value , for now )
     world_list_from_db = World.objects.all().values("name_value")
     world_list_df = pd.DataFrame(data=world_list_from_db)
@@ -450,6 +451,7 @@ def filter_highscores_data():
     worlds_id = collect_world_id()
     chars_id = collect_char_id()
 
+
     logging.info(f'Getting experience highscores started {date_with_seconds()}')
     category_exp = "experience"
     prof_for_exp = ["none", "knights", "paladins", "sorcerers", "druids"]
@@ -474,6 +476,7 @@ def filter_highscores_data():
     #
     # latest_highscores = pd.read_json('24_dupa_exp2.txt', orient='columns')
     # latest_charms = pd.read_json('24_dupa_charm2.txt', orient='columns')
+
 
     logging.info(f'Total records of highscores: {len(latest_highscores)} and '
                  f'charms: {len(latest_charms)}')
@@ -596,6 +599,8 @@ def filter_highscores_data():
 
     # # # EXP # # #
 
+    # # # EXP # # #
+
     # calculate experience change
     inner_data["exp_diff"] = (
             inner_data["value"] - inner_data["exp_value"]
@@ -622,6 +627,18 @@ def filter_highscores_data():
     inner_data["charm_diff"] = (
                 inner_data["value_latest_charm"] - inner_data["charm_value"]).fillna(0).astype(
         "int64")
+
+    # calculate charm rank change
+    inner_data["charm_rank_change"] = (
+        (inner_data["charm_rank"] - inner_data["rank_latest_charm"]).fillna(0).astype("int64")
+    )
+
+    # # # CHARMS # # #
+
+    inner_data = inner_data.merge(latest_charms, on="name", how="inner", suffixes=("_old", "_latest_charm"))
+
+    # calculate charm change
+    inner_data["charm_diff"] = (inner_data["value_latest_charm"] - inner_data["charm_value"]).fillna(0).astype("int64")
 
     # calculate charm rank change
     inner_data["charm_rank_change"] = (
@@ -724,6 +741,7 @@ def filter_highscores_data():
     #
     # === INSERT =============== HIGHSCORES ======================
     # for actual vps bulk is highly limited.
+
     obj = []
     inner_data_dict = inner_data.to_dict("index")
 
@@ -938,6 +956,46 @@ def delete_old_highscores_date():
     clear_data_query = Highscores.objects.filter(date__lte=date)
     clear_data_query._raw_delete(clear_data_query.db)
 
+
+def move_only_active_players():
+    now = datetime.datetime.now()
+    date = now - timedelta(days=1, hours=2)
+
+    only_active = Highscores.objects.filter(
+        Q(date__gte=date) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
+    ).values()
+    only_active_df = pd.DataFrame(data=only_active)
+
+    # charm = 0  # temp variable
+    obj = []
+    only_active_dict = only_active_df.to_dict("index")
+    for i in only_active_dict:
+        char = HighscoresHistory(
+            exp_rank=only_active_dict[i]["exp_rank"],
+            exp_rank_change=only_active_dict[i]["exp_rank_change"],
+            id_char_id=only_active_dict[i]["id_char_id"],
+            voc_id=only_active_dict[i]["voc_id"],
+            world_id=only_active_dict[i]["world_id"],
+            level=only_active_dict[i]["level"],
+            level_change=only_active_dict[i]["level_change"],
+            exp_value=only_active_dict[i]["exp_value"],
+            exp_diff=only_active_dict[i]["exp_diff"],
+            charm_rank=only_active_dict[i]["charm_rank"],
+            charm_rank_change=only_active_dict[i]["charm_rank_change"],
+            charm_value=only_active_dict[i]["charm_value"],
+            charm_diff=only_active_dict[i]["charm_diff"],
+            date=now,
+        )
+        obj.append(char)
+    HighscoresHistory.objects.bulk_create(obj, 500)
+
+
+def delete_old_highscores_date():
+    now = datetime.datetime.now()
+    date = now - timedelta(days=3, hours=2)
+
+    clear_data_query = Highscores.objects.filter(date__lte=date)
+    clear_data_query._raw_delete(clear_data_query.db)
 
 # # # # # # # Experience end # # # # # # #
 
