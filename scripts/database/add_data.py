@@ -34,7 +34,8 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 logging.basicConfig(
     level=logging.INFO,
     filename='/django-projects/tibia-stats/logs/highscores.log',
-    filemode='w'
+    # filename='G:\\Python nauka\\django\\strony\\tibia_stats\\logs\\highscores.log', ##################
+    filemode='a'
 )
 
 # All of this is already happening by default!
@@ -471,14 +472,17 @@ def filter_highscores_data():
         f.write(out2)
 
     #
-    # latest_highscores = pd.read_json('24_dupa_exp.txt', orient='columns')
-    # latest_charms = pd.read_json('234_dupa_charm.txt', orient='columns')
+    # latest_highscores = pd.read_json('24_dupa_exp2.txt', orient='columns')
+    # latest_charms = pd.read_json('24_dupa_charm2.txt', orient='columns')
 
+    logging.info(f'Total records of highscores: {len(latest_highscores)} and '
+                 f'charms: {len(latest_charms)}')
     #
     # ============= filter latest data ===============
 
     # levels higher than 20 ( 40k + record difference between 10-20 )
     latest_highscores = latest_highscores[latest_highscores["level"] > 20]
+    logging.info(f'Characters over 20 lvl: {len(latest_highscores)}')
 
     # add char id from db
     latest_highscores["name_id_db"] = latest_highscores["name"]\
@@ -549,6 +553,7 @@ def filter_highscores_data():
         for key, value in name_change.items():
             Character.objects.filter(name=key).update(name=value)
         logging.info(f'Updated {len(name_change)} name changes positions')
+
     # === END UPDATE ============================================
     #
 
@@ -561,6 +566,7 @@ def filter_highscores_data():
 
     # collect data from day before from db from last day
     yesterday = date - timedelta(days=1, hours=2)
+    # yesterday = '2023-01-23 13:17:12'                                            ##########################
     old_highscores_query = (
         Highscores.objects.all()
         .filter(Q(date__gt=yesterday))
@@ -574,6 +580,7 @@ def filter_highscores_data():
     id_to_name = {}
     for key, value in chars_id_after_update.items():
         id_to_name.update({value: key})
+
     old_highscores_df["name"] = old_highscores_df["id_char"].map(id_to_name)
 
     # change old names for new ones
@@ -765,6 +772,7 @@ def get_daily_records():
     pd.set_option("display.max_columns", None)
     pd.set_option("display.width", 2000)
 
+    logging.info(f'# # START # # # # {date_with_seconds()} # # # # DAILY RECORDS # # # # # #')
     # best exp yesterday on each world
     now = datetime.datetime.now()
     date = now - timedelta(days=1, hours=2)
@@ -842,6 +850,9 @@ def get_daily_records():
     record_type = "exp"
     event = "none"
     obj = []
+    # print(history)
+    db_record_history_count_before = RecordsHistory.objects.all().count()
+
     history_dict = history.to_dict("index")
     for i in history_dict:
         record = RecordsHistory(
@@ -865,8 +876,17 @@ def get_daily_records():
         obj.append(record)
     RecordsHistory.objects.bulk_create(obj)
 
+    db_record_history_count_after = RecordsHistory.objects.all().count()
+    if db_record_history_count_after == len(obj) + db_record_history_count_before:
+        logging.info(f'Successfully added {len(obj)} items to db.')
+    else:
+        logging.info(f'Some records might be missing. Added {len(obj)} to db.')
+    logging.info(f'# # END # # # # {date_with_seconds()} # # # # Daily records # # # # # #')
+
 
 def move_only_active_players():
+    # Store data only for players that gained experience
+    logging.info(f'# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # # #')
     now = datetime.datetime.now()
     date = now - timedelta(days=1, hours=2)
 
@@ -875,10 +895,12 @@ def move_only_active_players():
     ).values()
     only_active_df = pd.DataFrame(data=only_active)
 
+    db_active_before = HighscoresHistory.objects.all().count()
+
     # charm = 0  # temp variable
     obj = []
     only_active_dict = only_active_df.to_dict("index")
-    for i in only_active_dict:
+    for index, i in enumerate(only_active_dict):
         char = HighscoresHistory(
             exp_rank=only_active_dict[i]["exp_rank"],
             exp_rank_change=only_active_dict[i]["exp_rank_change"],
@@ -896,7 +918,17 @@ def move_only_active_players():
             date=now,
         )
         obj.append(char)
-    HighscoresHistory.objects.bulk_create(obj, 500)
+        if index % 3000 == 0:
+            HighscoresHistory.objects.bulk_create(obj, 500)
+            obj = []
+        if index == len(only_active_dict) - 1:
+            HighscoresHistory.objects.bulk_create(obj, 500)
+
+    db_active_after = HighscoresHistory.objects.all().count()
+    if db_active_after == len(obj) + db_active_before:
+        logging.info(f'Successfully added {len(obj)} items to db history.')
+    else:
+        logging.info(f'Some records might be missing. Added {len(obj)} to db history.')
 
 
 def delete_old_highscores_date():
