@@ -3,3 +3,4 @@ tibia_stats/.env
 ignore/
 scripts/tibiacom_scrapper/temp
 main/migrations/
+temp/
