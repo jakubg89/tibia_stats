@@ -1,3 +1,4 @@
+import gc
 import sys
 sys.path.append("/django-projects/tibia-stats/")
 from tibia_stats.wsgi import *
@@ -37,8 +38,8 @@ import tracemalloc
 
 logging.basicConfig(
     level=logging.INFO,
-    filename="/django-projects/tibia-stats/logs/highscores.log",
-    # filename='G:\\Python nauka\\django\\strony\\tibia_stats\\logs\\highscores.log', ##################
+    # filename="/django-projects/tibia-stats/logs/highscores.log",
+    filename='G:\\Python nauka\\django\\strony\\tibia_stats\\logs\\highscores.log', ##################
     filemode="a",
 )
 
@@ -83,7 +84,7 @@ def main():
     # add_news_ticker_to_db()
 
     # once a day (every 24h)
-    # add_highscores()
+    add_highscores()
     # get_daily_records()
     # move_active_players_to_history
     # delete_records_from_highscores
@@ -95,8 +96,8 @@ def main():
 def temp_del():
     now = datetime.datetime.now()
     # date = now - timedelta(days=3, hours=2)
-    date = "2023-01-22 05:45:00"
-    clear_data_query = Highscores.objects.filter(date__gte=date)
+    date = "2023-02-01 04:00:00"
+    clear_data_query = Highscores.objects.filter(date__gt=date)
     clear_data_query._raw_delete(clear_data_query.db)
 
 
@@ -450,37 +451,38 @@ def collect_char_id():
 
 def save_to_json(item, file_name):
     path_to_directory = "/django-projects/tibia-stats/temp/"
-    # path_to_directory = 'G:\\Python nauka\\django\\strony\\tibia_stats\\temp\\'
     full_path = "".join([path_to_directory, file_name])
     write = json.dumps(item)
+
     with open(full_path, "w") as f:
         f.write(write)
 
 
 def read_json(file_name):
     path_to_directory = "/django-projects/tibia-stats/temp/"
-    # path_to_directory = 'G:\\Python nauka\\django\\strony\\tibia_stats\\temp\\'
     full_path = "".join([path_to_directory, file_name])
+
     with open(full_path, 'r') as file:
         json_data = json.load(file)
+
     return json_data
 
 
 def save_to_file(item, file_name):
     path_to_directory = "/django-projects/tibia-stats/temp/"
-    # path_to_directory = 'G:\\Python nauka\\django\\strony\\tibia_stats\\temp\\'
-
     raw_file = ''.join([date_for_files(), "-", file_name, ".csv"])
-    full_path = "".join([path_to_directory, date_for_files(), "-", raw_file, ".csv"])
+
+    full_path = "".join([path_to_directory, raw_file])
     item.to_csv(path_or_buf=full_path,
                 mode='w',
                 index=False)
 
 
 def read_file(file_name):
-    # raw_file = ''.join([date_for_files(), "-", file_name, ".csv"])
-    raw_file = ''.join(["30012023", file_name])
-    full_path = ''.join(['/django-projects/tibia-stats/temp/', raw_file, ".csv"])
+    path_to_directory = "/django-projects/tibia-stats/temp/"
+    raw_file = ''.join([date_for_files(), "-", file_name, ".csv"])
+    full_path = ''.join([path_to_directory, raw_file])
+
     file_df = pd.read_csv(filepath_or_buffer=full_path,
                           index_col=False,
                           memory_map=True)
@@ -516,7 +518,7 @@ def scrap_charms(date):
 def prepare_data_and_db(date):
     logging.info(f"Preparing data started: {date_with_seconds()}")
     datetime_obj = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-    yesterday = datetime_obj - timedelta(days=2, hours=2)
+    yesterday = datetime_obj - timedelta(days=1, hours=4)
 
     latest_highscores = read_file("raw_exp")
     latest_charms = read_file("raw_charms")
@@ -525,8 +527,8 @@ def prepare_data_and_db(date):
     latest_charms = latest_charms[latest_charms["level"] > 20]
 
     chars_id = collect_char_id()
-    latest_highscores["name_id_db"] = latest_highscores["name"].map(chars_id).fillna(0, inplace=True)
-    latest_charms["name_id_db"] = latest_charms["name"].map(chars_id).fillna(0, inplace=True)
+    latest_highscores["name_id_db"] = latest_highscores["name"].map(chars_id).fillna(0)
+    latest_charms["name_id_db"] = latest_charms["name"].map(chars_id).fillna(0)
 
     world_id = collect_world_id()
     latest_highscores["world"].update(latest_highscores["world"].map(world_id))
@@ -542,6 +544,7 @@ def prepare_data_and_db(date):
     name_list_dont_exist1 = exp_without_id["name"].values.tolist()
     name_list_dont_exist2 = charms_without_id["name"].values.tolist()
     name_list_dont_exist = name_list_dont_exist1 + name_list_dont_exist2
+    name_list_dont_exist = list(set(name_list_dont_exist))
 
     checked = Tasks.objects.filter(task_name="checked_characters").values('status')[:1]
 
@@ -557,7 +560,6 @@ def prepare_data_and_db(date):
     # deleted_characters = names["deleted_characters"]
 
     old_name_list = [value for key, value in name_change.items()]
-    new_name_list = [key for key, value in name_change.items()]
 
     if name_change:
         update_character(name_change)
@@ -595,21 +597,22 @@ def prepare_data_and_db(date):
         name_change_exp = latest_highscores[latest_highscores["name"].isin(old_name_list)]
         name_change_charm = latest_charms[latest_charms["name"].isin(old_name_list)]
         name_change_df = pd.concat([name_change_charm, name_change_exp])
-        name_change_df.drop_duplicates("name")
-        old_name = dict((v, k) for k, v in name_change.items())
-        name_change_dict = name_change_df.to_dict("index")
-        date_to_file = {"old_name": old_name,
-                           "name_change_dict": name_change_dict}
+        name_change_df = name_change_df.drop_duplicates("name")
+        save_to_file(name_change_df, "name_changes_df")
 
-        save_to_json(date_to_file, ''.join([date_for_files(), "-name_changes.txt"]))
+        old_name = dict((v, k) for k, v in name_change.items())
+        save_to_json(old_name, "name_changes.txt")
         logging.info(f'File saved.')
 
     all_chars = latest_highscores.merge(
         latest_charms, on="id_char", how="outer", suffixes=("_exp", "_charm")
     )
     all_chars.fillna(0, inplace=True)
-    latest_charms = ''
-    latest_highscores = ''
+
+    del latest_highscores
+    del latest_charms
+    gc.collect()
+
     if all_chars.isnull().values.any():
         raise ValueError(f'NaN found... {all_chars.isnull().sum().any()}')
 
@@ -639,7 +642,7 @@ def prepare_data_and_db(date):
         "name_charm",
     ], axis=1, inplace=True)
 
-    all_chars.drop_duplicates("name_exp", keep='last')
+    all_chars = all_chars.drop_duplicates("name_exp", keep='last')
 
     all_chars.rename(columns={
         'name_exp': 'name',
@@ -671,7 +674,13 @@ def prepare_data_and_db(date):
     prep_for_bulk = old_highscores_df.merge(
         all_chars, on="id_char", how="outer", suffixes=("_db", "_new")
     )
+
+    del all_chars
+    del old_highscores_df
+    gc.collect()
     prep_for_bulk.fillna(0, inplace=True)
+
+    prep_for_bulk = prep_for_bulk.drop_duplicates("id_char", keep='last')
 
     prep_for_bulk = prep_for_bulk.astype({
         "exp_rank_db": "int64",
@@ -729,6 +738,9 @@ def prepare_data_and_db(date):
         "exp_rank_change": "int64",
         "charm_rank_change": "int64",
     })
+
+    prep_for_bulk = prep_for_bulk.drop_duplicates("id_char", keep='last')
+
     save_to_file(prep_for_bulk, "prep_for_bulk")
     Tasks.objects.filter(task_name="prepare_data_and_db").update(status='done')
     logging.info(f'{len(prep_for_bulk)} characters prepared for insert. File saved.')
@@ -749,14 +761,12 @@ def check_characters_at_tibiacom(name_list_dont_exist):
             old_name = char["character"]["former_names"][-1]
             new_name = char["character"]["name"]
             name_change.update({old_name: new_name})
-            # todo dopisac jak jest wiecej name change
-            # if len(char["character"]["former_names"]) > 1:
-            #    name_change.update(
         else:
             new_players.append(char["character"]["name"])
     character_names = {"new_players": new_players,
                        "name_change": name_change,
                        "deleted_characters": deleted_characters}
+
     save_to_json(character_names, 'checked.txt')
     task_name = Tasks(task_name="checked_characters",
                       status='done',
@@ -767,20 +777,14 @@ def check_characters_at_tibiacom(name_list_dont_exist):
 
 
 # === INSERT =============== NAME CHANGE ====================
-def insert_name_change(latest_highscores,
-                       latest_charms,
-                       old_name_list,
-                       new_name_list,
-                       name_change,
-                       date):
-    name_change_exp = latest_highscores[latest_highscores["name"].isin(old_name_list)]
-    name_change_charm = latest_charms[latest_charms["name"].isin(old_name_list)]
-    name_change_df = pd.concat([name_change_charm, name_change_exp])
-    name_change_df.drop_duplicates("name", keep='last')
-    old_name = dict((v, k) for k, v in name_change.items())
+def insert_name_change(date):
+    name_change_df = read_file("name_changes_df")
+    old_name = read_json('name_changes.txt')
+
+    name_change_dict = name_change_df.to_dict("index")
+
     obj_name_change = []
     traded = 0  # temp variable
-    name_change_dict = name_change_df.to_dict("index")
     for name_in_dict in name_change_dict:
         name = NameChange(
             id_char_id=name_change_dict[name_in_dict]["id_char"],
@@ -800,7 +804,6 @@ def insert_new_players(latest_highscores, latest_charms, new_players):
     new_characters_in_exp = latest_highscores[latest_highscores["name"].isin(new_players)]
     new_characters_in_charms = latest_charms[latest_charms["name"].isin(new_players)]
     new_characters = pd.concat([new_characters_in_charms, new_characters_in_exp])
-    print(new_characters.reset_index(drop=True))
     new_characters.reset_index(drop=True, inplace=True)
     new_characters_dict = new_characters.to_dict("index")
     char_to_insert = []
@@ -821,7 +824,6 @@ def insert_new_players(latest_highscores, latest_charms, new_players):
 def insert_world_changes(date):
     logging.info(f'Insert world changes started: {date_with_seconds()}')
     world_transfers = read_file("world_transfers")
-    # world_transfers = read_file(''.join([date_for_files(), "-world_transfers.txt"]))
 
     id_to_world = {}
     world_id = collect_world_id()
@@ -859,13 +861,7 @@ def update_character(name_change):
 
 def insert_highscores(date):
     logging.info(f'Highscores insert started: {date_with_seconds()}')
-    # prep_for_bulk = read_file("prep_for_bulk")
-
-    path_to_directory = "/django-projects/tibia-stats/temp/"
-    full_path = "".join([path_to_directory, "prep_for_bulk.csv"])
-    prep_for_bulk = pd.read_csv(filepath_or_buffer=full_path,
-                    index_col=False,
-                    memory_map=True)
+    prep_for_bulk = read_file("prep_for_bulk")
 
     obj = []
     prep_for_bulk = prep_for_bulk.loc[(prep_for_bulk['voc_id'] != 0)
@@ -874,7 +870,9 @@ def insert_highscores(date):
 
     if not prep_for_bulk.isnull().values.any():
         inner_data_dict = prep_for_bulk.to_dict("index")
+
         del prep_for_bulk
+        gc.collect()
 
         db_count = Highscores.objects.all().count()
         amouont_for_insert = len(inner_data_dict)
@@ -914,37 +912,20 @@ def insert_highscores(date):
             )
         Tasks.objects.filter(task_name="insert_highscores").update(status='done')
         logging.info(f"Insert end: {date_with_seconds()}")
-        tracemalloc.stop()
 
 
 def add_highscores():
     pass
-    # logging.info(" - - - - - - - - - - - - - - - - - - - ")
-    # date = date_with_seconds()
-    # now = datetime.datetime.now()
-    # yesterday = now - timedelta(days=1, hours=6)
-    # logging.info(f"Add highscores start {date}")
-
-    '''    latest_highscores = scrap_experience()
-    save_to_file(latest_highscores, ''.join([date_for_files(), "-raw_exp.txt"]))
-    logging.info('Exp saved.')
-
-    latest_charms = scrap_charms()
-    save_to_file(latest_charms, ''.join([date_for_files(), "-raw_charms27.txt"]))
-    logging.info('Charms saved.')'''
-    # date = '2023-01-28 04:03:51'
-    # yesterday = '2023-01-25 14:40:00'
-
-    # latest_highscores = pd.read_json('27012023-raw_exp27.txt', orient='columns')
-    # latest_charms = pd.read_json('27012023-raw_charms27.txt', orient='columns')
-
-    # prep_for_bulk = prepare_data_and_db(latest_charms, latest_highscores, date, yesterday)
-    # insert_highscores(prep_for_bulk, date)
-    # logging.info(" - - - - - - - - - - - - - - - - - - - ")
+    # date = "2023-02-01 05:00:00"
+    # temp_del()
+    # insert_name_change(date)
+    # insert_world_changes(date)
+    # insert_highscores(date)
+    # get_daily_records()
 
 
 def get_daily_records():
-    # todo sprawdzić czy działa
+    # todo
     pd.set_option("display.max_columns", None)
     pd.set_option("display.width", 2000)
 
@@ -1025,6 +1006,7 @@ def get_daily_records():
 
             history = pd.concat([worst_exp, history], ignore_index=True)
 
+    print(history)
     charm = 0
     record_type = "exp"
     event = "none"
@@ -1032,7 +1014,7 @@ def get_daily_records():
     # print(history)
     db_record_history_count_before = RecordsHistory.objects.all().count()
 
-    history_dict = history.to_dict("index")
+    '''history_dict = history.to_dict("index")
     for i in history_dict:
         record = RecordsHistory(
             exp_rank=history_dict[i]["exp_rank"],
@@ -1053,7 +1035,7 @@ def get_daily_records():
             date=now,
         )
         obj.append(record)
-    RecordsHistory.objects.bulk_create(obj)
+    RecordsHistory.objects.bulk_create(obj)'''
 
     db_record_history_count_after = RecordsHistory.objects.all().count()
     if db_record_history_count_after == len(obj) + db_record_history_count_before:
@@ -1064,7 +1046,7 @@ def get_daily_records():
 
 
 def move_only_active_players():
-    #todo sprawdzić czy działa
+    #todo sprawdzi
     # Store data only for players that gained experience
     logging.info(f"# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # # #")
     now = datetime.datetime.now()
@@ -1117,7 +1099,6 @@ def delete_old_highscores_date():
 
     clear_data_query = Highscores.objects.filter(date__lte=date)
     clear_data_query._raw_delete(clear_data_query.db)
-
 
 # # # # # # # Experience end # # # # # # #
 
