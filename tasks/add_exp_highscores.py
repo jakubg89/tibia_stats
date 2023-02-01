@@ -7,7 +7,8 @@ if __name__ == '__main__':
                                            prepare_data_and_db,
                                            insert_name_change,
                                            insert_world_changes,
-                                           insert_highscores)
+                                           insert_highscores,
+                                           get_daily_records)
 from tibia_stats.wsgi import *
 from main.models import Tasks
 from datetime import datetime, timedelta
@@ -27,10 +28,11 @@ django.setup()
 
 
 def main():
-    now = datetime.datetime.now()
-    date = now - timedelta(days=1, hours=2)
+    # now = datetime.datetime.now()
+    # date = now - timedelta(days=1, hours=2)
+    delete_files()
+    date = datetime.datetime.now()
     if start_time():
-        # date = '2023-01-29 17:00:00'
         logging.info(f'{datetime.datetime.now()} TASK START')
         delete_tasks()
         logging.info(f'{datetime.datetime.now()} Tasks deleted.')
@@ -39,7 +41,6 @@ def main():
         create_tasks(date)
         logging.info(f'{datetime.datetime.now()} Tasks created.')
         perform_script()
-
     else:
         perform_script()
 
@@ -51,7 +52,6 @@ def perform_script():
     if list_and_date:
         to_do = list_and_date['to_do']
         date = list_and_date['date']
-        # date = '2023-01-29 17:00:00'
         for i in to_do:
             logging.info(f'Performing {i} - {datetime.datetime.now()}')
             eval(i + '(date)')
@@ -66,7 +66,7 @@ def delete_tasks():
 
 
 def delete_files():
-    for file in glob.glob("/django-projects/tibia-stats/temp/"):
+    for file in glob.glob("G:\\Python nauka\\django\\strony\\tibia_stats\\temp\\"):
         os.remove(file)
 
 
@@ -83,10 +83,11 @@ def create_tasks(date):
     tasks_list = [
         "scrap_experience",
         "scrap_charms",
-        #"prepare_data_and_db",
-        #"insert_name_change",
-        #"insert_world_changes",
-        #"insert_highscores"
+        "prepare_data_and_db",
+        "insert_name_change",
+        "insert_world_changes",
+        "insert_highscores",
+        "get_daily_records"
     ]
 
     for idx, i in enumerate(tasks_list):
