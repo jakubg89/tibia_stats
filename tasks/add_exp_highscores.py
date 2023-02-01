@@ -11,7 +11,7 @@ if __name__ == '__main__':
                                            get_daily_records)
 from tibia_stats.wsgi import *
 from main.models import Tasks
-from datetime import datetime, timedelta
+from datetime import datetime
 import datetime
 import logging
 import glob
