@@ -1,10 +1,100 @@
 /********** Template CSS **********/
 :root {
-    --primary: #c00000;
-    --secondary: #191C24;
-    --light: #6C7293;
-    --dark: #000000;
+    --primary: var(--red-light);     /* side bar text active */
+    --secondary: #96969B;   /* side bg (must be same as bg element) */
+    --light: #96969B;       /* side + nav bar text + icons */
+    --dark: #D5D8D8;        /* bg + icon bg + nav bar hover */
+    
+    
+    --dark-black: #1B191C;      /* rgb(27, 25, 28) */
+    --white-light: #EEF2F2;     /* rgb(238, 242, 242) */
+    --white-dark: #D5D8D8;      /* rgb(213, 216, 216) */
+    --gray-dark: #96969B;       /* rgb(150, 150, 155) */
+    --red-dark: #E41E19;        /* rgb(228, 30, 25) */
+    --red-light: #ED8172;       /* rgb(237, 129, 114) */
+    --light-success: #C2CA92;   /* rgb(194, 202, 146) */
+    --light-danger: #FCCBC7;    /* rgb(252, 203, 199) */
+    --light-warning: #FCC79B;   /* rgb(252,199,155) */
+
+    --link: var(--red-light);
+    --link-hover: #34B1AA;
+
+    --background-element: #EEF2F2;  /* elements */
+    --text-primary: #cf0404;        /* icons */
+    --test: 0, 0, 0;
+
+    --font-color: var(--dark-black);          /* font color */
 }
+
+
+/* colors */
+.accordion-button:not(.collapsed) {
+    color: var(--dark-black);
+	background-color: var(--white-dark);
+}
+
+.accordion-button:hover {
+	background-color: #e6e7e7;
+}
+
+.text-primary {
+	color: var(--primary) !important
+}
+
+.bg-secondary-test {
+	background-color: var(--dark) !important
+}
+
+.bg-secondary-onecolor {
+	background-color: var(--dark-black) !important
+}
+
+.bg-secondary {
+	background-color: var(--background-element) !important
+}
+
+.bg-primary {
+	background-color: var(--background-element) !important
+}
+
+body {
+    color: var(--dark-black);
+}
+
+h1, .h1, h2, .h2, h3, .h3,
+h4, .h4, h5, .h5, h6, .h6 {
+        color: var(--gray-dark) !important
+}
+.title {
+    color: var(--red-light);
+}
+
+a {
+	color: var(--red-light);
+	text-decoration: none
+}
+
+a:hover {
+	color: var(--red-dark);
+}
+
+.border-bottom {
+	border-bottom: 1px solid var(--gray-dark)!important
+}
+
+.shadow {
+	box-shadow: 0 0.5rem 1rem rgba(var(--test), 0.15) !important
+}
+
+.shadow-sm {
+	box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important
+}
+
+.shadow-lg {
+	box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important
+}
+
+
 
 .back-to-top {
     position: fixed;
@@ -71,15 +161,15 @@
     width: 250px;
     height: 100vh;
     overflow-y: auto;
-    background: var(--secondary);
-    transition: 0.5s;
+    background: var(--white-dark);
+    transition: 0.7s;
     z-index: 999;
 }
 
 .content {
     margin-left: 250px;
     min-height: 100vh;
-    background: var(--dark);
+    background: var(--white-dark);
     transition: 0.5s;
 }
 
@@ -120,34 +210,36 @@
 
 /*** Navbar ***/
 .sidebar .navbar .navbar-nav .nav-link {
-    padding: 7px 20px;
-    color: var(--light);
+    padding: 7px 10px;
+    color: var(--white-dark);
     font-weight: 500;
-    border-left: 3px solid var(--secondary);
-    border-radius: 0 30px 30px 0;
+    /* border-left: 3px solid var(--dark-black); */
+    border-radius: 10px 0 0 10px;
     outline: none;
 }
 
 .sidebar .navbar .navbar-nav .nav-link:hover,
 .sidebar .navbar .navbar-nav .nav-link.active {
-    color: var(--primary);
-    background: var(--dark);
+    color: var(--dark-black);
+    background: var(--white-dark);
     border-color: var(--primary);
 }
 
 .sidebar .navbar .navbar-nav .nav-link i {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--dark);
+    color: var(--dark-black);
+    background: var(--white-dark);
     border-radius: 40px;
 }
 
 .sidebar .navbar .navbar-nav .nav-link:hover i,
 .sidebar .navbar .navbar-nav .nav-link.active i {
-    background: var(--secondary);
+    background: var(--white-light);
+    color: var(--red-light);
 }
 
 .sidebar .navbar .dropdown-toggle::after {
@@ -167,25 +259,26 @@
 
 .sidebar .navbar .dropdown-item {
     padding-left: 25px;
-    border-radius: 0 30px 30px 0;
-    color: var(--light);
+    border-radius: 10px 0 0 10px;
+    color: var(--white-dark);
 }
 
 .sidebar .navbar .dropdown-item:hover,
 .sidebar .navbar .dropdown-item.active {
-    background: var(--dark);
+    background: var(--white-dark);
+    color: var(--dark-black);
 }
 
 .content .navbar .navbar-nav .nav-link {
     margin-left: 25px;
     padding: 12px 0;
-    color: var(--light);
+    color: var(--red-light);
     outline: none;
 }
 
 .content .navbar .navbar-nav .nav-link:hover,
 .content .navbar .navbar-nav .nav-link.active {
-    color: var(--primary);
+    color: var(--red-dark);
 }
 
 .content .navbar .sidebar-toggler,
@@ -195,7 +288,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--dark);
+    background: var(--white-dark);
     border-radius: 40px;
 }
 
@@ -221,6 +314,58 @@
 .content .navbar .dropdown-toggle[aria-expanded=true]::after {
     transform: rotate(-180deg);
 }
+
+.content .navbar .search-form {
+    position: relative;
+    margin-right: 0;
+    vertical-align: middle;
+    height: 14px;
+  }
+  
+  .content .navbar .search-form {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  
+  .content .navbar .search-form i {
+    font-size: 1.25rem;
+    position: absolute;
+    left: 0;
+    top: 60%;
+    transform: translateY(-50%);
+    color: var(--red-light);
+  }
+  
+  .content .navbar .search-form i {
+    left: auto;
+    right: 0;
+  }
+  
+  .content .navbar .search-form input {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    width: 0;
+    height: 26px;
+    padding: 0 0 0 30px;
+    position: relative;
+    transition: width 400ms ease, background 400ms ease;
+  }
+  
+  .content .navbar .search-form input:focus {
+    background-color: transparent;
+    border-bottom: 1px solid var(--dark-black);
+    border-radius: 0;
+    padding-left: 30px;
+    cursor: text;
+    outline: 0;
+    width: 200px;
+  }
+  
+  .content .navbar .search-form input:focus {
+    padding-right: 30px;
+    padding-left: 0;
+  }
 
 @media (max-width: 575.98px) {
     .content .navbar .navbar-nav .nav-link {
@@ -289,16 +434,168 @@
 }
 
 
-/*** DataTable ***/
-.page-item.active .page-link {
-    background-color: lightgrey !important;
-    border: 1px solid black;
+/* DataTable */
+table.dataTable thead tr {
+    color: var(--gray-dark) !important;
+  }
+
+
+.dataTables_filter input {
+    display: block;
+	width: 100% !important;
+	padding: .375rem .75rem !important;
+	font-size: 1rem !important;
+	font-weight: 400 !important;
+	line-height: 1.5 !important;
+	color: #6C7293 !important;
+	background-color: var(--white-dark) !important;
+	background-clip: padding-box !important; 
+	border: 1px solid var(--dark-black) !important;
+	appearance: none !important;
+	border-radius: 5px !important
+ }
+
+ /* .dataTables_wrapper .dataTables_filter input {
+	border: 1px solid rgb(182, 3, 3) !important;
+	border-radius: 3px;
+	padding: 5px;
+	background-color: transparent;
+	margin-left: 3px
+} */
+
+
+ div.dataTables_length select{
+    display: block;
+	width: 80px !important;
+	padding: .375rem .75rem !important;
+	font-size: 1rem !important;
+	font-weight: 400 !important;
+	line-height: 1.5 !important;
+	color: #6C7293 !important;
+	background-color: var(--white-dark) !important;
+	background-clip: padding-box !important;
+	border: 1px solid rgb(27, 25, 28) !important;
+	appearance: none !important;
+	border-radius: 5px !important;
+ }
+
+ /* arrows */
+table.dataTable thead>tr>th.sorting:before,
+table.dataTable thead>tr>th.sorting:after,
+table.dataTable thead>tr>th.sorting_asc:before,
+table.dataTable thead>tr>th.sorting_asc:after,
+table.dataTable thead>tr>th.sorting_desc:before,
+table.dataTable thead>tr>th.sorting_desc:after,
+table.dataTable thead>tr>th.sorting_asc_disabled:before,
+table.dataTable thead>tr>th.sorting_asc_disabled:after,
+table.dataTable thead>tr>th.sorting_desc_disabled:before,
+table.dataTable thead>tr>th.sorting_desc_disabled:after,
+table.dataTable thead>tr>td.sorting:before,
+table.dataTable thead>tr>td.sorting:after,
+table.dataTable thead>tr>td.sorting_asc:before,
+table.dataTable thead>tr>td.sorting_asc:after,
+table.dataTable thead>tr>td.sorting_desc:before,
+table.dataTable thead>tr>td.sorting_desc:after,
+table.dataTable thead>tr>td.sorting_asc_disabled:before,
+table.dataTable thead>tr>td.sorting_asc_disabled:after,
+table.dataTable thead>tr>td.sorting_desc_disabled:before,
+table.dataTable thead>tr>td.sorting_desc_disabled:after {
+	position: absolute;
+	display: block;
+	opacity: .2 !important;
+	right: 5px;
+	line-height: 10px !important;
+	color: var(--gray-dark) !important;
+    font-size: 1em !important
 }
 
-.page-link {
-    color: black !important;
+table.dataTable thead>tr>th.sorting_asc:before,
+table.dataTable thead>tr>th.sorting_desc:after,
+table.dataTable thead>tr>td.sorting_asc:before,
+table.dataTable thead>tr>td.sorting_desc:after {
+	opacity: .6 !important
 }
 
-div.dataTables_wrapper div.dataTables_length select{
-width:100px;
+table.dataTable thead>tr>th.sorting:before,
+table.dataTable thead>tr>th.sorting_asc:before,
+table.dataTable thead>tr>th.sorting_desc:before,
+table.dataTable thead>tr>th.sorting_asc_disabled:before,
+table.dataTable thead>tr>th.sorting_desc_disabled:before,
+table.dataTable thead>tr>td.sorting:before,
+table.dataTable thead>tr>td.sorting_asc:before,
+table.dataTable thead>tr>td.sorting_desc:before,
+table.dataTable thead>tr>td.sorting_asc_disabled:before,
+table.dataTable thead>tr>td.sorting_desc_disabled:before {
+	bottom: 50%;
+	content: "▲"
 }
+
+table.dataTable thead>tr>th.sorting:after,
+table.dataTable thead>tr>th.sorting_asc:after,
+table.dataTable thead>tr>th.sorting_desc:after,
+table.dataTable thead>tr>th.sorting_asc_disabled:after,
+table.dataTable thead>tr>th.sorting_desc_disabled:after,
+table.dataTable thead>tr>td.sorting:after,
+table.dataTable thead>tr>td.sorting_asc:after,
+table.dataTable thead>tr>td.sorting_desc:after,
+table.dataTable thead>tr>td.sorting_asc_disabled:after,
+table.dataTable thead>tr>td.sorting_desc_disabled:after {
+	top: 50%;
+	content: "▼"
+}
+
+/* pagination */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+	box-sizing: border-box;
+	display: inline-block;
+	min-width: 1.5em;
+	padding: .5em 1em;
+	margin-left: 2px;
+	text-align: center;
+	text-decoration: none !important;
+	cursor: pointer;
+	color: var(--red) !important;
+	border: 1px solid transparent;
+	border-radius: 2px
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+	color: var(--dark-black) !important;
+	border: 1px solid var(--white-dark) !important;
+    border-radius: 7px;
+	background-color: rgba(238, 242, 242, 0.1) !important;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(27, 25, 28, 0.1)), color-stop(100%, rgba(0, 0, 0, 0.1))) !important;
+	background: -webkit-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: -moz-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: -ms-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: -o-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: linear-gradient(to bottom, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+	cursor: default;
+	color: rgb(241, 1, 1) !important;
+	border: 1px solid transparent;
+	background: transparent;
+	box-shadow: none
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+	border: 1px solid var(--red-light) !important;
+    border-radius: 7px;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(27, 25, 28, 0.1)), color-stop(100%, rgba(0, 0, 0, 0.1))) !important;
+	background: -webkit-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: -moz-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: -ms-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: -o-linear-gradient(top, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important;
+	background: linear-gradient(to bottom, rgba(238, 242, 242, 0.1) 0%, rgba(27, 25, 28, 0.1) 100%) !important
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:active {
+	outline: none !important;
+	box-shadow: inset 0 0 3px #111 !important
+}
+

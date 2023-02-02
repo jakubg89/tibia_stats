@@ -1,3 +1,7 @@
+import gc
+import sys
+
+sys.path.append("/django-projects/tibia-stats/")
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
@@ -13,6 +17,7 @@ from main.models import (
     Boosted,
     WorldOnlineHistory,
     HighscoresHistory,
+    Tasks,
 )
 
 # custom
@@ -26,22 +31,22 @@ import datetime
 from bs4 import BeautifulSoup
 import json
 from pathlib import Path
-import sys
+import numpy as np
 import logging
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
 
+
 logging.basicConfig(
     level=logging.INFO,
-    filename='/django-projects/tibia-stats/logs/highscores.log',
-    # filename='G:\\Python nauka\\django\\strony\\tibia_stats\\logs\\highscores.log', ##################
-    filemode='a'
+    filename="/django-projects/tibia-stats/logs/highscores.log",
+    filemode="a",
 )
 
 # All of this is already happening by default!
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.ERROR  # Send errors as events
+    level=logging.INFO,  # Capture info and above as breadcrumbs
+    event_level=logging.ERROR,  # Send errors as events
 )
 
 sentry_sdk.init(
@@ -49,14 +54,13 @@ sentry_sdk.init(
     integrations=[
         sentry_logging,
     ],
-
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
     traces_sample_rate=1.0,
 )
 
-sys.path.append("/django-projects/tibia-stats/")
+
 # environ.setdefault('DJANGO_SETTINGS_MODULE', 'tibia_stats.settings')
 
 
@@ -76,7 +80,7 @@ def main():
     # add_news_ticker_to_db()
 
     # once a day (every 24h)
-    # filter_highscores_data()
+    add_highscores()
     # get_daily_records()
     # move_active_players_to_history
     # delete_records_from_highscores
@@ -88,8 +92,8 @@ def main():
 def temp_del():
     now = datetime.datetime.now()
     # date = now - timedelta(days=3, hours=2)
-    date = '2023-01-22 05:45:00'
-    clear_data_query = Highscores.objects.filter(date__gte=date)
+    date = "2023-02-01 04:00:00"
+    clear_data_query = Highscores.objects.filter(date__gt=date)
     clear_data_query._raw_delete(clear_data_query.db)
 
 
@@ -147,10 +151,9 @@ def add_news_ticker_to_db():
     all_ticker_df = pd.DataFrame(data=all_ticker)
     all_ticker_df.rename(columns={"id": "id_on_tibiacom"}, inplace=True)
     all_ticker_df.drop(columns=["date", "news", "category", "url"], inplace=True)
-    not_existing_id = db_news_df.merge(all_ticker_df, on="id_on_tibiacom", how="right",
-                                       indicator=True).query(
-        '_merge == "right_only"'
-    )
+    not_existing_id = db_news_df.merge(
+        all_ticker_df, on="id_on_tibiacom", how="right", indicator=True
+    ).query('_merge == "right_only"')
 
     id_list = not_existing_id["id_on_tibiacom"].values.tolist()
 
@@ -196,10 +199,9 @@ def add_news_to_db():
     all_news_df.rename(columns={"id": "id_on_tibiacom"}, inplace=True)
     all_news_df.drop(columns=["date", "news", "category", "url"], inplace=True)
 
-    not_existing_id = db_news_df.merge(all_news_df, on="id_on_tibiacom", how="right",
-                                       indicator=True).query(
-        '_merge == "right_only"'
-    )
+    not_existing_id = db_news_df.merge(
+        all_news_df, on="id_on_tibiacom", how="right", indicator=True
+    ).query('_merge == "right_only"')
 
     id_list = not_existing_id["id_on_tibiacom"].values.tolist()
 
@@ -244,10 +246,7 @@ def add_boss_to_db():
         date = date_with_seconds()
 
         boss = Boosted(
-            name=boss_info["name"],
-            image_url=boss_info["image_url"],
-            type=category,
-            date_time=date
+            name=boss_info["name"], image_url=boss_info["image_url"], type=category, date_time=date
         )
         boss.save()
 
@@ -262,8 +261,10 @@ def add_creature_to_db():
         date = date_with_seconds()
 
         creature = Boosted(
-            name=creature_info["name"], image_url=creature_info["image_url"], type=category,
-            date_time=date
+            name=creature_info["name"],
+            image_url=creature_info["image_url"],
+            type=category,
+            date_time=date,
         )
         creature.save()
 
@@ -279,7 +280,8 @@ def add_worlds_information_to_db():
     worlds_information = dataapi.get_worlds_information()
     path_to_json = Path(__file__).resolve().parent.parent
     values = json.load(
-        open(os.path.join(path_to_json, "tibiacom_scrapper\\temp\\data_value\\data.json")))
+        open(os.path.join(path_to_json, "tibiacom_scrapper\\temp\\data_value\\data.json"))
+    )
 
     for world in worlds_information:
 
@@ -289,7 +291,8 @@ def add_worlds_information_to_db():
 
                 # check if database already has that id return 1 or 0
                 cursor.execute(
-                    f"SELECT EXISTS (SELECT name FROM world WHERE name = '{world['name']}') as truth;")
+                    f"SELECT EXISTS (SELECT name FROM world WHERE name = '{world['name']}') as truth;"
+                )
                 exist = cursor.fetchone()
 
                 # check the result and perform insert if it's not in database
@@ -348,7 +351,7 @@ def add_world_online_history():
         players_online = WorldOnlineHistory(
             world_id=worlds_id_dict[world["name"]],
             players_online=world["players_online"],
-            date=date
+            date=date,
         )
         obj.append(players_online)
     WorldOnlineHistory.objects.bulk_create(obj)
@@ -395,9 +398,10 @@ def get_highscores(category: str, proffesions: list):
                 if i == 1 and world == worlds[0] and prof == proffesions[0]:
                     result_df = pd.DataFrame(data=request_from_api["highscore_list"])
                 else:
-                    tempdf = pd.DataFrame(data=request_from_api["highscore_list"])
-                    result_df = pd.concat([result_df, tempdf], ignore_index=True)
-
+                    result_df = pd.concat(
+                        [result_df, pd.DataFrame(data=request_from_api["highscore_list"])],
+                        ignore_index=True,
+                    )
     # returning collected data in df
     return result_df
 
@@ -441,369 +445,494 @@ def collect_char_id():
     return formatted_characters_data
 
 
-# filter and prepare data to put inside db
-def filter_highscores_data():
-    logging.info(f'# # START # # # # {date_with_seconds()} # # # # highscores # # # # # #')
-    # collect data
-    date = date_with_seconds()
+def save_to_json(item, file_name):
+    path_to_directory = "/django-projects/tibia-stats/temp/"
+    full_path = "".join([path_to_directory, file_name])
+    write = json.dumps(item)
 
-    vocations_id = collect_voc_id()
-    worlds_id = collect_world_id()
-    chars_id = collect_char_id()
+    with open(full_path, "w") as f:
+        f.write(write)
 
-    logging.info(f'Getting experience highscores started {date_with_seconds()}')
+
+def read_json(file_name):
+    path_to_directory = "/django-projects/tibia-stats/temp/"
+    full_path = "".join([path_to_directory, file_name])
+
+    with open(full_path, "r") as file:
+        json_data = json.load(file)
+
+    return json_data
+
+
+def save_to_file(item, file_name):
+    path_to_directory = "/django-projects/tibia-stats/temp/"
+    raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
+
+    full_path = "".join([path_to_directory, raw_file])
+    item.to_csv(path_or_buf=full_path, mode="w", index=False)
+
+
+def read_file(file_name):
+    path_to_directory = "/django-projects/tibia-stats/temp/"
+    raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
+    full_path = "".join([path_to_directory, raw_file])
+
+    file_df = pd.read_csv(filepath_or_buffer=full_path, index_col=False, memory_map=True)
+    return file_df
+
+
+def date_for_files():
+    return datetime.datetime.now().strftime("%d%m%Y")
+
+
+def scrap_experience(date):
+    logging.info(f"{date_with_seconds()} - started exp scrapping")
     category_exp = "experience"
     prof_for_exp = ["none", "knights", "paladins", "sorcerers", "druids"]
     latest_highscores = get_highscores(category_exp, prof_for_exp)
-    logging.info(f'Getting  experience higscores ended {date_with_seconds()}'
-                 f'and there is {len(latest_highscores)} items.')
-    # temp
-    out = latest_highscores.to_json(orient='columns')
-    with open('25_dupa_exp2.txt', 'w') as f:
-        f.write(out)
+    save_to_file(latest_highscores, "raw_exp")
+    Tasks.objects.filter(task_name="scrap_experience").update(status="done")
+    logging.info(f"{date_with_seconds()} - Exp saved.")
+    # return latest_highscores
 
+
+def scrap_charms(date):
+    logging.info(f"{date_with_seconds()} - started charm scrapping")
     category_charms = "charmpoints"
     prof_for_charms = ["knights", "paladins", "sorcerers", "druids"]
     latest_charms = get_highscores(category_charms, prof_for_charms)
-    logging.info(f'Getting  charms higscores ended {date_with_seconds()}'
-                 f'and there is {len(latest_charms)} items.')
-    # temp
-    out2 = latest_charms.to_json(orient='columns')
-    with open('25_dupa_charm2.txt', 'w') as f:
-        f.write(out2)
-
-    #
-    # latest_highscores = pd.read_json('24_dupa_exp2.txt', orient='columns')
-    # latest_charms = pd.read_json('24_dupa_charm2.txt', orient='columns')
+    save_to_file(latest_charms, "raw_charms")
+    Tasks.objects.filter(task_name="scrap_charms").update(status="done")
+    logging.info(f"{date_with_seconds()} - Charms saved.")
+    # return latest_charms
 
 
-    logging.info(f'Total records of highscores: {len(latest_highscores)} and '
-                 f'charms: {len(latest_charms)}')
-    #
-    # ============= filter latest data ===============
+def prepare_data_and_db(date):
+    logging.info(f"Preparing data started: {date_with_seconds()}")
+    datetime_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    yesterday = datetime_obj - timedelta(days=1, hours=4)
 
-    # levels higher than 20 ( 40k + record difference between 10-20 )
+    latest_highscores = read_file("raw_exp")
+    latest_charms = read_file("raw_charms")
+
     latest_highscores = latest_highscores[latest_highscores["level"] > 20]
-    logging.info(f'Characters over 20 lvl: {len(latest_highscores)}')
+    latest_charms = latest_charms[latest_charms["level"] > 20]
 
-    # add char id from db
-    latest_highscores["name_id_db"] = latest_highscores["name"]\
-        .map(chars_id).fillna(0).astype("int64")
+    chars_id = collect_char_id()
+    latest_highscores["name_id_db"] = latest_highscores["name"].map(chars_id).fillna(0)
+    latest_charms["name_id_db"] = latest_charms["name"].map(chars_id).fillna(0)
 
-    # replace world name with db id
-    latest_highscores["world"] = latest_highscores["world"]\
-        .map(worlds_id).fillna(0).astype("int64")
+    world_id = collect_world_id()
+    latest_highscores["world"].update(latest_highscores["world"].map(world_id))
+    latest_charms["world"].update(latest_charms["world"].map(world_id))
 
-    # replace world name with db id
-    latest_highscores["vocation"] = latest_highscores["vocation"]\
-        .map(vocations_id).fillna(0).astype("int64")
+    voc_id = collect_voc_id()
+    latest_highscores["vocation"].update(latest_highscores["vocation"].map(voc_id))
+    latest_charms["vocation"].update(latest_charms["vocation"].map(voc_id))
 
-    # collect data about characters that don't exist in db
-    # 0 represent names that don't exist
-    dont_exist = latest_highscores[latest_highscores["name_id_db"] == 0]
+    exp_without_id = latest_highscores[latest_highscores["name_id_db"] == 0]
+    charms_without_id = latest_charms[latest_charms["name_id_db"] == 0]
 
-    # delete db index
+    name_list_dont_exist1 = exp_without_id["name"].values.tolist()
+    name_list_dont_exist2 = charms_without_id["name"].values.tolist()
+    name_list_dont_exist = name_list_dont_exist1 + name_list_dont_exist2
+    name_list_dont_exist = list(set(name_list_dont_exist))
+
+    checked = Tasks.objects.filter(task_name="checked_characters").values("status")[:1]
+
+    if checked and (checked[0]["status"] == "done"):
+        names = read_json("checked.txt")
+        logging.info(f"Names readed from checked.txt file.")
+    else:
+        names = check_characters_at_tibiacom(name_list_dont_exist)
+        logging.info(f"Names checked on tibia.com")
+
+    new_players = names["new_players"]
+    name_change = names["name_change"]
+    # deleted_characters = names["deleted_characters"]
+
+    old_name_list = [value for key, value in name_change.items()]
+
+    if name_change:
+        update_character(name_change)
+        logging.info(f"Update character completed. Updated {len(name_change)} characters")
+
     latest_highscores.drop("name_id_db", axis=1, inplace=True)
+    latest_charms.drop("name_id_db", axis=1, inplace=True)
+    chars_id = collect_char_id()
+    latest_highscores["name_id_db"] = (
+        latest_highscores["name"].map(chars_id).fillna(0).astype("int64")
+    )
+    latest_charms["name_id_db"] = latest_charms["name"].map(chars_id).fillna(0).astype("int64")
 
-    # perform individual check of each character
+    exp_after_up = latest_highscores[latest_highscores["name_id_db"] == 0]
+    charm_after_up = latest_charms[latest_charms["name_id_db"] == 0]
+    exp_after_up = exp_after_up["name"].values.tolist()
+    charm_after_up = charm_after_up["name"].values.tolist()
+    check_chars = exp_after_up + charm_after_up + new_players
+    new_players = list(set(check_chars))
+
+    if new_players:
+        insert_new_players(latest_highscores, latest_charms, new_players)
+    logging.info(f"Inserted {len(new_players)} new players.")
+
+    latest_highscores.drop("name_id_db", axis=1, inplace=True)
+    latest_charms.drop("name_id_db", axis=1, inplace=True)
+
+    chars_id = collect_char_id()
+    latest_highscores["id_char"] = latest_highscores["name"].map(chars_id)
+    latest_charms["id_char"] = latest_charms["name"].map(chars_id)
+
+    logging.info(f"{date_with_seconds()} - Name change preparing data.")
+    if name_change:
+        name_change_exp = latest_highscores[latest_highscores["name"].isin(old_name_list)]
+        name_change_charm = latest_charms[latest_charms["name"].isin(old_name_list)]
+        name_change_df = pd.concat([name_change_charm, name_change_exp])
+        name_change_df = name_change_df.drop_duplicates("name")
+        save_to_file(name_change_df, "name_changes_df")
+
+        old_name = dict((v, k) for k, v in name_change.items())
+        save_to_json(old_name, "name_changes.txt")
+        logging.info(f"File saved.")
+
+    all_chars = latest_highscores.merge(
+        latest_charms, on="id_char", how="outer", suffixes=("_exp", "_charm")
+    )
+    all_chars.fillna(0, inplace=True)
+
+    del latest_highscores
+    del latest_charms
+    gc.collect()
+
+    if all_chars.isnull().values.any():
+        raise ValueError(f"NaN found... {all_chars.isnull().sum().any()}")
+
+    all_chars = all_chars.astype(
+        {
+            "rank_exp": "int64",
+            "vocation_exp": "int64",
+            "vocation_charm": "int64",
+            "world_charm": "int64",
+            "level_exp": "int64",
+            "world_exp": "int64",
+            "value_exp": "int64",
+            "rank_charm": "int64",
+            "value_charm": "int64",
+            "level_charm": "int64",
+            "id_char": "int64",
+        }
+    )
+
+    all_chars.loc[all_chars["vocation_exp"] == 0, "vocation_exp"] = all_chars["vocation_charm"]
+    all_chars.loc[all_chars["world_exp"] == 0, "world_exp"] = all_chars["world_charm"]
+    all_chars.loc[(all_chars["name_exp"] == 0), "name_exp"] = all_chars["name_charm"]
+    all_chars.loc[all_chars["level_exp"] == 0, "level_exp"] = all_chars["level_charm"]
+
+    all_chars.drop(
+        columns=[
+            "level_charm",
+            "world_charm",
+            "vocation_charm",
+            "name_charm",
+        ],
+        axis=1,
+        inplace=True,
+    )
+
+    all_chars = all_chars.drop_duplicates("name_exp", keep="last")
+
+    all_chars.rename(
+        columns={
+            "name_exp": "name",
+            "rank_exp": "exp_rank",
+            "vocation_exp": "voc_id",
+            "world_exp": "world_id",
+            "level_exp": "level",
+            "value_exp": "exp_value",
+            "rank_charm": "charm_rank",
+            "value_charm": "charm_value",
+        },
+        inplace=True,
+    )
+
+    old_highscores_query = (
+        Highscores.objects.all()
+        .filter(Q(date__gt=yesterday))
+        .values(
+            "exp_rank",
+            "id_char",
+            "id_char__name",
+            "world_id",
+            "level",
+            "exp_value",
+            "charm_rank",
+            "charm_value",
+        )
+    )
+    old_highscores_df = pd.DataFrame(data=old_highscores_query)
+
+    prep_for_bulk = old_highscores_df.merge(
+        all_chars, on="id_char", how="outer", suffixes=("_db", "_new")
+    )
+
+    del all_chars
+    del old_highscores_df
+    gc.collect()
+    prep_for_bulk.fillna(0, inplace=True)
+
+    prep_for_bulk = prep_for_bulk.drop_duplicates("id_char", keep="last")
+
+    prep_for_bulk = prep_for_bulk.astype(
+        {
+            "exp_rank_db": "int64",
+            "world_id_db": "int64",
+            "level_db": "int64",
+            "exp_value_db": "int64",
+            "charm_rank_db": "int64",
+            "charm_value_db": "int64",
+            "exp_rank_new": "int64",
+            "voc_id": "int64",
+            "world_id_new": "int64",
+            "level_new": "int64",
+            "exp_value_new": "int64",
+            "charm_rank_new": "int64",
+            "charm_value_new": "int64",
+        }
+    )
+
+    world_transfers = prep_for_bulk[prep_for_bulk["world_id_db"] != prep_for_bulk["world_id_new"]]
+    world_transfers = world_transfers[
+        (world_transfers["world_id_new"] != 0) & (world_transfers["world_id_db"] != 0)
+    ]
+
+    if not world_transfers.isnull().values.any():
+        save_to_file(world_transfers, "world_transfers")
+        logging.info(f"World transfers file saved.")
+
+    prep_for_bulk["exp_diff"] = np.where(
+        (prep_for_bulk["exp_value_db"] != 0) & (prep_for_bulk["exp_value_new"] != 0),
+        prep_for_bulk["exp_value_new"] - prep_for_bulk["exp_value_db"],
+        0,
+    )
+
+    prep_for_bulk["exp_rank_change"] = np.where(
+        (prep_for_bulk["exp_rank_db"] != 0) & (prep_for_bulk["exp_rank_new"] != 0),
+        prep_for_bulk["exp_rank_db"] - prep_for_bulk["exp_rank_new"],
+        0,
+    )
+
+    prep_for_bulk["level_change"] = prep_for_bulk["level_new"] - prep_for_bulk["level_db"]
+
+    prep_for_bulk["charm_rank_change"] = np.where(
+        (prep_for_bulk["charm_rank_db"] != 0) & (prep_for_bulk["charm_rank_new"] != 0),
+        prep_for_bulk["charm_rank_db"] - prep_for_bulk["charm_rank_new"],
+        0,
+    )
+
+    prep_for_bulk["charm_diff"] = np.where(
+        (prep_for_bulk["charm_value_db"] != 0) & (prep_for_bulk["charm_value_new"] != 0),
+        prep_for_bulk["charm_value_new"] - prep_for_bulk["charm_value_db"],
+        0,
+    )
+
+    prep_for_bulk = prep_for_bulk.astype(
+        {
+            "exp_diff": "int64",
+            "charm_diff": "int64",
+            "exp_rank_change": "int64",
+            "charm_rank_change": "int64",
+        }
+    )
+
+    prep_for_bulk = prep_for_bulk.drop_duplicates("id_char", keep="last")
+
+    save_to_file(prep_for_bulk, "prep_for_bulk")
+    Tasks.objects.filter(task_name="prepare_data_and_db").update(status="done")
+    logging.info(f"{len(prep_for_bulk)} characters prepared for insert. File saved.")
+
+
+# ================== check_characters ====================
+def check_characters_at_tibiacom(name_list_dont_exist):
+    logging.info(f"{date_with_seconds()} - started checking characters.")
+    new_players = []
     name_change = {}
     deleted_characters = []
-    new_names = []
-    name_list_dont_exist = dont_exist["name"].values.tolist()
-    logging.info(f"There are {len(name_list_dont_exist)} names that don't exist in database")
-
     for i in name_list_dont_exist:
         char = dataapi.get_character_info(i)
         if char["character"]["name"] == "":
             # character is deleted
             deleted_characters.append(i)
         elif "former_names" in char["character"]:
-            old_name = char["character"]["former_names"][0]
+            old_name = char["character"]["former_names"][-1]
             new_name = char["character"]["name"]
             name_change.update({old_name: new_name})
-            new_names.append(new_name)
+        else:
+            new_players.append(char["character"]["name"])
+    character_names = {
+        "new_players": new_players,
+        "name_change": name_change,
+        "deleted_characters": deleted_characters,
+    }
 
-    #
-    # === INSERT =============== CHARACTER ===================
+    save_to_json(character_names, "checked.txt")
+    task_name = Tasks(task_name="checked_characters", status="done", date=date_with_seconds())
+    task_name.save()
+    logging.info(f"{date_with_seconds()} - saved and updated task status in db.")
+    return character_names
 
-    # insert new characters to db
 
-    name_list = set(name_list_dont_exist).difference(new_names)
+# === INSERT =============== NAME CHANGE ====================
+def insert_name_change(date):
+    name_change_df = read_file("name_changes_df")
+    old_name = read_json("name_changes.txt")
 
-    if name_list:
-        new_characters = latest_highscores[latest_highscores["name"].isin(name_list)]
-        new_characters_dict = new_characters.to_dict("index")
-        obj = []
-        for i in new_characters_dict:
-            char = Character(
-                name=new_characters_dict[i]["name"],
-                world_id=new_characters_dict[i]["world"],
-                voc_id=new_characters_dict[i]["vocation"],
-            )
-            obj.append(char)
-        Character.objects.bulk_create(obj)
-        logging.info(f'{date_with_seconds()} added {len(obj)} characters to db.')
+    name_change_dict = name_change_df.to_dict("index")
 
-    # === END INSERT ===========================================
-    #
+    obj_name_change = []
+    traded = 0  # temp variable
+    for name_in_dict in name_change_dict:
+        name = NameChange(
+            id_char_id=name_change_dict[name_in_dict]["id_char"],
+            old_name=old_name[name_change_dict[name_in_dict]["name"]],
+            new_name=name_change_dict[name_in_dict]["name"],
+            level=name_change_dict[name_in_dict]["level"],
+            traded=traded,
+            date=date,
+        )
+        obj_name_change.append(name)
+    NameChange.objects.bulk_create(obj_name_change, batch_size=500)
 
-    #
-    # === UPDATE ================ CHARACTER ====================
-    # update character name after name change
 
-    if name_change:
-        for key, value in name_change.items():
-            Character.objects.filter(name=key).update(name=value)
-        logging.info(f'Updated {len(name_change)} name changes positions')
+# === INSERT =============== New players ====================
+def insert_new_players(latest_highscores, latest_charms, new_players):
+    logging.info(f"Insert new players started: {date_with_seconds()}")
+    new_characters_in_exp = latest_highscores[latest_highscores["name"].isin(new_players)]
+    new_characters_in_charms = latest_charms[latest_charms["name"].isin(new_players)]
+    new_characters = pd.concat([new_characters_in_charms, new_characters_in_exp])
+    new_characters.reset_index(drop=True, inplace=True)
+    new_characters_dict = new_characters.to_dict("index")
+    char_to_insert = []
 
-    # === END UPDATE ============================================
-    #
+    for item in new_characters_dict:
+        char_ready_to_bulk = Character(
+            name=new_characters_dict[item]["name"],
+            world_id=new_characters_dict[item]["world"],
+            voc_id=new_characters_dict[item]["vocation"],
+        )
+        char_to_insert.append(char_ready_to_bulk)
 
-    # collect new id's from db
-    chars_id_after_update = collect_char_id()
-    latest_highscores["name_id_db"] = latest_highscores["name"]\
-        .map(chars_id_after_update).fillna(0).astype("int64")
+    Character.objects.bulk_create(char_to_insert, batch_size=100)
+    logging.info(f"Insert new players ended: {date_with_seconds()}")
 
-    latest_highscores = latest_highscores[latest_highscores["name_id_db"] != 0]
 
-    # collect data from day before from db from last day
-    yesterday = date - timedelta(days=1, hours=2)
-    # yesterday = '2023-01-23 13:17:12'                                            ##########################
-    old_highscores_query = (
-        Highscores.objects.all()
-        .filter(Q(date__gt=yesterday))
-        .values("exp_rank", "id_char", "voc_id", "world_id", "level", "exp_value", "charm_rank",
-                "charm_value")
-    )
-
-    old_highscores_df = pd.DataFrame(data=old_highscores_query)
-
-    # swap key(name), value(id_char) in dictionary
-    id_to_name = {}
-    for key, value in chars_id_after_update.items():
-        id_to_name.update({value: key})
-
-    old_highscores_df["name"] = old_highscores_df["id_char"].map(id_to_name)
-
-    # change old names for new ones
-    if name_change:
-        for key, value in name_change.items():
-            old_highscores_df.loc[old_highscores_df.name == key, "name"] = value
-
-    # merge data - inner_data contains only existing characters in db
-    inner_data = old_highscores_df.merge(latest_highscores,
-                                         on="name",
-                                         how="inner",
-                                         suffixes=("_old", "_latest"))
-
-    # # # EXP # # #
-
-    # # # EXP # # #
-
-    # # # EXP # # #
-
-    # calculate experience change
-    inner_data["exp_diff"] = (
-            inner_data["value"] - inner_data["exp_value"]
-    ).fillna(0).astype("int64")
-
-    # calculate experience rank change
-    inner_data["exp_rank_change"] = (
-            inner_data["exp_rank"] - inner_data["rank"]
-    ).fillna(0).astype("int64")
-
-    # calculate level change
-    inner_data["level_change"] = (
-            inner_data["level_latest"] - inner_data["level_old"]
-    ).fillna(0).astype("int64")
-
-    # # # CHARMS # # #
-
-    inner_data = inner_data.merge(latest_charms,
-                                  on="name",
-                                  how="left",
-                                  suffixes=("_old", "_latest_charm")).fillna(0)
-
-    # calculate charm change
-    inner_data["charm_diff"] = (
-                inner_data["value_latest_charm"] - inner_data["charm_value"]).fillna(0).astype(
-        "int64")
-
-    # calculate charm rank change
-    inner_data["charm_rank_change"] = (
-        (inner_data["charm_rank"] - inner_data["rank_latest_charm"]).fillna(0).astype("int64")
-    )
-
-    # # # CHARMS # # #
-
-    inner_data = inner_data.merge(latest_charms, on="name", how="inner", suffixes=("_old", "_latest_charm"))
-
-    # calculate charm change
-    inner_data["charm_diff"] = (inner_data["value_latest_charm"] - inner_data["charm_value"]).fillna(0).astype("int64")
-
-    # calculate charm rank change
-    inner_data["charm_rank_change"] = (
-        (inner_data["charm_rank"] - inner_data["rank_latest_charm"]).fillna(0).astype("int64")
-    )
-
-    # # # CHARMS # # #
-
-    inner_data = inner_data.merge(latest_charms, on="name", how="inner", suffixes=("_old", "_latest_charm"))
-
-    # calculate charm change
-    inner_data["charm_diff"] = (inner_data["value_latest_charm"] - inner_data["charm_value"]).fillna(0).astype("int64")
-
-    # calculate charm rank change
-    inner_data["charm_rank_change"] = (
-        (inner_data["charm_rank"] - inner_data["rank_latest_charm"]).fillna(0).astype("int64")
-    )
-
-    # delete duplicates
-    inner_data = inner_data.drop_duplicates("name")
-    inner_data['rank_latest_charm'] = inner_data['rank_latest_charm'].astype(int)
-    inner_data['level'] = inner_data['level'].astype(int)
-    inner_data['value_latest_charm'] = inner_data['value_latest_charm'].astype(int)
-
-    # catch world transfers
-    world_transfers = inner_data[inner_data["world_id"] != inner_data["world_old"]]
-
-    #
-    # === INSERT =============== WORLD ========================
-    # insert all transfers to transfer table
+# === INSERT =============== WORLD CHANGE ====================
+def insert_world_changes(date):
+    logging.info(f"Insert world changes started: {date_with_seconds()}")
+    world_transfers = read_file("world_transfers")
 
     id_to_world = {}
-    for key, value in worlds_id.items():
+    world_id = collect_world_id()
+    for key, value in world_id.items():
         id_to_world.update({value: key})
 
     obj_world = []
     traded = 0  # temp variable
     world_transfers_dict = world_transfers.to_dict("index")
+
     for i in world_transfers_dict:
         transfer = WorldTransfers(
             id_char_id=world_transfers_dict[i]["id_char"],
-            old_world=id_to_world[world_transfers_dict[i]["world_id"]],
-            oldid=world_transfers_dict[i]["world_id"],
-            new_world=id_to_world[world_transfers_dict[i]["world_old"]],
-            newid=world_transfers_dict[i]["world_old"],
-            level=world_transfers_dict[i]["level_latest"],
+            old_world=id_to_world[world_transfers_dict[i]["world_id_db"]],
+            oldid=world_transfers_dict[i]["world_id_db"],
+            new_world=id_to_world[world_transfers_dict[i]["world_id_new"]],
+            newid=world_transfers_dict[i]["world_id_new"],
+            level=world_transfers_dict[i]["level_new"],
             traded=traded,
             date=date,
         )
         obj_world.append(transfer)
-    WorldTransfers.objects.bulk_create(obj_world, 500)
-    logging.info(f'Added {len(obj_world)} world transfers.')
+    WorldTransfers.objects.bulk_create(obj_world, batch_size=500)
+    Tasks.objects.filter(task_name="insert_world_changes").update(status="done")
+    logging.info(
+        f"{len(world_transfers_dict)}world transfers inserted. \n" f" End: {date_with_seconds()}"
+    )
 
-    # === END INSERT =============== WORLD ====================
-    #
 
-    #
-    # === INSERT =============== DELETED_CHARACTERS ===========
+def update_character(name_change):
+    logging.info(f"UPDATE started: {date_with_seconds()}")
+    for key, value in name_change.items():
+        Character.objects.filter(name=key).update(name=value)
+    logging.info(f"UPDATE ended: {date_with_seconds()} updated: {len(name_change)} names.")
 
-    # insert data to deleted table - for future
-    # future develop
-    # print(deleted_characters)
-    # deleted_df = inner_data[inner_data['name'].isin(deleted_characters)]
-    # print('deleted df')
-    # print()
-    # print(deleted_df)
-    # Columns: [exp_rank, id_char, voc_id, world_id, level_old, exp_value, charm_rank, charm_value,
-    # name, rank, vocation, world, level_latest, value, name_id_db, exp_diff, exp_rank_change, level_change]
-    # deleted_dict = deleted_df.to_dict('index')
 
-    # for do bulk
-    #
-    # === END INSERT ========= DELETED_CHARACTERS ==============
-    #
-
-    #
-    # === INSERT =============== NAME CHANGE ====================
-
-    # insert name changes
-
-    if name_change:
-        name_change_list = []
-        for key, value in name_change.items():
-            name_change_list.append(value)
-
-        names_df = pd.DataFrame(
-            {"old_name": list(name_change.keys()), "name": list(name_change.values())})
-        name_change_df = latest_highscores[latest_highscores["name"].isin(name_change_list)]
-
-        name_changes = name_change_df.merge(names_df, on="name", how="inner",
-                                            suffixes=("_old", "_latest"))
-
-        obj_name_change = []
-        traded = 0  # temp variable
-        name_change_dict = name_changes.to_dict("index")
-        for i in name_change_dict:
-            xxx = NameChange(
-                id_char_id=name_change_dict[i]["name_id_db"],
-                old_name=name_change_dict[i]["old_name"],
-                new_name=name_change_dict[i]["name"],
-                level=name_change_dict[i]["level"],
-                traded=traded,
-                date=date,
-            )
-            obj_name_change.append(xxx)
-        NameChange.objects.bulk_create(obj_name_change, 500)
-        logging.info(f'Added {len(obj_name_change)} name changes.')
-
-    # === END INSERT =============== NAME CHANGE =================
-    #
-
-    #
-    # === INSERT =============== HIGHSCORES ======================
-    # for actual vps bulk is highly limited.
+def insert_highscores(date):
+    logging.info(f"Highscores insert started: {date_with_seconds()}")
+    prep_for_bulk = read_file("prep_for_bulk")
 
     obj = []
-    inner_data_dict = inner_data.to_dict("index")
+    prep_for_bulk = prep_for_bulk.loc[
+        (prep_for_bulk["voc_id"] != 0)
+        & (prep_for_bulk["world_id_new"] != 0)
+        & (prep_for_bulk["id_char"] != 0)
+    ]
 
-    db_count = Highscores.objects.all().count()
-    amouont_for_insert = len(inner_data_dict)
-    logging.info(f'Records for insert: {amouont_for_insert}.'
-                 f' Actual amount of records: {db_count}')
+    if not prep_for_bulk.isnull().values.any():
+        inner_data_dict = prep_for_bulk.to_dict("index")
 
-    for index, i in enumerate(inner_data_dict):
-        char = Highscores(
-            exp_rank=inner_data_dict[i]["rank_old"],
-            exp_rank_change=inner_data_dict[i]["exp_rank_change"],
-            id_char_id=inner_data_dict[i]["id_char"],
-            voc_id=inner_data_dict[i]["vocation_old"],
-            world_id=inner_data_dict[i]["world_old"],
-            level=inner_data_dict[i]["level_latest"],
-            level_change=inner_data_dict[i]["level_change"],
-            exp_value=inner_data_dict[i]["value_old"],
-            exp_diff=inner_data_dict[i]["exp_diff"],
-            charm_rank=inner_data_dict[i]["rank_latest_charm"],
-            charm_rank_change=inner_data_dict[i]["charm_rank_change"],
-            charm_value=inner_data_dict[i]["value_latest_charm"],
-            charm_diff=inner_data_dict[i]["charm_diff"],
-            date=date,
-        )
-        obj.append(char)
-        if index % 3000 == 0:
-            Highscores.objects.bulk_create(obj, 500)
-            obj = []
-        if index == len(inner_data_dict) - 1:
-            Highscores.objects.bulk_create(obj, 500)
+        del prep_for_bulk
+        gc.collect()
 
-    db_count_after_insert = Highscores.objects.all().count()
-    if db_count_after_insert == db_count+amouont_for_insert:
-        logging.info(f'Successfully added: {amouont_for_insert}')
-    else:
-        logging.info(f'Actual amount of items: {db_count_after_insert}.'
-                     f'Items that should be added: {amouont_for_insert}.')
-    logging.info(f'# # END # # # # {date_with_seconds()} # # # # highscores # # # # # #')
+        db_count = Highscores.objects.all().count()
+        amouont_for_insert = len(inner_data_dict)
 
-    #
-    # === END INSERT =============== HIGHSCORES ==================
+        for index, i in enumerate(inner_data_dict):
+            char = Highscores(
+                exp_rank=inner_data_dict[i]["exp_rank_new"],
+                exp_rank_change=inner_data_dict[i]["exp_rank_change"],
+                id_char_id=inner_data_dict[i]["id_char"],
+                voc_id=inner_data_dict[i]["voc_id"],
+                world_id=inner_data_dict[i]["world_id_new"],
+                level=inner_data_dict[i]["level_new"],
+                level_change=inner_data_dict[i]["level_change"],
+                exp_value=inner_data_dict[i]["exp_value_new"],
+                exp_diff=inner_data_dict[i]["exp_diff"],
+                charm_rank=inner_data_dict[i]["charm_rank_new"],
+                charm_rank_change=inner_data_dict[i]["charm_rank_change"],
+                charm_value=inner_data_dict[i]["charm_value_new"],
+                charm_diff=inner_data_dict[i]["charm_diff"],
+                date=date,
+            )
+            obj.append(char)
+
+            if index % 3000 == 0:
+                Highscores.objects.bulk_create(obj, batch_size=500)
+                obj = []
+            if index == len(inner_data_dict) - 1:
+                Highscores.objects.bulk_create(obj, batch_size=200)
+
+        db_count_after_insert = Highscores.objects.all().count()
+        if db_count_after_insert == db_count + amouont_for_insert:
+            logging.info(f"Successfully added: {amouont_for_insert}")
+        else:
+            logging.info(
+                f"Actual amount of items: {db_count_after_insert}."
+                f"Items that should be added: {amouont_for_insert}."
+            )
+        Tasks.objects.filter(task_name="insert_highscores").update(status="done")
+        logging.info(f"Insert end: {date_with_seconds()}")
+
+
+def add_highscores():
+    pass
+    # date = "2023-02-01 05:00:00"
+    # temp_del()
+    # insert_name_change(date)
+    # insert_world_changes(date)
+    # insert_highscores(date)
+    # get_daily_records()
 
 
 def get_daily_records():
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.width", 2000)
-
-    logging.info(f'# # START # # # # {date_with_seconds()} # # # # DAILY RECORDS # # # # # #')
     # best exp yesterday on each world
     now = datetime.datetime.now()
     date = now - timedelta(days=1, hours=2)
@@ -828,39 +957,40 @@ def get_daily_records():
     # getting the best exp (each vocation on every world)
     best = Highscores.objects.filter(
         Q(date__gt=date) & Q(exp_diff__gt=0) | Q(exp_diff__lt=0)
-    ).values("exp_rank",
-             "exp_rank_change",
-             "id_char",
-             "voc_id",
-             "world_id",
-             "level",
-             "level_change",
-             "exp_value",
-             "exp_diff",
-             "charm_rank",
-             "charm_rank_change",
-             "charm_value",
-             "charm_diff",
-             "date")
+    ).values(
+        "exp_rank",
+        "exp_rank_change",
+        "id_char",
+        "voc_id",
+        "world_id",
+        "level",
+        "level_change",
+        "exp_value",
+        "exp_diff",
+        "charm_rank",
+        "charm_rank_change",
+        "charm_value",
+        "charm_diff",
+        "date",
+    )
     db_data_to_df = pd.DataFrame(data=best)
-
-    # best_df[best_df['world_id'] == 1].sort_values(by='exp_diff').tail(1)
 
     # best experience gained
     for world in worlds:
         for vocation in vocations:
 
-            worst_exp = (
+            best_exp = (
                 db_data_to_df[
-                    (db_data_to_df["world_id"] == world) & (db_data_to_df["voc_id"] == vocation)]
+                    (db_data_to_df["world_id"] == world) & (db_data_to_df["voc_id"] == vocation)
+                ]
                 .sort_values(by="exp_diff")
                 .tail(1)
             )
 
             if world == 1 and vocation == 1:
-                history = worst_exp
+                history_best_exp = best_exp
             else:
-                history = pd.concat([worst_exp, history], ignore_index=True)
+                history_best_exp = pd.concat([best_exp, history_best_exp], ignore_index=True)
 
     # biggest lost experience
     for world in worlds:
@@ -870,21 +1000,46 @@ def get_daily_records():
                     (db_data_to_df["world_id"] == world)
                     & (db_data_to_df["voc_id"] == vocation)
                     & (db_data_to_df["exp_diff"] < 0)
-                    ]
+                ]
                 .sort_values(by="exp_diff")
                 .head(1)
             )
+            if world == 1 and vocation == 1:
+                history_worst_exp = worst_exp
+            else:
+                history_worst_exp = pd.concat([worst_exp, history_worst_exp], ignore_index=True)
 
-            history = pd.concat([worst_exp, history], ignore_index=True)
+    for world in worlds:
+        for vocation in vocations:
+            if vocation != 0:
+                best_charm = (
+                    db_data_to_df[
+                        (db_data_to_df["world_id"] == world)
+                        & (db_data_to_df["voc_id"] == vocation)
+                    ]
+                    .sort_values(by="charm_diff")
+                    .tail(1)
+                )
 
-    charm = 0
+            if world == 1 and vocation == 1:
+                history_best_charm = best_charm
+            else:
+                history_best_charm = pd.concat([best_charm, history_best_charm], ignore_index=True)
+
+    history = pd.concat(
+        [history_worst_exp, history_best_charm, history_best_exp], ignore_index=True
+    )
+
     record_type = "exp"
     event = "none"
-    obj = []
-    # print(history)
     db_record_history_count_before = RecordsHistory.objects.all().count()
 
     history_dict = history.to_dict("index")
+
+    del history
+    gc.collect()
+
+    obj = []
     for i in history_dict:
         record = RecordsHistory(
             exp_rank=history_dict[i]["exp_rank"],
@@ -896,10 +1051,10 @@ def get_daily_records():
             level_change=history_dict[i]["level_change"],
             exp_value=history_dict[i]["exp_value"],
             exp_diff=history_dict[i]["exp_diff"],
-            charm_rank=charm,
-            charm_rank_change=charm,
-            charm_value=charm,
-            charm_diff=charm,
+            charm_rank=history_dict[i]["charm_rank"],
+            charm_rank_change=history_dict[i]["charm_rank_change"],
+            charm_value=history_dict[i]["charm_value"],
+            charm_diff=history_dict[i]["charm_diff"],
             record_type=record_type,
             event=event,
             date=now,
@@ -909,28 +1064,34 @@ def get_daily_records():
 
     db_record_history_count_after = RecordsHistory.objects.all().count()
     if db_record_history_count_after == len(obj) + db_record_history_count_before:
-        logging.info(f'Successfully added {len(obj)} items to db.')
+        logging.info(f"Successfully added {len(obj)} items to db.")
     else:
-        logging.info(f'Some records might be missing. Added {len(obj)} to db.')
-    logging.info(f'# # END # # # # {date_with_seconds()} # # # # Daily records # # # # # #')
+        logging.info(f"Some records might be missing. Added {len(obj)} to db.")
+    logging.info(f"# # END # # # # {date_with_seconds()} # # # # Daily records # # # # # #")
 
 
 def move_only_active_players():
-    # Store data only for players that gained experience
-    logging.info(f'# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # # #')
+    logging.info(f"# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # #")
     now = datetime.datetime.now()
-    date = now - timedelta(days=1, hours=2)
+    date = now - timedelta(days=1)
 
     only_active = Highscores.objects.filter(
         Q(date__gte=date) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
     ).values()
     only_active_df = pd.DataFrame(data=only_active)
 
+    del only_active
+    gc.collect()
+
     db_active_before = HighscoresHistory.objects.all().count()
 
     # charm = 0  # temp variable
     obj = []
     only_active_dict = only_active_df.to_dict("index")
+
+    del only_active_df
+    gc.collect()
+
     for index, i in enumerate(only_active_dict):
         char = HighscoresHistory(
             exp_rank=only_active_dict[i]["exp_rank"],
@@ -957,98 +1118,18 @@ def move_only_active_players():
 
     db_active_after = HighscoresHistory.objects.all().count()
     if db_active_after == len(obj) + db_active_before:
-        logging.info(f'Successfully added {len(obj)} items to db history.')
+        logging.info(f"Successfully added {len(obj)} items to db history.")
     else:
-        logging.info(f'Some records might be missing. Added {len(obj)} to db history.')
-
-
-def delete_old_highscores_date():
-    now = datetime.datetime.now()
-    date = now - timedelta(days=2, hours=2)
-
-    clear_data_query = Highscores.objects.filter(date__lte=date)
-    clear_data_query._raw_delete(clear_data_query.db)
-
-
-def move_only_active_players():
-    now = datetime.datetime.now()
-    date = now - timedelta(days=1, hours=2)
-
-    only_active = Highscores.objects.filter(
-        Q(date__gte=date) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
-    ).values()
-    only_active_df = pd.DataFrame(data=only_active)
-
-    # charm = 0  # temp variable
-    obj = []
-    only_active_dict = only_active_df.to_dict("index")
-    for i in only_active_dict:
-        char = HighscoresHistory(
-            exp_rank=only_active_dict[i]["exp_rank"],
-            exp_rank_change=only_active_dict[i]["exp_rank_change"],
-            id_char_id=only_active_dict[i]["id_char_id"],
-            voc_id=only_active_dict[i]["voc_id"],
-            world_id=only_active_dict[i]["world_id"],
-            level=only_active_dict[i]["level"],
-            level_change=only_active_dict[i]["level_change"],
-            exp_value=only_active_dict[i]["exp_value"],
-            exp_diff=only_active_dict[i]["exp_diff"],
-            charm_rank=only_active_dict[i]["charm_rank"],
-            charm_rank_change=only_active_dict[i]["charm_rank_change"],
-            charm_value=only_active_dict[i]["charm_value"],
-            charm_diff=only_active_dict[i]["charm_diff"],
-            date=now,
-        )
-        obj.append(char)
-    HighscoresHistory.objects.bulk_create(obj, 500)
+        logging.info(f"Some records might be missing. Added {len(obj)} to db history.")
 
 
 def delete_old_highscores_date():
     now = datetime.datetime.now()
     date = now - timedelta(days=3, hours=2)
 
-    clear_data_query = Highscores.objects.filter(date__lte=date)
+    clear_data_query = Highscores.objects.filter(date__lt=date)
     clear_data_query._raw_delete(clear_data_query.db)
 
-def move_only_active_players():
-    now = datetime.datetime.now()
-    date = now - timedelta(days=1, hours=2)
-
-    only_active = Highscores.objects.filter(
-        Q(date__gte=date) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
-    ).values()
-    only_active_df = pd.DataFrame(data=only_active)
-
-    # charm = 0  # temp variable
-    obj = []
-    only_active_dict = only_active_df.to_dict("index")
-    for i in only_active_dict:
-        char = HighscoresHistory(
-            exp_rank=only_active_dict[i]["exp_rank"],
-            exp_rank_change=only_active_dict[i]["exp_rank_change"],
-            id_char_id=only_active_dict[i]["id_char_id"],
-            voc_id=only_active_dict[i]["voc_id"],
-            world_id=only_active_dict[i]["world_id"],
-            level=only_active_dict[i]["level"],
-            level_change=only_active_dict[i]["level_change"],
-            exp_value=only_active_dict[i]["exp_value"],
-            exp_diff=only_active_dict[i]["exp_diff"],
-            charm_rank=only_active_dict[i]["charm_rank"],
-            charm_rank_change=only_active_dict[i]["charm_rank_change"],
-            charm_value=only_active_dict[i]["charm_value"],
-            charm_diff=only_active_dict[i]["charm_diff"],
-            date=now,
-        )
-        obj.append(char)
-    HighscoresHistory.objects.bulk_create(obj, 500)
-
-
-def delete_old_highscores_date():
-    now = datetime.datetime.now()
-    date = now - timedelta(days=3, hours=2)
-
-    clear_data_query = Highscores.objects.filter(date__lte=date)
-    clear_data_query._raw_delete(clear_data_query.db)
 
 # # # # # # # Experience end # # # # # # #
 

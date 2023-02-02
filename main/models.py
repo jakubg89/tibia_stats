@@ -28,7 +28,7 @@ class Character(models.Model):
 class Highscores(models.Model):
     exp_rank = models.IntegerField(blank=True, null=True)
     exp_rank_change = models.IntegerField(blank=True, null=True)
-    id_char = models.ForeignKey(Character, models.DO_NOTHING, db_column='id_char')
+    id_char = models.ForeignKey('Character', models.DO_NOTHING, db_column='id_char')
     voc = models.ForeignKey('Vocation', models.DO_NOTHING)
     world = models.ForeignKey('World', models.DO_NOTHING)
     level = models.IntegerField(blank=True, null=True)
@@ -121,6 +121,17 @@ class RecordsHistory(models.Model):
         managed = True
         db_table = 'records_history'
         unique_together = (('id', 'id_char', 'voc', 'world'),)
+
+
+class Tasks(models.Model):
+    task = models.AutoField(primary_key=True)
+    task_name = models.CharField(max_length=30, blank=True, null=True)
+    status = models.CharField(max_length=15, blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'tasks'
 
 
 class Vocation(models.Model):

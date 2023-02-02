@@ -16,7 +16,7 @@
                     <script type="text/javascript">
 
                         Chart.defaults.color = "#6C7293";
-                        Chart.defaults.borderColor = "#000000";
+                        Chart.defaults.borderColor = "#D5D8D8";
                         var ctx1 = document.getElementById("creation-date").getContext("2d");
                         var myChart1 = new Chart(ctx1, {
                             type: "bar",
@@ -36,7 +36,7 @@
                                             {{ number }}{% if not date.forloop.last %},{% endif %}
                                         {% endfor %}
                                         ],
-                                        backgroundColor: "rgba(235, 22, 22, .{{ forloop.counter|add:"4" }})",
+                                        backgroundColor: "rgba(194, 202, 146, .{{ forloop.counter|add:"3" }})",
                                         fill: true
                                     }
                                         {% if not key.forloop.last %},{% endif %}
@@ -64,7 +64,7 @@
                     <script type="text/javascript">
 
                         Chart.defaults.color = "#6C7293";
-                        Chart.defaults.borderColor = "#000000";
+                        Chart.defaults.borderColor = "#D5D8D8";
                         var ctx1 = document.getElementById("online-history").getContext("2d");
                         var myChart1 = new Chart(ctx1, {
                             type: "bar",
@@ -84,7 +84,7 @@
                                             {{ number }}{% if not date.forloop.last %},{% endif %}
                                         {% endfor %}
                                         ],
-                                        backgroundColor: "rgba(235, 22, 22, .{{ forloop.counter|add:"3" }})",
+                                        backgroundColor: "rgba(194, 202, 146, .{{ forloop.counter|add:"5" }})",
                                         fill: true
                                     }
                                         {% if not key.forloop.last %},{% endif %}
@@ -172,7 +172,7 @@
                                 <td>{{ i.world.creation_date |date:'Y-m' }}</td>
 
                                 <!-- Online -->
-                                <td class="{% if i.players_online >= 250 %}text-danger{% else %}text-success{% endif %}">{{ i.players_online }}</td>
+                                <td class="{% if i.players_online >= 250 and i.players_online < 500 %}text-danger{% elif i.players_online >= 500 %}text-danger-red{% else %}text-success{% endif %}">{{ i.players_online }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
