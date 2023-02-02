@@ -30,6 +30,8 @@ from main.views import (
     explore_highscores,
     world_transfers,
     name_changes,
+    top_250_charms,
+    world_charms
 )
 
 # Error custom view
@@ -54,9 +56,9 @@ urlpatterns = [
     path("experience/explore/", explore_highscores),
     path("experience/stats", under_construction),
     # Charms menu
-    path("charms/top500", under_construction),
-    path("charms/mainland", under_construction),
-    path("charms/rookgaard", under_construction),
+    path("charms/top250", top_250_charms),
+    path("charms/world-charms/", world_charms),
+    # path("charms/rookgaard", under_construction),
     path("charms/stats", under_construction),
     # Char bazaar menu
     path("bazaar/active", under_construction),

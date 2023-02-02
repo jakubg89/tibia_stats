@@ -10,7 +10,7 @@
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary rounded h-100 p-4 text-center">
                 <h1 class="display-4">{% if world %}{{ world }}{% else %}Select world{% endif %}</h1>
-                <small>List of players that gained or lost experience yesterday on Mainland on selected world.</small>
+                <small>List of players that gained charm points yesterday on selected world.</small>
             </div>
         </div>
         <!-- Title end -->
@@ -22,12 +22,12 @@
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
                 <form>
                     <select id="dynamic_select" class="form-select p-3" aria-label="Default select example" >
-                        <option value="/experience/mainland">Select world...</option>
+                        <option value="/charms/world-charms">Select world...</option>
                         {% for i in world_list %}
                             {% if i.name != world %}
-                                <option value="/experience/mainland/?q={{ i.name_value }}">{{ i.name }}</option>
+                                <option value="/charms/world-charms/?q={{ i.name_value }}">{{ i.name }}</option>
                             {% else %}
-                                <option selected value="/experience/mainland/?q={{ i.value }}">{{ i.name }}</option>
+                                <option selected value="/charms/world-charms/?q={{ i.value }}">{{ i.name }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
@@ -59,17 +59,15 @@
         <div class="col-sm-12">
             <div class="bg-secondary rounded h-100 p-4">
                 <div class="table-responsive-xl">
-                    <table id="mainland" class="table table-hover">
+                    <table id="mainland-charms" class="table table-hover">
                         <thead>
                             <tr>
                                 <th scope="col">No.</th>
                                 <th scope="col" class="dt-center">Name</th>
                                 <th scope="col" class="dt-center">Vocation</th>
                                 <th scope="col" class="dt-center">Level</th>
-                                <th scope="col" class="dt-center">Level change</th>
-                                <th scope="col" class="dt-center">Vocation rank</th>
-                                <th scope="col" class="dt-center">Change</th>
-                                <th scope="col" class="dt-center">Experience</th>
+                                <th scope="col" class="dt-center">Points gained</th>
+                                <th scope="col" class="dt-center">Total points</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,22 +86,16 @@
                                 </td>
 
                                 <!-- Vocation -->
-                                <td>{{ i.voc.name }}</td>
+                                <td class="dt-center">{{ i.voc.name }}</td>
 
                                 <!-- Level -->
-                                <td>{{ i.level }}</td>
+                                <td class="dt-center">{{ i.level }}</td>
 
-                                <!-- Level change -->
-                                <td class="{% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %}">{{ i.level_change }}</td>
+                                <!-- Points gained -->
+                                <td class="{% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %} dt-center">{{ i.charm_diff }}</td>
 
-                                <!-- Vocation rank -->
-                                <td>{{ i.exp_rank }}</td>
-
-                                <!-- Vocation rank change -->
-                                <td class="{% if i.exp_rank_change < 0 %}text-danger{% elif i.exp_rank_change > 0 %}text-success{% endif %}">{{ i.exp_rank_change }}</td>
-
-                                <!-- Experience value -->
-                                <td class="{% if i.exp_diff < 0 %}text-danger{% elif i.exp_diff > 0 %}text-success{% endif %}">{{ i.exp_diff }}</td>
+                                <!-- Charm points -->
+                                <td class="dt-center">{{ i.charm_value }}</td>
 
                             </tr>
                         {% endfor %}

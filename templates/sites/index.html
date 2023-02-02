@@ -6,7 +6,7 @@
         <div class="row g-4">
             <!-- News ticker Start -->
                 <div class="col-sm-6 col-xl-9">
-                    <div class="h-100 bg-secondary rounded p-4">
+                    <div class="shadow-sm h-100 bg-secondary rounded p-4">
 
                         <div class="d-flex align-items-center justify-content-center mb-0">
                             <h4 class="mb-0">News ticker</h4>
@@ -34,7 +34,7 @@
                     <div class="row h-100">
                             <!-- Boosted creature -->
                             <div class="col-sm-12 mb-2">
-                                <div class="bg-secondary rounded d-flex align-items-center justify-content-between h-100 p-4">
+                                <div class="shadow-sm bg-secondary rounded d-flex align-items-center justify-content-between h-100 p-4">
                                     <div class="col-sm-5 align-items-center">
                                         <img src="{{ boosted_boss.0.image_url }}">
                                     </div>
@@ -47,7 +47,7 @@
 
                             <!-- Boosted boss -->
                             <div class="col-sm-12 mt-2">
-                                <div class="bg-secondary rounded d-flex align-items-center justify-content-between h-100 p-4">
+                                <div class="shadow-sm bg-secondary rounded d-flex align-items-center justify-content-between h-100 p-4">
                                     <div class="col-sm-5">
                                         <img src="{{ boosted_creature.0.image_url }}">
                                     </div>
@@ -68,11 +68,10 @@
     <div class="container-fluid pt-4 px-4">
         <div class="row g-4">
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
+                <div class="shadow-sm bg-secondary rounded d-flex align-items-center justify-content-center p-3 h-100">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_open.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3 h-100 text-center">
-                        <small>Open PvP</small>
-                        <h6 class="mb-0">
+                    <div class="ms-3 h-100 text-center ps-4">
+                        <h6 class="mb-0 mt-3">
                             <a href="/character/search/?q={{ open.id_char.name }}">{{ open.id_char.name }}</a>
                             <a href="https://www.tibia.com/community/?subtopic=characters&name={{ open.id_char.name }}" class="text-muted" target="_blank">
                                 <i class="fas fa-external-link-alt fa-xs"></i>
@@ -83,11 +82,10 @@
                 </div>
             </div>
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
+                <div class="shadow-sm bg-secondary rounded d-flex align-items-center justify-content-center p-3 h-100">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retro.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3 text-center">
-                        <small>Retro Open PvP</small>
-                        <h6 class="mb-0">
+                    <div class="ms-3 h-100 text-center ps-4">
+                        <h6 class="mb-0 mt-3">
                             <a href="/character/search/?q={{ retro_open.id_char.name }}">{{ retro_open.id_char.name }}</a>
                             <a href="https://www.tibia.com/community/?subtopic=characters&name={{ retro_open.id_char.name }}" class="text-muted" target="_blank">
                                 <i class="fas fa-external-link-alt fa-xs"></i>
@@ -98,11 +96,10 @@
                 </div>
             </div>
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
+                <div class="shadow-sm bg-secondary rounded d-flex align-items-center justify-content-center p-3 h-100">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_retrohardcore.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3 text-center">
-                        <small>Retro Hardcore PvP</small>
-                        <h6 class="mb-0">
+                    <div class="ms-3 h-100 text-center ps-4">
+                        <h6 class="mb-0 mt-3">
                             <a href="/character/search/?q={{ retro_hardcore.id_char.name }}">{{ retro_hardcore.id_char.name }}</a>
                             <a href="https://www.tibia.com/community/?subtopic=characters&name={{ retro_hardcore.id_char.name }}" class="text-muted" target="_blank">
                                 <i class="fas fa-external-link-alt fa-xs"></i>
@@ -113,11 +110,10 @@
                 </div>
             </div>
             <div class="col-sm-6 col-xl-3">
-                <div class="bg-secondary rounded d-flex align-items-center justify-content-around p-4">
+                <div class="shadow-sm bg-secondary rounded d-flex align-items-center justify-content-center p-3 h-100">
                     <img src="https://static.tibia.com/images/global/content/option_server_pvp_type_optional.gif" style="width: 48px; height: 48px;">
-                    <div class="ms-3 text-center">
-                        <small>Optional PvP</small>
-                        <h6 class="mb-0">
+                    <div class="ms-3 h-100 text-center ps-4">
+                        <h6 class="mb-0 mt-3">
                             <a href="/character/search/?q={{ optional.id_char.name }}">{{ optional.id_char.name }}</a>
                             <a href="https://www.tibia.com/community/?subtopic=characters&name={{ optional.id_char.name }}" class="text-muted" target="_blank">
                                 <i class="fas fa-external-link-alt fa-xs"></i>
@@ -132,36 +128,40 @@
  <!-- Best yesterday End -->
 
 <!-- News Start -->
+
+{% for i in latest_news %}
     <div class="container-fluid pt-4 px-4">
         <div class="row g-4">
             <div class="col-sm-12">
-                <div class="bg-secondary rounded h-100 p-4">
-                    <div class="owl-carousel testimonial-carousel">
+                <div class="shadow-sm bg-secondary rounded h-100 p-4">
+
 
                         <!-- News card -->
-                        {% for i in latest_news %}
-                            <div class="testimonial-item text-justified">
+
+
                                 <div class="row">
                                     <div class="col-sm-9"><h1>{{ i.news_title }}</h1></div>
                                     <div class="col-sm-3 text-end"><small>{{ i.date_added }}</small></div>
                                 </div>
 
                                 <p>{{ i.content_html| safe }}</p>
-                                <!--<a data-toggle="collapse" href="#collapseName" role="button" aria-expanded="false" aria-controls="collapseName">
+                                <a data-toggle="collapse" href="#collapseName" role="button" aria-expanded="false" aria-controls="collapseName">
                                     Read more <i class="fas fa-angle-double-down"></i>
                                 </a>
                                 <div class="collapse" id="collapseName">
                                     <div class="bg-secondary.bg-gradient rounded">
                                         xxx
                                     </div>
-                                </div>-->
-                            </div>
-                        {% endfor %}
+                                </div>
+
+
                     </div>
-                </div>
+
             </div>
         </div>
-    </div>
+            </div>
+{% endfor %}
+
 <!-- News End -->
 
 {% endblock %}

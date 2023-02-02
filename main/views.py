@@ -297,6 +297,69 @@ def str_to_int_list(request):
     return list(list_of_items)
 
 
+def top_250_charms(request, *args, **kwargs):
+    date = date_highscores()
+
+    best_retro_hardcore_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=4))
+        .order_by("-charm_diff")
+        .first()
+    )
+
+    best_optional_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=1))
+        .order_by("-charm_diff")
+        .first()
+    )
+
+    best_retro_open_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=3))
+        .order_by("-charm_diff")
+        .first()
+    )
+
+    best_open_pvp = (
+        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=0))
+        .order_by("-charm_diff")
+        .first()
+    )
+
+    top = Highscores.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0)).order_by("-charm_diff")[:500]
+
+    best = {
+        "optional": best_optional_pvp,
+        "open": best_open_pvp,
+        "retro": best_retro_open_pvp,
+        "retrohardcore": best_retro_hardcore_pvp,
+    }
+
+    content = {"top": top, "best": best}
+
+    return render(request, "sites/charms/top250charms.html", content)
+
+
+# Single world charms
+def world_charms(request):
+    date = date_highscores()
+
+    query = ""
+    # get world list with id
+    world_list = World.objects.all().values("name", "name_value", "world_id")
+    main = {}
+    if request.GET:
+        query = request.GET["q"]
+
+        worlds_df = pd.DataFrame(data=world_list)
+        worlds_id = worlds_df[worlds_df["name"] == query]["world_id"].item()
+
+        main = Highscores.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world_id=worlds_id)).order_by(
+            "-charm_diff"
+        )
+
+    content = {"main": main, "world": query, "world_list": world_list}
+
+    return render(request, "sites/charms/world_charms.html", content)
+
 @csrf_protect
 def explore_highscores(request, *args, **kwargs):
     date = date_highscores()
@@ -477,6 +540,7 @@ def explore_highscores(request, *args, **kwargs):
 # Search character
 def search_character(request, *args, **kwargs):
     database = True
+    # todo add information about character from db if exist
 
     # check if it's not empty
     if request.GET:
@@ -533,6 +597,8 @@ def world_transfers(request, *args, **kwargs):
     last_30_days_transfers = transfers.filter(date__gt=last_30_days).count()
     all_transfers = transfers.count()
 
+    transfers = transfers[:1000]
+
     content = {
         "transfers": transfers,
         "world_pvp": worlds_dict,
@@ -568,6 +634,7 @@ def name_changes(request, *args, **kwargs):
     last_30_days_changes = name_change.filter(date__gt=last_30_days).count()
     all_changes = name_change.count()
 
+    name_change = name_change[:1000]
     content = {
         "transfers": name_change,
         "amount_chart": name_changes_dict,

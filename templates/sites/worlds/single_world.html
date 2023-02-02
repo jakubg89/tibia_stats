@@ -20,7 +20,7 @@
             <div class="bg-secondary rounded text-center h-100 p-4">
 
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-                <form>
+                <form class="pt-1">
                     <select id="dynamic_select" class="form-select p-3" aria-label="Default select example" >
                         <option>Select world...</option>
 
@@ -67,7 +67,7 @@
                     <script src="{% static 'root/lib/chart/chart.min.js' %}"></script>
                     <script type="text/javascript">
                         Chart.defaults.color = "#6C7293";
-                        Chart.defaults.borderColor = "#000000";
+                        Chart.defaults.borderColor = "#D5D8D8";
                         var ctx1 = document.getElementById("online-voc").getContext("2d");
                         var myChart1 = new Chart(ctx1, {
                             type: "bar",
@@ -79,11 +79,11 @@
                                 ],
                                 datasets: [{
                                     backgroundColor: [
-                                        "rgba(235, 22, 22, .7)",
-                                        "rgba(235, 22, 22, .6)",
-                                        "rgba(235, 22, 22, .5)",
-                                        "rgba(235, 22, 22, .4)",
-                                        "rgba(235, 22, 22, .3)"
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)"
                                     ],
                                     data: [
                                     {% for key, value in online.items %}
