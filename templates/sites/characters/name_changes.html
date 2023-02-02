@@ -46,7 +46,7 @@
                     <script src="{% static 'root/lib/chart/chart.min.js' %}"></script>
                     <script type="text/javascript">
                         Chart.defaults.color = "#6C7293";
-                        Chart.defaults.borderColor = "#000000";
+                        Chart.defaults.borderColor = "#D5D8D8";
                         var ctx1 = document.getElementById("transfer-count").getContext("2d");
                         var myChart1 = new Chart(ctx1, {
                             type: "bar",
@@ -58,11 +58,11 @@
                                 ],
                                 datasets: [{
                                     backgroundColor: [
-                                        "rgba(235, 22, 22, .7)",
-                                        "rgba(235, 22, 22, .6)",
-                                        "rgba(235, 22, 22, .5)",
-                                        "rgba(235, 22, 22, .4)",
-                                        "rgba(235, 22, 22, .3)"
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)",
+                                        "rgba(194, 202, 146, .7)"
                                     ],
                                     data: [
                                     {% for key, value in amount_chart.items %}
@@ -106,11 +106,11 @@
                         <thead>
                             <tr>
                                 <th scope="col">id</th>
-                                <th scope="col">Old name</th>
+                                <th scope="col" class="dt-center">Old name</th>
                                 <th scope="col"></th>
-                                <th scope="col">New name</th>
-                                <th scope="col">Level</th>
-                                <th scope="col">Date</th>
+                                <th scope="col" class="dt-center">New name</th>
+                                <th scope="col" class="dt-center">Level</th>
+                                <th scope="col" class="dt-center">Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -119,7 +119,7 @@
                                 <td>{{ forloop.counter }}</td>
 
                                 <!-- Old name -->
-                                <td>
+                                <td class="dt-center">
                                     <a href="/character/search/?q={{ i.id_char.name }}">{{ i.old_name }}</a>
                                     <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
@@ -127,10 +127,10 @@
                                 </td>
 
                                 <!-- Arrow -->
-                                <td><i class="fas fa-arrow-right fa-lg"></i></td>
+                                <td class="dt-center"><i class="fas fa-arrow-right fa-lg text-success"></i></td>
 
                                 <!-- New name -->
-                                <td>
+                                <td class="dt-center">
                                     <a href="/character/search/?q={{ i.id_char.name }}">{{ i.new_name }}</a>
                                     <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
@@ -138,10 +138,10 @@
                                 </td>
 
                                 <!-- Level -->
-                                <td>{{ i.level }}</td>
+                                <td class="dt-center">{{ i.level }}</td>
 
                                 <!-- Date -->
-                                <td>{{ i.date|date:"d/m/Y" }}</td>
+                                <td class="dt-right">{{ i.date|date:"d/m/Y" }}</td>
 
                             </tr>
                         {% endfor %}
