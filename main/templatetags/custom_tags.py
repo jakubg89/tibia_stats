@@ -22,7 +22,7 @@ def get_value(my_dict, key):
 
 @register.filter(name='tc_amount_transfer')
 def get_value(transfers):
-    return transfers * 750
+    return f'{transfers * 750:,}'.replace(',', ' ')
 
 
 @register.filter(name='tc_amount_name')
