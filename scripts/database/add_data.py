@@ -1071,7 +1071,7 @@ def get_daily_records():
 
 
 def move_only_active_players():
-    logging.info(f"# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # # #")
+    logging.info(f"# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # #")
     now = datetime.datetime.now()
     date = now - timedelta(days=1)
 
