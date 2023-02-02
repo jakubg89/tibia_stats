@@ -32,15 +32,16 @@ from bs4 import BeautifulSoup
 import json
 from pathlib import Path
 import numpy as np
+
 import logging
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
-
 
 logging.basicConfig(
     level=logging.INFO,
     filename="/django-projects/tibia-stats/logs/highscores.log",
     filemode="a",
+
 )
 
 # All of this is already happening by default!
@@ -54,12 +55,12 @@ sentry_sdk.init(
     integrations=[
         sentry_logging,
     ],
+
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
     traces_sample_rate=1.0,
 )
-
 
 # environ.setdefault('DJANGO_SETTINGS_MODULE', 'tibia_stats.settings')
 
@@ -94,6 +95,7 @@ def temp_del():
     # date = now - timedelta(days=3, hours=2)
     date = "2023-02-01 04:00:00"
     clear_data_query = Highscores.objects.filter(date__gt=date)
+
     clear_data_query._raw_delete(clear_data_query.db)
 
 
@@ -246,7 +248,9 @@ def add_boss_to_db():
         date = date_with_seconds()
 
         boss = Boosted(
-            name=boss_info["name"], image_url=boss_info["image_url"], type=category, date_time=date
+            name=boss_info["name"],
+            image_url=boss_info["image_url"],
+            type=category, date_time=date
         )
         boss.save()
 
@@ -282,6 +286,7 @@ def add_worlds_information_to_db():
     values = json.load(
         open(os.path.join(path_to_json, "tibiacom_scrapper\\temp\\data_value\\data.json"))
     )
+
 
     for world in worlds_information:
 
@@ -727,6 +732,7 @@ def prepare_data_and_db(date):
         (prep_for_bulk["charm_rank_db"] != 0) & (prep_for_bulk["charm_rank_new"] != 0),
         prep_for_bulk["charm_rank_db"] - prep_for_bulk["charm_rank_new"],
         0,
+
     )
 
     prep_for_bulk["charm_diff"] = np.where(
@@ -904,6 +910,7 @@ def insert_highscores(date):
             )
             obj.append(char)
 
+
             if index % 3000 == 0:
                 Highscores.objects.bulk_create(obj, batch_size=500)
                 obj = []
@@ -978,7 +985,6 @@ def get_daily_records():
     # best experience gained
     for world in worlds:
         for vocation in vocations:
-
             best_exp = (
                 db_data_to_df[
                     (db_data_to_df["world_id"] == world) & (db_data_to_df["voc_id"] == vocation)
@@ -1000,7 +1006,7 @@ def get_daily_records():
                     (db_data_to_df["world_id"] == world)
                     & (db_data_to_df["voc_id"] == vocation)
                     & (db_data_to_df["exp_diff"] < 0)
-                ]
+                    ]
                 .sort_values(by="exp_diff")
                 .head(1)
             )
@@ -1032,6 +1038,7 @@ def get_daily_records():
 
     record_type = "exp"
     event = "none"
+
     db_record_history_count_before = RecordsHistory.objects.all().count()
 
     history_dict = history.to_dict("index")
