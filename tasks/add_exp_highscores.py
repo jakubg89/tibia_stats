@@ -30,7 +30,7 @@ django.setup()
 def main():
     # now = datetime.datetime.now()
     # date = now - timedelta(days=1, hours=2)
-    delete_files()
+    # delete_files()
     date = datetime.datetime.now()
     if start_time():
         logging.info(f'{datetime.datetime.now()} TASK START')
