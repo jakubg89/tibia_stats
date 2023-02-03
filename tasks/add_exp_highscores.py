@@ -87,7 +87,9 @@ def create_tasks(date):
         "insert_name_change",
         "insert_world_changes",
         "insert_highscores",
-        "get_daily_records"
+        "get_daily_records",
+        # "move_only_active_players",
+        # "delete_old_highscores_date"
     ]
 
     for idx, i in enumerate(tasks_list):
