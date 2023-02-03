@@ -514,7 +514,8 @@ def scrap_charms(date):
 
 def prepare_data_and_db(date):
     logging.info(f"Preparing data started: {date_with_seconds()}")
-    datetime_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    # datetime_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    datetime_obj = date
     yesterday = datetime_obj - timedelta(days=1, hours=4)
 
     latest_highscores = read_file("raw_exp")
@@ -793,7 +794,6 @@ def insert_name_change(date):
     old_name = read_json("name_changes.txt")
 
     name_change_dict = name_change_df.to_dict("index")
-
     obj_name_change = []
     traded = 0  # temp variable
     for name_in_dict in name_change_dict:
@@ -807,6 +807,7 @@ def insert_name_change(date):
         )
         obj_name_change.append(name)
     NameChange.objects.bulk_create(obj_name_change, batch_size=500)
+    Tasks.objects.filter(task_name="insert_name_change").update(status="done")
 
 
 # === INSERT =============== New players ====================
@@ -939,10 +940,10 @@ def add_highscores():
     # get_daily_records()
 
 
-def get_daily_records():
+def get_daily_records(date):
     # best exp yesterday on each world
-    now = datetime.datetime.now()
-    date = now - timedelta(days=1, hours=2)
+    # now = datetime.datetime.now()
+    yesterday = date - timedelta(days=1, hours=2)
 
     # world_types = {
     #    0: 'Open PvP',
@@ -963,7 +964,7 @@ def get_daily_records():
 
     # getting the best exp (each vocation on every world)
     best = Highscores.objects.filter(
-        Q(date__gt=date) & Q(exp_diff__gt=0) | Q(exp_diff__lt=0)
+        Q(date__gt=yesterday) & Q(exp_diff__gt=0) | Q(exp_diff__lt=0)
     ).values(
         "exp_rank",
         "exp_rank_change",
@@ -1064,12 +1065,13 @@ def get_daily_records():
             charm_diff=history_dict[i]["charm_diff"],
             record_type=record_type,
             event=event,
-            date=now,
+            date=date,
         )
         obj.append(record)
     RecordsHistory.objects.bulk_create(obj)
 
     db_record_history_count_after = RecordsHistory.objects.all().count()
+    Tasks.objects.filter(task_name="get_daily_records").update(status="done")
     if db_record_history_count_after == len(obj) + db_record_history_count_before:
         logging.info(f"Successfully added {len(obj)} items to db.")
     else:
@@ -1077,13 +1079,12 @@ def get_daily_records():
     logging.info(f"# # END # # # # {date_with_seconds()} # # # # Daily records # # # # # #")
 
 
-def move_only_active_players():
+def move_only_active_players(date):
     logging.info(f"# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # #")
-    now = datetime.datetime.now()
-    date = now - timedelta(days=1)
+    yesterday = date - timedelta(days=1)
 
     only_active = Highscores.objects.filter(
-        Q(date__gte=date) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
+        Q(date__gte=yesterday) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
     ).values()
     only_active_df = pd.DataFrame(data=only_active)
 
@@ -1114,7 +1115,7 @@ def move_only_active_players():
             charm_rank_change=only_active_dict[i]["charm_rank_change"],
             charm_value=only_active_dict[i]["charm_value"],
             charm_diff=only_active_dict[i]["charm_diff"],
-            date=now,
+            date=date,
         )
         obj.append(char)
         if index % 3000 == 0:
@@ -1124,19 +1125,19 @@ def move_only_active_players():
             HighscoresHistory.objects.bulk_create(obj, 500)
 
     db_active_after = HighscoresHistory.objects.all().count()
+    Tasks.objects.filter(task_name="move_only_active_players").update(status="done")
     if db_active_after == len(obj) + db_active_before:
         logging.info(f"Successfully added {len(obj)} items to db history.")
     else:
         logging.info(f"Some records might be missing. Added {len(obj)} to db history.")
 
 
-def delete_old_highscores_date():
-    now = datetime.datetime.now()
-    date = now - timedelta(days=3, hours=2)
+def delete_old_highscores_date(date):
+    date = date - timedelta(days=3, hours=2)
 
     clear_data_query = Highscores.objects.filter(date__lt=date)
     clear_data_query._raw_delete(clear_data_query.db)
-
+    Tasks.objects.filter(task_name="delete_old_highscores_date").update(status="done")
 
 # # # # # # # Experience end # # # # # # #
 

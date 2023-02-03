@@ -37,7 +37,6 @@ sentry_sdk.init(
 
 
 def main():
-    logging.info(f' - TASK CHECKER')
     check_running_tasks()
 
 
