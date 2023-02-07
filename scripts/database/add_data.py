@@ -81,7 +81,7 @@ def main():
     # add_news_ticker_to_db()
 
     # once a day (every 24h)
-    add_highscores()
+    # add_highscores()
     # get_daily_records()
     # move_active_players_to_history
     # delete_records_from_highscores

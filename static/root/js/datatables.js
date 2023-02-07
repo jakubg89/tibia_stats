@@ -430,7 +430,7 @@ $(document).ready(function () {
         },
 
         // sortowanie po pierwszym wczytaniu
-        // order: [[3, 'desc']],
+        order: [[0, 'asc']],
 
         // szerokość automatyczna
         "autoWidth": true,
