@@ -21,7 +21,9 @@ from django.views.decorators.csrf import csrf_protect
 
 # Date for highscores table
 def date_highscores():
-    return datetime.datetime.now() - timedelta(days=1, hours=2)
+    # return "2023-02-01 03:00:00"
+    return datetime.datetime.now() - timedelta(days=1, hours=3)
+    # todo change before commit
 
 
 # Main page
@@ -301,30 +303,40 @@ def top_250_charms(request, *args, **kwargs):
     date = date_highscores()
 
     best_retro_hardcore_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=4))
+        RecordsHistory.objects.filter(Q(date__gt=date) &
+                                      Q(charm_diff__gt=0) &
+                                      Q(world__pvp_type_value=4))
         .order_by("-charm_diff")
         .first()
     )
 
     best_optional_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=1))
+        RecordsHistory.objects.filter(Q(date__gt=date) &
+                                      Q(charm_diff__gt=0) &
+                                      Q(world__pvp_type_value=1))
         .order_by("-charm_diff")
         .first()
     )
 
     best_retro_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=3))
+        RecordsHistory.objects.filter(Q(date__gt=date) &
+                                      Q(charm_diff__gt=0) &
+                                      Q(world__pvp_type_value=3))
         .order_by("-charm_diff")
         .first()
     )
 
     best_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=0))
+        RecordsHistory.objects.filter(Q(date__gt=date) &
+                                      Q(charm_diff__gt=0) &
+                                      Q(world__pvp_type_value=0))
         .order_by("-charm_diff")
         .first()
     )
 
-    top = Highscores.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0)).order_by("-charm_diff")[:500]
+    top = Highscores.objects.filter(Q(date__gt=date) &
+                                    Q(charm_diff__gt=0)
+                                    ).order_by("-charm_diff")[:500]
 
     best = {
         "optional": best_optional_pvp,
@@ -597,7 +609,7 @@ def world_transfers(request, *args, **kwargs):
     last_30_days_transfers = transfers.filter(date__gt=last_30_days).count()
     all_transfers = transfers.count()
 
-    transfers = transfers[:1000]
+    transfers = transfers.order_by('-date')[:1000]
 
     content = {
         "transfers": transfers,
@@ -634,7 +646,8 @@ def name_changes(request, *args, **kwargs):
     last_30_days_changes = name_change.filter(date__gt=last_30_days).count()
     all_changes = name_change.count()
 
-    name_change = name_change[:1000]
+    name_change = name_change.order_by('-date')[:1000]
+
     content = {
         "transfers": name_change,
         "amount_chart": name_changes_dict,
