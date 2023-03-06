@@ -36,7 +36,7 @@ def main():
         logging.info(f'{datetime.datetime.now()} TASK START')
         delete_tasks()
         logging.info(f'{datetime.datetime.now()} Tasks deleted.')
-        # delete_files()
+        delete_files()
         logging.info(f'{datetime.datetime.now()} Files deleted.')
         create_tasks(date)
         logging.info(f'{datetime.datetime.now()} Tasks created.')
@@ -66,8 +66,14 @@ def delete_tasks():
 
 
 def delete_files():
-    for file in glob.glob("G:\\Python nauka\\django\\strony\\tibia_stats\\temp\\"):
-        os.remove(file)
+    folder = '/django-projects/tibia-stats/temp'
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
 def start_time():

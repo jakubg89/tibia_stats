@@ -5,3 +5,4 @@ scripts/tibiacom_scrapper/temp
 main/migrations/
 temp/
 logs/
+.env
