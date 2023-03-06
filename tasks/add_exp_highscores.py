@@ -8,7 +8,9 @@ if __name__ == '__main__':
                                            insert_name_change,
                                            insert_world_changes,
                                            insert_highscores,
-                                           get_daily_records)
+                                           get_daily_records,
+                                           move_only_active_players,
+                                           delete_old_highscores_date)
 from tibia_stats.wsgi import *
 from main.models import Tasks
 from datetime import datetime
@@ -94,8 +96,8 @@ def create_tasks(date):
         "insert_world_changes",
         "insert_highscores",
         "get_daily_records",
-        # "move_only_active_players",
-        # "delete_old_highscores_date"
+        "move_only_active_players",
+        "delete_old_highscores_date"
     ]
 
     for idx, i in enumerate(tasks_list):

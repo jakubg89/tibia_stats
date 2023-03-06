@@ -40,6 +40,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 logging.basicConfig(
     level=logging.INFO,
     filename="/django-projects/tibia-stats/logs/highscores.log",
+    # filename="D:\\Python\\Projekty\\Django\\tibia_stats\\tibia_stats\\logs\\highscores.log",
     filemode="a",
 )
 
@@ -285,7 +286,6 @@ def add_creature_to_db():
 
 
 def add_worlds_information_to_db():
-    # TODO reformat whole function
     worlds_information = dataapi.get_worlds_information()
     worlds_latest = pd.DataFrame(data=worlds_information)
 
@@ -543,7 +543,6 @@ def scrap_charms(date):
 
 def prepare_data_and_db(date):
     logging.info(f"Preparing data started: {date_with_seconds()}")
-    # datetime_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     datetime_obj = date
     yesterday = datetime_obj - timedelta(days=1, hours=4)
 
@@ -1041,7 +1040,7 @@ def get_daily_records(date):
 
     # getting the best exp (each vocation on every world)
     best = Highscores.objects.filter(
-        Q(date__gt=yesterday) & Q(exp_diff__gt=0) | Q(exp_diff__lt=0)
+        Q(date__gt=yesterday) & (Q(exp_diff__gt="0") | Q(exp_diff__lt="0"))
     ).values(
         "exp_rank",
         "exp_rank_change",
@@ -1176,7 +1175,7 @@ def move_only_active_players(date):
     yesterday = date - timedelta(days=1)
 
     only_active = Highscores.objects.filter(
-        Q(date__gte=yesterday) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
+        Q(date__gt=yesterday) & (Q(exp_diff__gt="0") | Q(exp_diff__lt="0"))
     ).values()
     only_active_df = pd.DataFrame(data=only_active)
 
@@ -1185,7 +1184,6 @@ def move_only_active_players(date):
 
     db_active_before = HighscoresHistory.objects.all().count()
 
-    # charm = 0  # temp variable
     obj = []
     only_active_dict = only_active_df.to_dict("index")
 
