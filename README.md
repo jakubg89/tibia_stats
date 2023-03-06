@@ -5,7 +5,6 @@
 - [About](#about)
 - [Features](#features)
 - [Tech stack](#stack)
-- [Structure](#structure)
 - [Requirements](#requirements)
 - [Installation](#installation)
 
@@ -20,7 +19,7 @@ and JavaScript frontend, making it easy to use the tools and analyze their Tibia
 
 # Features
 
-1. **Worlds informations.**
+1. **Worlds information.**
     - [x] Basic information.
     - [ ] Online time counter.
 2. **Character information.**
@@ -52,42 +51,6 @@ and JavaScript frontend, making it easy to use the tools and analyze their Tibia
 **Database:** MySQL
 
 **Front-end:** HTML5, CSS3, Bootstrap, JavaScript
-
-# Structure
-```bash
-tibia_stats
-   |-- logs
-   |-- main
-   |   |-- migrations
-   |   `-- templatetags
-   |-- scripts
-   |   |-- database
-   |   |-- json_files
-   |   |-- proxy_scrapper
-   |   |-- tibiacom_scrapper
-   |   `-- tibiadata_API
-   |-- static
-   |   `-- root
-   |       |-- admin
-   |       |-- css
-   |       |-- django_extensions
-   |       |-- js
-   |       |-- lib
-   |       `-- scss
-   |-- tasks
-   |-- temp
-   |-- templates
-   |   `-- sites
-   |       |-- bazaar
-   |       |-- bosses
-   |       |-- calculators
-   |       |-- characters
-   |       |-- charms
-   |       |-- experience
-   |       `-- worlds
-   |-- tibia_stats
-```
-
 
 # Requirements
 - Sentry account
