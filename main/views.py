@@ -28,15 +28,20 @@ def date_highscores():
 
 # Main page
 def main_page(request, *args, **kwargs):
-
     # news ticker
-    latest_tickers = News.objects.filter(type="ticker").order_by("-news_id")[:3]
+    latest_tickers = News.objects.filter(type="ticker").order_by("-news_id")[
+        :3
+    ]
 
     # boosted boss
-    boosted_boss = Boosted.objects.filter(type="boss").order_by("-boosted_id")[:1]
+    boosted_boss = Boosted.objects.filter(type="boss").order_by("-boosted_id")[
+        :1
+    ]
 
     # boosted creature
-    boosted_creature = Boosted.objects.filter(type="creature").order_by("-boosted_id")[:1]
+    boosted_creature = Boosted.objects.filter(type="creature").order_by(
+        "-boosted_id"
+    )[:1]
 
     # news
     latest_news = News.objects.filter(type="news").order_by("-news_id")[:4]
@@ -52,25 +57,33 @@ def main_page(request, *args, **kwargs):
     # }
 
     best_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=0))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=0)
+        )
         .order_by("-exp_diff")
         .first()
     )
 
     best_optional_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=1))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=1)
+        )
         .order_by("-exp_diff")
         .first()
     )
 
     best_retro_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=3))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=3)
+        )
         .order_by("-exp_diff")
         .first()
     )
 
     best_retro_hardcore_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=4))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=4)
+        )
         .order_by("-exp_diff")
         .first()
     )
@@ -126,6 +139,7 @@ def sign_up(request, *args, **kwargs):
 
 # # # # # # # # # # # # Worlds # # # # # # # # # # # #
 
+
 # World main
 def worlds_main(request, *args, **kwargs):
     # All worlds
@@ -133,21 +147,56 @@ def worlds_main(request, *args, **kwargs):
         date__gt=datetime.datetime.now() - datetime.timedelta(minutes=15)
     )
 
-    # Load data for creation chart from json
-    # path_to_json = Path(__file__).resolve().parent.parent
-    # creation_chart = json.load(open(os.path.join(path_to_json, 'scripts\\json_files\\creation_chart.json')))
     x = {
-        "Open_PvP": {"2015": 2, "2016": 8, "2017": 11, "2018": 6, "2019": 6, "2020": 14, "2021": 12, "2022": 3},
-        "Optional_PvP": {"2015": 1, "2016": 5, "2017": 9, "2018": 6, "2019": 2, "2020": 9, "2021": 11, "2022": 3},
-        "Retro_Hardcore_PvP": {"2015": 0, "2016": 0, "2017": 0, "2018": 0, "2019": 1, "2020": 7, "2021": 6, "2022": 0},
-        "Retro_Open_PvP": {"2015": 0, "2016": 1, "2017": 4, "2018": 3, "2019": 0, "2020": 4, "2021": 7, "2022": 3},
+        "Open_PvP": {
+            "2015": 2,
+            "2016": 8,
+            "2017": 11,
+            "2018": 6,
+            "2019": 6,
+            "2020": 14,
+            "2021": 12,
+            "2022": 3,
+        },
+        "Optional_PvP": {
+            "2015": 1,
+            "2016": 5,
+            "2017": 9,
+            "2018": 6,
+            "2019": 2,
+            "2020": 9,
+            "2021": 11,
+            "2022": 3,
+        },
+        "Retro_Hardcore_PvP": {
+            "2015": 0,
+            "2016": 0,
+            "2017": 0,
+            "2018": 0,
+            "2019": 1,
+            "2020": 7,
+            "2021": 6,
+            "2022": 0,
+        },
+        "Retro_Open_PvP": {
+            "2015": 0,
+            "2016": 1,
+            "2017": 4,
+            "2018": 3,
+            "2019": 0,
+            "2020": 4,
+            "2021": 7,
+            "2022": 3,
+        },
     }
     creation_chart = x
 
     # Online history chart
     get_online_history = (
         WorldOnlineHistory.objects.select_related("world")
-        .filter(date__gte=datetime.datetime.now() - datetime.timedelta(hours=24))
+        .filter(
+            date__gte=datetime.datetime.now() - datetime.timedelta(hours=24)
+        )
         .values("world__location", "world_id", "players_online", "date")
     )
 
@@ -163,19 +212,36 @@ def worlds_main(request, *args, **kwargs):
         mean_location = {}
         for hour in hours:
             mean_location.update(
-                {hour: int(df.loc[(df["world__location"] == i) & (df["hour"] == hour), "players_online"].mean())}
+                {
+                    hour: int(
+                        df.loc[
+                            (df["world__location"] == i)
+                            & (df["hour"] == hour),
+                            "players_online",
+                        ].mean()
+                    )
+                }
             )
             if i == world[-1]:
-                online_history_all.update({hour: int(df.loc[df["hour"] == hour, "players_online"].mean())})
+                online_history_all.update(
+                    {
+                        hour: int(
+                            df.loc[df["hour"] == hour, "players_online"].mean()
+                        )
+                    }
+                )
         online_history.update({i: mean_location})
     online_history.update({"Total": online_history_all})
-    content = {"all_worlds": all_worlds, "created": creation_chart, "online_history": online_history}
+    content = {
+        "all_worlds": all_worlds,
+        "created": creation_chart,
+        "online_history": online_history,
+    }
     return render(request, "sites/worlds/all_worlds.html", content)
 
 
 # Single world
 def single_world(request, name):
-
     # get data from api
     world_information = dataapi.get_world_details(name)
 
@@ -189,17 +255,29 @@ def single_world(request, name):
                 druid += 1
             elif i["vocation"] == "Knight" or i["vocation"] == "Elite Knight":
                 knight += 1
-            elif i["vocation"] == "Sorcerer" or i["vocation"] == "Master Sorcerer":
+            elif (
+                i["vocation"] == "Sorcerer"
+                or i["vocation"] == "Master Sorcerer"
+            ):
                 sorcerer += 1
             else:
                 none += 1
 
     # data to dictionary
-    online_counter = {"Knights": knight, "Sorcerers": sorcerer, "Paladins": paladin, "Druids": druid, "None": none}
+    online_counter = {
+        "Knights": knight,
+        "Sorcerers": sorcerer,
+        "Paladins": paladin,
+        "Druids": druid,
+        "None": none,
+    }
 
     # sort by value (highest > lowest)
     online_counter = {
-        key: value for key, value in sorted(online_counter.items(), key=lambda item: item[1], reverse=True)
+        key: value
+        for key, value in sorted(
+            online_counter.items(), key=lambda item: item[1], reverse=True
+        )
     }
 
     # get world list with id
@@ -222,30 +300,40 @@ def top_500(request, *args, **kwargs):
     date = date_highscores()
 
     best_retro_hardcore_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=4))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=4)
+        )
         .order_by("-exp_diff")
         .first()
     )
 
     best_optional_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=1))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=1)
+        )
         .order_by("-exp_diff")
         .first()
     )
 
     best_retro_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=3))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=3)
+        )
         .order_by("-exp_diff")
         .first()
     )
 
     best_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=0))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(exp_diff__gt=0) & Q(world__pvp_type_value=0)
+        )
         .order_by("-exp_diff")
         .first()
     )
 
-    top = Highscores.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0)).order_by("-exp_diff")[:500]
+    top = Highscores.objects.filter(
+        Q(date__gt=date) & Q(exp_diff__gt=0)
+    ).order_by("-exp_diff")[:500]
 
     best = {
         "optional": best_optional_pvp,
@@ -272,9 +360,9 @@ def mainland(request, *args, **kwargs):
         worlds_df = pd.DataFrame(data=world_list)
         worlds_id = worlds_df[worlds_df["name"] == query]["world_id"].item()
 
-        main = Highscores.objects.filter(Q(date__gt=date) & ~Q(exp_diff=0) & Q(world_id=worlds_id)).order_by(
-            "-exp_diff"
-        )
+        main = Highscores.objects.filter(
+            Q(date__gt=date) & ~Q(exp_diff=0) & Q(world_id=worlds_id)
+        ).order_by("-exp_diff")
 
     content = {"main": main, "world": query, "world_list": world_list}
 
@@ -284,9 +372,13 @@ def mainland(request, *args, **kwargs):
 def rookgaard(request, *args, **kwargs):
     date = date_highscores()
 
-    top_5 = RecordsHistory.objects.filter(Q(exp_diff__gt=0) & Q(voc=1)).order_by("-exp_diff")[:5]
+    top_5 = RecordsHistory.objects.filter(
+        Q(exp_diff__gt=0) & Q(voc=1)
+    ).order_by("-exp_diff")[:5]
 
-    top = Highscores.objects.filter(Q(date__gt=date) & Q(exp_diff__gt=0) & Q(voc=1)).order_by("-exp_diff")
+    top = Highscores.objects.filter(
+        Q(date__gt=date) & Q(exp_diff__gt=0) & Q(voc=1)
+    ).order_by("-exp_diff")
 
     content = {"top": top, "top_5": top_5}
 
@@ -303,40 +395,40 @@ def top_250_charms(request, *args, **kwargs):
     date = date_highscores()
 
     best_retro_hardcore_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) &
-                                      Q(charm_diff__gt=0) &
-                                      Q(world__pvp_type_value=4))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=4)
+        )
         .order_by("-charm_diff")
         .first()
     )
 
     best_optional_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) &
-                                      Q(charm_diff__gt=0) &
-                                      Q(world__pvp_type_value=1))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=1)
+        )
         .order_by("-charm_diff")
         .first()
     )
 
     best_retro_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) &
-                                      Q(charm_diff__gt=0) &
-                                      Q(world__pvp_type_value=3))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=3)
+        )
         .order_by("-charm_diff")
         .first()
     )
 
     best_open_pvp = (
-        RecordsHistory.objects.filter(Q(date__gt=date) &
-                                      Q(charm_diff__gt=0) &
-                                      Q(world__pvp_type_value=0))
+        RecordsHistory.objects.filter(
+            Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world__pvp_type_value=0)
+        )
         .order_by("-charm_diff")
         .first()
     )
 
-    top = Highscores.objects.filter(Q(date__gt=date) &
-                                    Q(charm_diff__gt=0)
-                                    ).order_by("-charm_diff")[:500]
+    top = Highscores.objects.filter(
+        Q(date__gt=date) & Q(charm_diff__gt=0)
+    ).order_by("-charm_diff")[:500]
 
     best = {
         "optional": best_optional_pvp,
@@ -364,13 +456,14 @@ def world_charms(request):
         worlds_df = pd.DataFrame(data=world_list)
         worlds_id = worlds_df[worlds_df["name"] == query]["world_id"].item()
 
-        main = Highscores.objects.filter(Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world_id=worlds_id)).order_by(
-            "-charm_diff"
-        )
+        main = Highscores.objects.filter(
+            Q(date__gt=date) & Q(charm_diff__gt=0) & Q(world_id=worlds_id)
+        ).order_by("-charm_diff")
 
     content = {"main": main, "world": query, "world_list": world_list}
 
     return render(request, "sites/charms/world_charms.html", content)
+
 
 @csrf_protect
 def explore_highscores(request, *args, **kwargs):
@@ -402,7 +495,6 @@ def explore_highscores(request, *args, **kwargs):
     world_selected = ""
 
     if request.POST:
-
         pvp_request = request.POST.getlist("pvp")
         pvp_selected = str_to_int_list(pvp_request)
         pvp_all_values = pvp_type_q.values_list("pvp_type_value", flat=True)
@@ -432,7 +524,9 @@ def explore_highscores(request, *args, **kwargs):
         if world_request[0] and vocation_selected:
             world_selected = world_request[0]
             print(world_selected)
-            result = result.filter(world__in=world_request, voc__in=vocation_selected)
+            result = result.filter(
+                world__in=world_request, voc__in=vocation_selected
+            )
 
         elif world_request[0] and not vocation_selected:
             world_selected = world_request[0]
@@ -448,8 +542,12 @@ def explore_highscores(request, *args, **kwargs):
             result = []
 
         else:
-            if vocation_selected and pvp_selected and be_selected and location_selected:
-
+            if (
+                vocation_selected
+                and pvp_selected
+                and be_selected
+                and location_selected
+            ):
                 result = result.filter(
                     world__pvp_type_value__in=pvp_selected,
                     world__battleye_value__in=be_selected,
@@ -457,70 +555,130 @@ def explore_highscores(request, *args, **kwargs):
                     voc__in=vocation_selected,
                 )
 
-            elif vocation_selected and pvp_selected and be_selected and not location_selected:
-
+            elif (
+                vocation_selected
+                and pvp_selected
+                and be_selected
+                and not location_selected
+            ):
                 result = result.filter(
                     world__pvp_type_value__in=pvp_selected,
                     world__battleye_value__in=be_selected,
                     voc__in=vocation_selected,
                 )
 
-            elif vocation_selected and pvp_selected and not be_selected and not location_selected:
+            elif (
+                vocation_selected
+                and pvp_selected
+                and not be_selected
+                and not location_selected
+            ):
+                result = result.filter(
+                    world__pvp_type_value__in=pvp_selected,
+                    voc__in=vocation_selected,
+                )
 
-                result = result.filter(world__pvp_type_value__in=pvp_selected, voc__in=vocation_selected)
-
-            elif vocation_selected and not pvp_selected and not be_selected and not location_selected:
-
+            elif (
+                vocation_selected
+                and not pvp_selected
+                and not be_selected
+                and not location_selected
+            ):
                 result = result.filter(voc__in=vocation_selected)
 
-            elif not vocation_selected and pvp_selected and be_selected and location_selected:
-
+            elif (
+                not vocation_selected
+                and pvp_selected
+                and be_selected
+                and location_selected
+            ):
                 result = result.filter(
                     world__pvp_type_value__in=pvp_selected,
                     world__battleye_value__in=be_selected,
                     world__location_value__in=location_selected,
                 )
 
-            elif not vocation_selected and pvp_selected and be_selected and not location_selected:
+            elif (
+                not vocation_selected
+                and pvp_selected
+                and be_selected
+                and not location_selected
+            ):
+                result = result.filter(
+                    world__pvp_type_value__in=pvp_selected,
+                    world__battleye_value__in=be_selected,
+                )
 
-                result = result.filter(world__pvp_type_value__in=pvp_selected, world__battleye_value__in=be_selected)
-
-            elif not vocation_selected and pvp_selected and not be_selected and not location_selected:
-
+            elif (
+                not vocation_selected
+                and pvp_selected
+                and not be_selected
+                and not location_selected
+            ):
                 result = result.filter(world__pvp_type_value__in=pvp_selected)
 
-            elif vocation_selected and not pvp_selected and be_selected and location_selected:
-
+            elif (
+                vocation_selected
+                and not pvp_selected
+                and be_selected
+                and location_selected
+            ):
                 result = result.filter(
                     world__battleye_value__in=be_selected,
                     world__location_value__in=location_selected,
                     voc__in=vocation_selected,
                 )
 
-            elif not vocation_selected and not pvp_selected and be_selected and location_selected:
-
+            elif (
+                not vocation_selected
+                and not pvp_selected
+                and be_selected
+                and location_selected
+            ):
                 result = result.filter(
-                    world__battleye_value__in=be_selected, world__location_value__in=location_selected
+                    world__battleye_value__in=be_selected,
+                    world__location_value__in=location_selected,
                 )
 
-            elif not vocation_selected and not pvp_selected and not be_selected and location_selected:
+            elif (
+                not vocation_selected
+                and not pvp_selected
+                and not be_selected
+                and location_selected
+            ):
+                result = result.filter(
+                    world__location_value__in=location_selected
+                )
 
-                result = result.filter(world__location_value__in=location_selected)
-
-            elif vocation_selected and pvp_selected and not be_selected and location_selected:
-
+            elif (
+                vocation_selected
+                and pvp_selected
+                and not be_selected
+                and location_selected
+            ):
                 result = result.filter(
                     world__pvp_type_value__in=pvp_selected,
                     world__location_value__in=location_selected,
                     voc__in=vocation_selected,
                 )
 
-            elif vocation_selected and pvp_selected and not be_selected and not location_selected:
+            elif (
+                vocation_selected
+                and pvp_selected
+                and not be_selected
+                and not location_selected
+            ):
+                result = result.filter(
+                    world__pvp_type_value__in=pvp_selected,
+                    voc__in=vocation_selected,
+                )
 
-                result = result.filter(world__pvp_type_value__in=pvp_selected, voc__in=vocation_selected)
-
-            elif not vocation_selected and not pvp_selected and be_selected and not location_selected:
-
+            elif (
+                not vocation_selected
+                and not pvp_selected
+                and be_selected
+                and not location_selected
+            ):
                 result = result.filter(world__battleye_value__in=be_selected)
 
         # values?
@@ -530,7 +688,11 @@ def explore_highscores(request, *args, **kwargs):
     content = {
         "worlds_obj": worlds,
         "vocation": vocations,
-        "worlds": {"pvp_type": pvp_type, "be": battleye_type, "location": location},
+        "worlds": {
+            "pvp_type": pvp_type,
+            "be": battleye_type,
+            "location": location,
+        },
         "result": result,
         "selected": {
             "vocation": vocation_selected,
@@ -549,6 +711,7 @@ def explore_highscores(request, *args, **kwargs):
 
 # # # # # # # # Characters # # # # # # # # # # #
 
+
 # Search character
 def search_character(request, *args, **kwargs):
     database = True
@@ -556,7 +719,9 @@ def search_character(request, *args, **kwargs):
 
     # check if it's not empty
     if request.GET:
-        query = request.GET["q"]  # <input name="q"> return dictionary { q : item }
+        query = request.GET[
+            "q"
+        ]  # <input name="q"> return dictionary { q : item }
 
         # check if it's only characters
         if query.replace(" ", "").isalpha():
@@ -566,7 +731,9 @@ def search_character(request, *args, **kwargs):
             if character_information["character"]["name"] != "":
                 exist = True
             else:
-                character_information = f"Character {query} does not exist."  # if not exist
+                character_information = (
+                    f"Character {query} does not exist."  # if not exist
+                )
                 exist = False
         else:
             character_information = f"Character {query} does not exist."  # if contains numbers or special characters
@@ -588,9 +755,9 @@ def search_character(request, *args, **kwargs):
 # World Transfers
 def world_transfers(request, *args, **kwargs):
     now = datetime.datetime.now()
-    date = (now - timedelta(days=1, hours=1))
-    last_7_days = (now - timedelta(days=7, hours=1))
-    last_30_days = (now - timedelta(days=30, hours=1))
+    date = now - timedelta(days=1, hours=1)
+    last_7_days = now - timedelta(days=7, hours=1)
+    last_30_days = now - timedelta(days=30, hours=1)
 
     transfers = WorldTransfers.objects.all()
 
@@ -609,7 +776,7 @@ def world_transfers(request, *args, **kwargs):
     last_30_days_transfers = transfers.filter(date__gt=last_30_days).count()
     all_transfers = transfers.count()
 
-    transfers = transfers.order_by('-date')[:1000]
+    transfers = transfers.order_by("-date")[:1000]
 
     content = {
         "transfers": transfers,
@@ -617,8 +784,8 @@ def world_transfers(request, *args, **kwargs):
         "amount_chart": transfers_count_dict,
         "stats": {
             "Yesterday": yesterday_transfers,
-            'Last_7_days': last_7_days_transfers,
-            'Last_30_days': last_30_days_transfers,
+            "Last_7_days": last_7_days_transfers,
+            "Last_30_days": last_30_days_transfers,
             "Total_recorded": all_transfers,
         },
     }
@@ -629,9 +796,9 @@ def world_transfers(request, *args, **kwargs):
 # Name Changes
 def name_changes(request, *args, **kwargs):
     now = datetime.datetime.now()
-    date = (now - timedelta(days=1, hours=1))
-    last_7_days = (now - timedelta(days=1, hours=1))
-    last_30_days = (now - timedelta(days=1, hours=1))
+    date = now - timedelta(days=1, hours=1)
+    last_7_days = now - timedelta(days=1, hours=1)
+    last_30_days = now - timedelta(days=1, hours=1)
 
     name_change = NameChange.objects.all()
 
@@ -646,15 +813,15 @@ def name_changes(request, *args, **kwargs):
     last_30_days_changes = name_change.filter(date__gt=last_30_days).count()
     all_changes = name_change.count()
 
-    name_change = name_change.order_by('-date')[:1000]
+    name_change = name_change.order_by("-date")[:1000]
 
     content = {
         "transfers": name_change,
         "amount_chart": name_changes_dict,
         "stats": {
             "Yesterday": yesterday_changes,
-            'Last_7_days': last_7_days_changes,
-            'Last_30_days': last_30_days_changes,
+            "Last_7_days": last_7_days_changes,
+            "Last_30_days": last_30_days_changes,
             "Total_recorded": all_changes,
         },
     }

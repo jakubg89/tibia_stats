@@ -144,6 +144,7 @@ def format_content(raw_html):
 
 # # # # # # # News ticker # # # # # # #
 
+
 # adding news to database if it not exists
 def add_news_ticker_to_db():
     # get all tibia.com id from database
@@ -191,6 +192,7 @@ def add_news_ticker_to_db():
 
 
 # # # # # # # News # # # # # # #
+
 
 # adding news to database if it not exists
 def add_news_to_db():
@@ -242,6 +244,7 @@ def add_news_to_db():
 
 
 # # # # # # # Boosted creature/boss # # # # # # #
+
 
 # adds boosted boss to database
 def add_boss_to_db():
@@ -391,7 +394,6 @@ def add_online_players():
 
 
 def get_highscores(category: str, proffesions: list):
-
     # getting world list ( name = value , for now )
     world_list_from_db = World.objects.all().values("name_value")
     world_list_df = pd.DataFrame(data=world_list_from_db)
@@ -402,7 +404,6 @@ def get_highscores(category: str, proffesions: list):
 
     # for loop for each world
     for world in worlds:
-
         # for loop for each profession
         for prof in proffesions:
             # get total site number before execution loop over each site
