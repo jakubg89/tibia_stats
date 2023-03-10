@@ -21,9 +21,7 @@ from django.views.decorators.csrf import csrf_protect
 
 # Date for highscores table
 def date_highscores():
-    # return "2023-02-01 03:00:00"
     return datetime.datetime.now() - timedelta(days=1, hours=3)
-    # todo change before commit
 
 
 # Main page
