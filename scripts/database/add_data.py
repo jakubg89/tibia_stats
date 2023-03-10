@@ -2,6 +2,7 @@ import gc
 import sys
 
 sys.path.append("/django-projects/tibia-stats/")
+import tibia_stats.settings
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
@@ -39,8 +40,8 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 
 logging.basicConfig(
     level=logging.INFO,
-    filename="/django-projects/tibia-stats/logs/highscores.log",
-    # filename="D:\\Python\\Projekty\\Django\\tibia_stats\\tibia_stats\\logs\\highscores.log",
+    # filename="/django-projects/tibia-stats/logs/highscores.log",
+    filename=f"{tibia_stats.settings.LOG_DIRECTORY_PATH}highscores.log",
     filemode="a",
 )
 
@@ -479,7 +480,7 @@ def collect_char_id():
 
 
 def save_to_json(item, file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     full_path = "".join([path_to_directory, file_name])
     write = json.dumps(item)
 
@@ -488,7 +489,7 @@ def save_to_json(item, file_name):
 
 
 def read_json(file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     full_path = "".join([path_to_directory, file_name])
 
     with open(full_path, "r") as file:
@@ -498,7 +499,7 @@ def read_json(file_name):
 
 
 def save_to_file(item, file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
 
     full_path = "".join([path_to_directory, raw_file])
@@ -506,7 +507,7 @@ def save_to_file(item, file_name):
 
 
 def read_file(file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
     full_path = "".join([path_to_directory, raw_file])
 
@@ -1010,16 +1011,10 @@ def insert_highscores(date):
 def add_highscores():
     pass
     # date = "2023-02-01 05:00:00"
-    # temp_del()
-    # insert_name_change(date)
-    # insert_world_changes(date)
-    # insert_highscores(date)
-    # get_daily_records()
 
 
 def get_daily_records(date):
     # best exp yesterday on each world
-    # now = datetime.datetime.now()
     yesterday = date - timedelta(days=1, hours=2)
 
     # world_types = {
@@ -1228,7 +1223,7 @@ def move_only_active_players(date):
 
 
 def delete_old_highscores_date(date):
-    date = date - timedelta(days=3, hours=2)
+    date = date - timedelta(days=2, hours=2)
 
     clear_data_query = Highscores.objects.filter(date__lt=date)
     clear_data_query._raw_delete(clear_data_query.db)
