@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-
+{% load custom_tags %}
 
 <!-- Title, select menu start -->
 <div class="container-fluid pt-4 px-4">
@@ -92,10 +92,10 @@
                                 <td class="dt-center">{{ i.level }}</td>
 
                                 <!-- Points gained -->
-                                <td class="{% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %} dt-center">{{ i.charm_diff }}</td>
+                                <td class="{% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %} dt-center">{{ i.charm_diff|exp_with_space }}</td>
 
                                 <!-- Charm points -->
-                                <td class="dt-center">{{ i.charm_value }}</td>
+                                <td class="dt-center">{{ i.charm_value|exp_with_space }}</td>
 
                             </tr>
                         {% endfor %}

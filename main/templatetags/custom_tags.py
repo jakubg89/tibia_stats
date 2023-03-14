@@ -27,4 +27,9 @@ def get_value(transfers):
 
 @register.filter(name='tc_amount_name')
 def get_value(name_change):
-    return name_change * 250
+    return f'{name_change * 250:,}'.replace(',', ' ')
+
+
+@register.filter(name='exp_with_space')
+def get_value(exp):
+    return f'{exp:,}'.replace(',', ' ')

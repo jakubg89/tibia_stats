@@ -545,8 +545,8 @@ def scrap_charms(date):
 
 def prepare_data_and_db(date):
     logging.info(f"Preparing data started: {date_with_seconds()}")
-    datetime_obj = date
-    yesterday = datetime_obj - timedelta(days=1, hours=4)
+
+    yesterday = Highscores.objects.all().order_by('-date').values('date')[:1]
 
     latest_highscores = read_file("raw_exp")
     latest_charms = read_file("raw_charms")
@@ -715,7 +715,7 @@ def prepare_data_and_db(date):
 
     old_highscores_query = (
         Highscores.objects.all()
-        .filter(Q(date__gt=yesterday))
+        .filter(Q(date__gte=yesterday))
         .values(
             "exp_rank",
             "id_char",

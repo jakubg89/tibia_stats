@@ -753,9 +753,9 @@ def search_character(request, *args, **kwargs):
 # World Transfers
 def world_transfers(request, *args, **kwargs):
     now = datetime.datetime.now()
-    date = now - timedelta(days=1, hours=1)
-    last_7_days = now - timedelta(days=7, hours=1)
-    last_30_days = now - timedelta(days=30, hours=1)
+    date = now - timedelta(days=1, hours=2)
+    last_7_days = now - timedelta(days=7, hours=2)
+    last_30_days = now - timedelta(days=30, hours=2)
 
     transfers = WorldTransfers.objects.all()
 
@@ -766,7 +766,7 @@ def world_transfers(request, *args, **kwargs):
     chart = transfers.values()
     chart_df = pd.DataFrame(data=chart)
     transfers_count = chart_df["date"].value_counts()
-    transfers_count_sorted = transfers_count.sort_index().head(7)
+    transfers_count_sorted = transfers_count.sort_index().tail(7)
     transfers_count_dict = transfers_count_sorted.to_dict()
 
     yesterday_transfers = transfers.filter(date__gt=date).count()
@@ -794,16 +794,16 @@ def world_transfers(request, *args, **kwargs):
 # Name Changes
 def name_changes(request, *args, **kwargs):
     now = datetime.datetime.now()
-    date = now - timedelta(days=1, hours=1)
-    last_7_days = now - timedelta(days=1, hours=1)
-    last_30_days = now - timedelta(days=1, hours=1)
+    date = now - timedelta(days=1, hours=2)
+    last_7_days = now - timedelta(days=7, hours=2)
+    last_30_days = now - timedelta(days=30, hours=2)
 
     name_change = NameChange.objects.all()
 
     chart = name_change.values()
     chart_df = pd.DataFrame(data=chart)
     name_changes_count = chart_df["date"].value_counts()
-    name_changes_sorted = name_changes_count.sort_index().head(7)
+    name_changes_sorted = name_changes_count.sort_index().tail(7)
     name_changes_dict = name_changes_sorted.to_dict()
 
     yesterday_changes = name_change.filter(date__gt=date).count()
