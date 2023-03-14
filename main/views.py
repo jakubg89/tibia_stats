@@ -351,6 +351,7 @@ def mainland(request, *args, **kwargs):
     query = ""
     # get world list with id
     world_list = World.objects.all().values("name", "name_value", "world_id")
+    world_list = world_list.order_by('name')
     main = {}
     if request.GET:
         query = request.GET["q"]
@@ -426,7 +427,7 @@ def top_250_charms(request, *args, **kwargs):
 
     top = Highscores.objects.filter(
         Q(date__gt=date) & Q(charm_diff__gt=0)
-    ).order_by("-charm_diff")[:500]
+    ).order_by("-charm_diff")[:250]
 
     best = {
         "optional": best_optional_pvp,
@@ -447,6 +448,7 @@ def world_charms(request):
     query = ""
     # get world list with id
     world_list = World.objects.all().values("name", "name_value", "world_id")
+    world_list = world_list.order_by('name')
     main = {}
     if request.GET:
         query = request.GET["q"]
@@ -472,7 +474,7 @@ def explore_highscores(request, *args, **kwargs):
     vocations = Vocation.objects.all()
 
     # get world list with id / names
-    worlds = World.objects.all()
+    worlds = World.objects.all().order_by('name')
 
     pvp_type_q = worlds.values("pvp_type", "pvp_type_value")
     pvp_type = pd.DataFrame(data=pvp_type_q)
