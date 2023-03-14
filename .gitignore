@@ -1,5 +1,5 @@
 .idea
-tibia_stats/.env
+tibia_stats/.esdnv
 ignore/
 scripts/tibiacom_scrapper/temp
 main/migrations/

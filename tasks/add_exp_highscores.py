@@ -1,14 +1,18 @@
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
 
-    sys.path.insert(0, '/django-projects/tibia-stats')
-    from scripts.database.add_data import (scrap_charms,
-                                           scrap_experience,
-                                           prepare_data_and_db,
-                                           insert_name_change,
-                                           insert_world_changes,
-                                           insert_highscores,
-                                           get_daily_records)
+    sys.path.insert(0, "/django-projects/tibia-stats")
+    from scripts.database.add_data import (
+        scrap_charms,
+        scrap_experience,
+        prepare_data_and_db,
+        insert_name_change,
+        insert_world_changes,
+        insert_highscores,
+        get_daily_records,
+        move_only_active_players,
+        delete_old_highscores_date,
+    )
 from tibia_stats.wsgi import *
 from main.models import Tasks
 from datetime import datetime
@@ -19,7 +23,7 @@ import os
 import django
 
 
-os.environ["DJANGO_SETTINGS_MODULE"] = 'tibia_stats.settings'
+os.environ["DJANGO_SETTINGS_MODULE"] = "tibia_stats.settings"
 django.setup()
 
 # Task status:
@@ -33,30 +37,30 @@ def main():
     # delete_files()
     date = datetime.datetime.now()
     if start_time():
-        logging.info(f'{datetime.datetime.now()} TASK START')
+        logging.info(f"{datetime.datetime.now()} TASK START")
         delete_tasks()
-        logging.info(f'{datetime.datetime.now()} Tasks deleted.')
+        logging.info(f"{datetime.datetime.now()} Tasks deleted.")
         delete_files()
-        logging.info(f'{datetime.datetime.now()} Files deleted.')
+        logging.info(f"{datetime.datetime.now()} Files deleted.")
         create_tasks(date)
-        logging.info(f'{datetime.datetime.now()} Tasks created.')
+        logging.info(f"{datetime.datetime.now()} Tasks created.")
         perform_script()
     else:
         perform_script()
 
 
 def perform_script():
-    logging.info(f'{datetime.datetime.now()} Perform script started.')
+    logging.info(f"{datetime.datetime.now()} Perform script started.")
 
     list_and_date = get_tasks_to_list()
     if list_and_date:
-        to_do = list_and_date['to_do']
-        date = list_and_date['date']
+        to_do = list_and_date["to_do"]
+        date = list_and_date["date"]
         for i in to_do:
-            logging.info(f'Performing {i} - {datetime.datetime.now()}')
-            eval(i + '(date)')
+            logging.info(f"Performing {i} - {datetime.datetime.now()}")
+            eval(i + "(date)")
     else:
-        logging.info(f'{datetime.datetime.now()} All tasks are done. EXIT')
+        logging.info(f"{datetime.datetime.now()} All tasks are done. EXIT")
         exit()
 
 
@@ -66,14 +70,14 @@ def delete_tasks():
 
 
 def delete_files():
-    folder = '/django-projects/tibia-stats/temp'
+    folder = "/django-projects/tibia-stats/temp"
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)
         try:
             if os.path.isfile(file_path):
                 os.unlink(file_path)
         except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+            print("Failed to delete %s. Reason: %s" % (file_path, e))
 
 
 def start_time():
@@ -94,44 +98,44 @@ def create_tasks(date):
         "insert_world_changes",
         "insert_highscores",
         "get_daily_records",
-        # "move_only_active_players",
-        # "delete_old_highscores_date"
+        "move_only_active_players",
+        "delete_old_highscores_date",
     ]
 
     for idx, i in enumerate(tasks_list):
-        tasks.update({idx: {
-            "task_name": i,
-            "status": status,
-            "date": date
-        }})
+        tasks.update({idx: {"task_name": i, "status": status, "date": date}})
     tasks_for_insert = []
     for task in tasks:
         task_obj = Tasks(
             task_name=tasks[task]["task_name"],
             status=tasks[task]["status"],
-            date=tasks[task]["date"]
+            date=tasks[task]["date"],
         )
         tasks_for_insert.append(task_obj)
     Tasks.objects.bulk_create(tasks_for_insert)
-    logging.info('Tasks created.')
+    logging.info("Tasks created.")
 
 
 def get_tasks_to_list():
-    get_tasks = Tasks.objects.all().values('task_name', 'status', 'date').order_by('task')
+    get_tasks = (
+        Tasks.objects.all()
+        .values("task_name", "status", "date")
+        .order_by("task")
+    )
 
     if get_tasks:
         to_do = []
         for i in get_tasks:
-            if (i['status'] != 'done') and (i['task_name'] != "checked_characters"):
+            if (i["status"] != "done") and (
+                i["task_name"] != "checked_characters"
+            ):
                 to_do.append(i["task_name"])
-        list_and_date = {'date': get_tasks[0]['date'],
-                         'to_do': to_do}
+        list_and_date = {"date": get_tasks[0]["date"], "to_do": to_do}
         return list_and_date
     else:
-        logging.info(f'{datetime.datetime.now()} All tasks are done. EXIT')
+        logging.info(f"{datetime.datetime.now()} All tasks are done. EXIT")
         exit()
 
 
 if __name__ == "__main__":
     main()
-

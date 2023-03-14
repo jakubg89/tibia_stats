@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-
+{% load custom_tags %}
 
 <!-- Title, select menu start -->
 <div class="container-fluid pt-4 px-4">
@@ -77,10 +77,10 @@
                             <tr>
 
                                 <!-- Rank -->
-                                <td>{{ forloop.counter }}</td>
+                                <td class="dt-center">{{ forloop.counter }}</td>
 
                                 <!-- Name -->
-                                <td>
+                                <td class="dt-center">
                                     <a href="/character/search/?q={{ i.id_char.name }}">{{ i.id_char.name }}</a>
                                     <a href="https://www.tibia.com/community/?subtopic=characters&name={{ i.id_char.name }}" class="text-muted" target="_blank">
                                         <i class="fas fa-external-link-alt fa-xs"></i>
@@ -88,22 +88,22 @@
                                 </td>
 
                                 <!-- Vocation -->
-                                <td>{{ i.voc.name }}</td>
+                                <td class="dt-center">{{ i.voc.name }}</td>
 
                                 <!-- Level -->
-                                <td>{{ i.level }}</td>
+                                <td class="dt-center">{{ i.level }}</td>
 
                                 <!-- Level change -->
-                                <td class="{% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %}">{{ i.level_change }}</td>
+                                <td class="dt-center {% if i.level_change < 0 %}text-danger{% elif i.level_change > 0 %}text-success{% endif %}">{{ i.level_change }}</td>
 
                                 <!-- Vocation rank -->
-                                <td>{{ i.exp_rank }}</td>
+                                <td class="dt-center">{{ i.exp_rank }}</td>
 
                                 <!-- Vocation rank change -->
-                                <td class="{% if i.exp_rank_change < 0 %}text-danger{% elif i.exp_rank_change > 0 %}text-success{% endif %}">{{ i.exp_rank_change }}</td>
+                                <td class="dt-center {% if i.exp_rank_change < 0 %}text-danger{% elif i.exp_rank_change > 0 %}text-success{% endif %}">{{ i.exp_rank_change }}</td>
 
                                 <!-- Experience value -->
-                                <td class="{% if i.exp_diff < 0 %}text-danger{% elif i.exp_diff > 0 %}text-success{% endif %}">{{ i.exp_diff }}</td>
+                                <td class="dt-center {% if i.exp_diff < 0 %}text-danger{% elif i.exp_diff > 0 %}text-success{% endif %}">{{ i.exp_diff|exp_with_space }}</td>
 
                             </tr>
                         {% endfor %}

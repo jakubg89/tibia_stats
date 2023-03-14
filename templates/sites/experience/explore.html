@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-
+{% load custom_tags %}
 
 <!-- Title, select menu start -->
 <div class="container-fluid pt-4 px-4">
@@ -221,7 +221,7 @@
                                 <td class="{% if i.exp_rank_change < 0 %}text-danger{% elif i.exp_rank_change > 0 %}text-success{% endif %} dt-center">{{ i.exp_rank_change }}</td>
 
                                 <!-- Experience value -->
-                                <td class="{% if i.exp_diff < 0 %}text-danger{% elif i.exp_diff > 0 %}text-success{% endif %} dt-center">{{ i.exp_diff }}</td>
+                                <td class="{% if i.exp_diff < 0 %}text-danger{% elif i.exp_diff > 0 %}text-success{% endif %} dt-center">{{ i.exp_diff|exp_with_space }}</td>
 
                                 <!-- World -->
                                 <td>

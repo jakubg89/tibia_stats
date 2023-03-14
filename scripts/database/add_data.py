@@ -2,6 +2,7 @@ import gc
 import sys
 
 sys.path.append("/django-projects/tibia-stats/")
+import tibia_stats.settings
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
@@ -39,7 +40,8 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 
 logging.basicConfig(
     level=logging.INFO,
-    filename="/django-projects/tibia-stats/logs/highscores.log",
+    # filename="/django-projects/tibia-stats/logs/highscores.log",
+    filename=f"{tibia_stats.settings.LOG_DIRECTORY_PATH}highscores.log",
     filemode="a",
 )
 
@@ -143,6 +145,7 @@ def format_content(raw_html):
 
 # # # # # # # News ticker # # # # # # #
 
+
 # adding news to database if it not exists
 def add_news_ticker_to_db():
     # get all tibia.com id from database
@@ -190,6 +193,7 @@ def add_news_ticker_to_db():
 
 
 # # # # # # # News # # # # # # #
+
 
 # adding news to database if it not exists
 def add_news_to_db():
@@ -242,6 +246,7 @@ def add_news_to_db():
 
 # # # # # # # Boosted creature/boss # # # # # # #
 
+
 # adds boosted boss to database
 def add_boss_to_db():
     boss_info = dataapi.boosted_boss()
@@ -285,7 +290,6 @@ def add_creature_to_db():
 
 
 def add_worlds_information_to_db():
-    # TODO reformat whole function
     worlds_information = dataapi.get_worlds_information()
     worlds_latest = pd.DataFrame(data=worlds_information)
 
@@ -391,7 +395,6 @@ def add_online_players():
 
 
 def get_highscores(category: str, proffesions: list):
-
     # getting world list ( name = value , for now )
     world_list_from_db = World.objects.all().values("name_value")
     world_list_df = pd.DataFrame(data=world_list_from_db)
@@ -402,7 +405,6 @@ def get_highscores(category: str, proffesions: list):
 
     # for loop for each world
     for world in worlds:
-
         # for loop for each profession
         for prof in proffesions:
             # get total site number before execution loop over each site
@@ -478,7 +480,7 @@ def collect_char_id():
 
 
 def save_to_json(item, file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     full_path = "".join([path_to_directory, file_name])
     write = json.dumps(item)
 
@@ -487,7 +489,7 @@ def save_to_json(item, file_name):
 
 
 def read_json(file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     full_path = "".join([path_to_directory, file_name])
 
     with open(full_path, "r") as file:
@@ -497,7 +499,7 @@ def read_json(file_name):
 
 
 def save_to_file(item, file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
 
     full_path = "".join([path_to_directory, raw_file])
@@ -505,7 +507,7 @@ def save_to_file(item, file_name):
 
 
 def read_file(file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
     full_path = "".join([path_to_directory, raw_file])
 
@@ -543,9 +545,8 @@ def scrap_charms(date):
 
 def prepare_data_and_db(date):
     logging.info(f"Preparing data started: {date_with_seconds()}")
-    # datetime_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
-    datetime_obj = date
-    yesterday = datetime_obj - timedelta(days=1, hours=4)
+
+    yesterday = Highscores.objects.all().order_by('-date').values('date')[:1]
 
     latest_highscores = read_file("raw_exp")
     latest_charms = read_file("raw_charms")
@@ -714,7 +715,7 @@ def prepare_data_and_db(date):
 
     old_highscores_query = (
         Highscores.objects.all()
-        .filter(Q(date__gt=yesterday))
+        .filter(Q(date__gte=yesterday))
         .values(
             "exp_rank",
             "id_char",
@@ -1010,16 +1011,10 @@ def insert_highscores(date):
 def add_highscores():
     pass
     # date = "2023-02-01 05:00:00"
-    # temp_del()
-    # insert_name_change(date)
-    # insert_world_changes(date)
-    # insert_highscores(date)
-    # get_daily_records()
 
 
 def get_daily_records(date):
     # best exp yesterday on each world
-    # now = datetime.datetime.now()
     yesterday = date - timedelta(days=1, hours=2)
 
     # world_types = {
@@ -1041,7 +1036,7 @@ def get_daily_records(date):
 
     # getting the best exp (each vocation on every world)
     best = Highscores.objects.filter(
-        Q(date__gt=yesterday) & Q(exp_diff__gt=0) | Q(exp_diff__lt=0)
+        Q(date__gt=yesterday) & (Q(exp_diff__gt="0") | Q(exp_diff__lt="0"))
     ).values(
         "exp_rank",
         "exp_rank_change",
@@ -1176,7 +1171,7 @@ def move_only_active_players(date):
     yesterday = date - timedelta(days=1)
 
     only_active = Highscores.objects.filter(
-        Q(date__gte=yesterday) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
+        Q(date__gt=yesterday) & (Q(exp_diff__gt="0") | Q(exp_diff__lt="0"))
     ).values()
     only_active_df = pd.DataFrame(data=only_active)
 
@@ -1185,7 +1180,6 @@ def move_only_active_players(date):
 
     db_active_before = HighscoresHistory.objects.all().count()
 
-    # charm = 0  # temp variable
     obj = []
     only_active_dict = only_active_df.to_dict("index")
 
@@ -1229,7 +1223,7 @@ def move_only_active_players(date):
 
 
 def delete_old_highscores_date(date):
-    date = date - timedelta(days=3, hours=2)
+    date = date - timedelta(days=2, hours=2)
 
     clear_data_query = Highscores.objects.filter(date__lt=date)
     clear_data_query._raw_delete(clear_data_query.db)

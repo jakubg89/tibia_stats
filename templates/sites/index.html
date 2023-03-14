@@ -134,29 +134,13 @@
         <div class="row g-4">
             <div class="col-sm-12">
                 <div class="shadow-sm bg-secondary rounded h-100 p-4">
-
-
-                        <!-- News card -->
-
-
-                                <div class="row">
-                                    <div class="col-sm-9"><h1>{{ i.news_title }}</h1></div>
-                                    <div class="col-sm-3 text-end"><small>{{ i.date_added }}</small></div>
-                                </div>
-
-                                <p>{{ i.content_html| safe }}</p>
-                                <a data-toggle="collapse" href="#collapseName" role="button" aria-expanded="false" aria-controls="collapseName">
-                                    Read more <i class="fas fa-angle-double-down"></i>
-                                </a>
-                                <div class="collapse" id="collapseName">
-                                    <div class="bg-secondary.bg-gradient rounded">
-                                        xxx
-                                    </div>
-                                </div>
-
-
+                <!-- News card -->
+                    <div class="row">
+                        <div class="col-sm-9"><h1>{{ i.news_title }}</h1></div>
+                        <div class="col-sm-3 text-end"><small>{{ i.date_added }}</small></div>
                     </div>
-
+                    <p>{{ i.content_html| safe }}</p>
+                </div>
             </div>
         </div>
             </div>
