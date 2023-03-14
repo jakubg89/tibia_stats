@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load custom_tags %}
 
 <!-- Title, select menu start -->
 <div class="container-fluid pt-4 px-4">
@@ -38,7 +39,7 @@
                                         </a>
                                     </td>
                                     <td>{{ value.level }}</td>
-                                    <td class="text-success">{{ value.charm_diff }}</td>
+                                    <td class="text-success">{{ value.charm_diff|exp_with_space }}</td>
                                 </tr>
                         {% endfor %}
 
@@ -95,10 +96,10 @@
                                 <td  class="dt-center">{{ i.level }}</td>
 
                                 <!-- Level change -->
-                                <td class="dt-center">{{ i.charm_value }}</td>
+                                <td class="dt-center">{{ i.charm_value|exp_with_space }}</td>
 
                                 <!-- Experience value -->
-                                <td class="{% if i.players_online >= 150 %}text-danger{% else %}text-success{% endif %} dt-center"><b>{{ i.charm_diff }}</b></td>
+                                <td class="{% if i.players_online >= 150 %}text-danger{% else %}text-success{% endif %} dt-center"><b>{{ i.charm_diff|exp_with_space }}</b></td>
 
                                 <!-- PvP -->
                                 <td class="dt-center">{{ i.world.pvp_type }}</td>

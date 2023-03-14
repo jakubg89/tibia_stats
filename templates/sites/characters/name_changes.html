@@ -10,7 +10,7 @@
         <div class="col-sm-12 col-xl-6">
             <div class="bg-secondary rounded text-center h-100 p-4">
                  <h1 class="display-4">Name changes</h1>
-                <small class="mb-5">Name changes list from last week</small>
+                <small class="mb-5"></small>
                 <div class="mt-5">
                     <table class="table table-borderless table-hover">
                                 <thead>
@@ -25,7 +25,7 @@
                                     <tr>
                                         <td>{{ key|put_space }}</td>
                                         <td>{{ value }}</td>
-                                        <td>{{ value|tc_amount_name}}</td>
+                                        <td>{{ value|tc_amount_name }} TC</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -105,7 +105,7 @@
                     <table id="name_change_table" class="table table-hover">
                         <thead>
                             <tr>
-                                <th scope="col">id</th>
+                                <th scope="col">No.</th>
                                 <th scope="col" class="dt-center">Old name</th>
                                 <th scope="col"></th>
                                 <th scope="col" class="dt-center">New name</th>
@@ -142,7 +142,6 @@
 
                                 <!-- Date -->
                                 <td class="dt-right">{{ i.date|date:"d/m/Y" }}</td>
-
                             </tr>
                         {% endfor %}
                         </tbody>

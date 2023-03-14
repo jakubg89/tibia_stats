@@ -151,7 +151,7 @@ $(document).ready(function () {
         "autoWidth": false,
 
         // możliwość sortowania
-        "ordering": true,
+        "ordering": false,
 
         "responsive": true,
         "bLengthChange": false,
@@ -202,7 +202,7 @@ $(document).ready(function () {
         "autoWidth": true,
 
         // możliwość sortowania
-        "ordering": true,
+        "ordering": false,
 
         "responsive": true,
         "bLengthChange": true,
@@ -228,7 +228,8 @@ $(document).ready(function () {
 
         // pozycjonowanie
         //"dom": "<'row d-flex justify-content-between'<'col-sm-3'f><'col-sm-3'<'row'<'col-sm-1'><'col-sm-1'l>>>><'row'<'col-md-12't>><'row'<'col-sm-12'p>>"
-        "dom": "<'row float-start'<'col'f>><'col float-end'l>"
+        // "dom": "<'row float-start'<'col'f>><'col float-end'l>"
+        "dom": "<'row d-flex justify-content-between'<'col-md-2'f><'col-md-1'l>><'row'<'col-md-12't>><'row'<'col-sm-12'p>>"
 
 
     }
@@ -260,7 +261,7 @@ $(document).ready(function () {
         "autoWidth": true,
 
         // możliwość sortowania
-        "ordering": true,
+        "ordering": false,
 
         "responsive": true,
         "bLengthChange": false,
@@ -318,7 +319,7 @@ $(document).ready(function () {
         "autoWidth": true,
 
         // możliwość sortowania
-        "ordering": true,
+        "ordering": false,
 
         "responsive": true,
         "bLengthChange": false,
@@ -377,7 +378,7 @@ $(document).ready(function () {
         "autoWidth": true,
 
         // możliwość sortowania
-        "ordering": true,
+        "ordering": false,
 
         "responsive": true,
         "bLengthChange": true,
@@ -430,7 +431,7 @@ $(document).ready(function () {
         },
 
         // sortowanie po pierwszym wczytaniu
-        // order: [[3, 'desc']],
+        order: [[0, 'asc']],
 
         // szerokość automatyczna
         "autoWidth": true,

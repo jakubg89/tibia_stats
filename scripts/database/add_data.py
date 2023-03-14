@@ -2,6 +2,7 @@ import gc
 import sys
 
 sys.path.append("/django-projects/tibia-stats/")
+import tibia_stats.settings
 from tibia_stats.wsgi import *
 from django.db import connection
 from django.db.models import Q
@@ -39,9 +40,9 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 
 logging.basicConfig(
     level=logging.INFO,
-    filename="/django-projects/tibia-stats/logs/highscores.log",
+    # filename="/django-projects/tibia-stats/logs/highscores.log",
+    filename=f"{tibia_stats.settings.LOG_DIRECTORY_PATH}highscores.log",
     filemode="a",
-
 )
 
 # All of this is already happening by default!
@@ -55,7 +56,6 @@ sentry_sdk.init(
     integrations=[
         sentry_logging,
     ],
-
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
@@ -81,7 +81,7 @@ def main():
     # add_news_ticker_to_db()
 
     # once a day (every 24h)
-    add_highscores()
+    # add_highscores()
     # get_daily_records()
     # move_active_players_to_history
     # delete_records_from_highscores
@@ -123,9 +123,13 @@ def format_content(raw_html):
             ] = f"width: {images_in_news[i]['width']}px; height: {images_in_news[i]['height']}px;"
         except KeyError as x:
             if x == "height":
-                images_in_news[i]["style"] = f"width: {images_in_news[i]['width']}px;"
+                images_in_news[i][
+                    "style"
+                ] = f"width: {images_in_news[i]['width']}px;"
             elif x == "width":
-                images_in_news[i]["style"] = f"height: {images_in_news[i]['height']}px;"
+                images_in_news[i][
+                    "style"
+                ] = f"height: {images_in_news[i]['height']}px;"
 
     # finds all paragraphs in news and adds id
     paragraphs_in_news = formatted_html.find_all("p")
@@ -141,6 +145,7 @@ def format_content(raw_html):
 
 # # # # # # # News ticker # # # # # # #
 
+
 # adding news to database if it not exists
 def add_news_ticker_to_db():
     # get all tibia.com id from database
@@ -152,7 +157,9 @@ def add_news_ticker_to_db():
     all_ticker = dataapi.get_ticker_history()
     all_ticker_df = pd.DataFrame(data=all_ticker)
     all_ticker_df.rename(columns={"id": "id_on_tibiacom"}, inplace=True)
-    all_ticker_df.drop(columns=["date", "news", "category", "url"], inplace=True)
+    all_ticker_df.drop(
+        columns=["date", "news", "category", "url"], inplace=True
+    )
     not_existing_id = db_news_df.merge(
         all_ticker_df, on="id_on_tibiacom", how="right", indicator=True
     ).query('_merge == "right_only"')
@@ -186,6 +193,7 @@ def add_news_ticker_to_db():
 
 
 # # # # # # # News # # # # # # #
+
 
 # adding news to database if it not exists
 def add_news_to_db():
@@ -238,6 +246,7 @@ def add_news_to_db():
 
 # # # # # # # Boosted creature/boss # # # # # # #
 
+
 # adds boosted boss to database
 def add_boss_to_db():
     boss_info = dataapi.boosted_boss()
@@ -250,7 +259,8 @@ def add_boss_to_db():
         boss = Boosted(
             name=boss_info["name"],
             image_url=boss_info["image_url"],
-            type=category, date_time=date
+            type=category,
+            date_time=date,
         )
         boss.save()
 
@@ -280,68 +290,80 @@ def add_creature_to_db():
 
 
 def add_worlds_information_to_db():
-    # TODO reformat whole function
     worlds_information = dataapi.get_worlds_information()
-    path_to_json = Path(__file__).resolve().parent.parent
-    values = json.load(
-        open(os.path.join(path_to_json, "tibiacom_scrapper\\temp\\data_value\\data.json"))
-    )
+    worlds_latest = pd.DataFrame(data=worlds_information)
 
+    db_worlds = World.objects.all().values()
+    db_worlds = pd.DataFrame(data=db_worlds)
 
-    for world in worlds_information:
+    world_list_new = worlds_latest["name"].values.tolist()
+    world_list_db = db_worlds["name"].values.tolist()
 
-        # check if list is not empty, if yes we just skip that part. All news tickers are up-to-date.
-        if world:
-            with connection.cursor() as cursor:
+    not_existing_worlds_list = [
+        x for x in world_list_new if x not in world_list_db
+    ]
+    if not_existing_worlds_list:
+        values = {
+            "beprotection": {
+                "Any World": "-1",
+                "Unprotected": "0",
+                "Protected": "1",
+                "Initially Protected": "2",
+            },
+            "pvp_type": {
+                "Open PvP": "0",
+                "Optional PvP": "1",
+                "Hardcore PvP": "2",
+                "Retro Open PvP": "3",
+                "Retro Hardcore PvP": "4",
+            },
+        }
 
-                # check if database already has that id return 1 or 0
-                cursor.execute(
-                    f"SELECT EXISTS (SELECT name FROM world WHERE name = '{world['name']}') as truth;"
+        obj_worlds = []
+        for world in worlds_information:
+            if world["name"] in not_existing_worlds_list:
+                # getting data of creation date
+                if world["battleye_date"] == "release":
+                    world_details = dataapi.get_world_details(world["name"])
+                    date = world_details["creation_date"] + "-01"
+                    battleye_value = values["beprotection"][
+                        "Initially Protected"
+                    ]
+                    creation_date = date
+                elif world["battleye_date"] == "":
+                    world_details = dataapi.get_world_details(world["name"])
+                    date = world_details["creation_date"] + "-01"
+                    battleye_value = values["beprotection"]["Unprotected"]
+                    creation_date = date
+                else:
+                    world_details = dataapi.get_world_details(world["name"])
+                    date = world["battleye_date"]
+                    battleye_value = values["beprotection"]["Protected"]
+                    creation_date = world_details["creation_date"] + "-01"
+
+                # add value based on location
+                if world["location"] == "Europe":
+                    location_value = 0
+                elif world["location"] == "South America":
+                    location_value = 1
+                else:
+                    location_value = 2
+
+                world_new = World(
+                    name=world["name"],
+                    name_value=world["name"],
+                    pvp_type=world["pvp_type"],
+                    pvp_type_value=values["pvp_type"][world["pvp_type"]],
+                    battleye_protected=world["battleye_protected"],
+                    battleye_date=date,
+                    battleye_value=battleye_value,
+                    location=world["location"],
+                    location_value=location_value,
+                    creation_date=creation_date,
                 )
-                exist = cursor.fetchone()
+                obj_worlds.append(world_new)
 
-                # check the result and perform insert if it's not in database
-                if exist[0] != 1:
-
-                    # getting data of creation date if world is initially protected
-                    if world["battleye_date"] == "release":
-                        world_details = dataapi.get_world_details(world["name"])
-                        date = world_details["creation_date"] + "-01"
-                        battleye_value = values["beprotection"]["Initially Protected"]
-                        creation_date = date
-                    elif world["battleye_date"] == "":
-                        world_details = dataapi.get_world_details(world["name"])
-                        date = world_details["creation_date"] + "-01"
-                        battleye_value = values["beprotection"]["Unprotected"]
-                        creation_date = date
-                    else:
-                        world_details = dataapi.get_world_details(world["name"])
-                        date = world["battleye_date"]
-                        battleye_value = values["beprotection"]["Protected"]
-                        creation_date = world_details["creation_date"] + "-01"
-
-                    # add value based on location
-                    if world["location"] == "Europe":
-                        location_value = 0
-                    elif world["location"] == "South America":
-                        location_value = 1
-                    else:
-                        location_value = 2
-
-                    # execute query
-                    cursor.execute(
-                        f"INSERT INTO world (world_id, name, name_value, pvp_type, pvp_type_value, battleye_protected, battleye_date, battleye_value, location, location_value, creation_date) VALUES (NULL, "
-                        f"'{world['name']}', "  # name
-                        f"'{values['world'][world['name']]}', "  # name_value
-                        f"'{world['pvp_type']}', "  # pvp_type
-                        f"'{values['pvp_type'][world['pvp_type']]}', "  # pvp_value
-                        f"'{world['battleye_protected']}', "  # battleye_protected
-                        f"'{date}',"  # battleye_date
-                        f"'{battleye_value}',"  # battleye_value
-                        f"'{world['location']}',"  # location
-                        f"'{location_value}',"  # location_value
-                        f"'{creation_date}');"  # creation_date
-                    )
+        World.objects.bulk_create(obj_worlds)
 
 
 def add_world_online_history():
@@ -373,7 +395,6 @@ def add_online_players():
 
 
 def get_highscores(category: str, proffesions: list):
-
     # getting world list ( name = value , for now )
     world_list_from_db = World.objects.all().values("name_value")
     world_list_df = pd.DataFrame(data=world_list_from_db)
@@ -384,7 +405,6 @@ def get_highscores(category: str, proffesions: list):
 
     # for loop for each world
     for world in worlds:
-
         # for loop for each profession
         for prof in proffesions:
             # get total site number before execution loop over each site
@@ -399,12 +419,21 @@ def get_highscores(category: str, proffesions: list):
 
             # perform collecting data from api for each vocation
             for i in range(1, site_num + 1):
-                request_from_api = dataapi.get_highscores(world, category, prof, i)
+                request_from_api = dataapi.get_highscores(
+                    world, category, prof, i
+                )
                 if i == 1 and world == worlds[0] and prof == proffesions[0]:
-                    result_df = pd.DataFrame(data=request_from_api["highscore_list"])
+                    result_df = pd.DataFrame(
+                        data=request_from_api["highscore_list"]
+                    )
                 else:
                     result_df = pd.concat(
-                        [result_df, pd.DataFrame(data=request_from_api["highscore_list"])],
+                        [
+                            result_df,
+                            pd.DataFrame(
+                                data=request_from_api["highscore_list"]
+                            ),
+                        ],
                         ignore_index=True,
                     )
     # returning collected data in df
@@ -451,7 +480,7 @@ def collect_char_id():
 
 
 def save_to_json(item, file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     full_path = "".join([path_to_directory, file_name])
     write = json.dumps(item)
 
@@ -460,7 +489,7 @@ def save_to_json(item, file_name):
 
 
 def read_json(file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     full_path = "".join([path_to_directory, file_name])
 
     with open(full_path, "r") as file:
@@ -470,7 +499,7 @@ def read_json(file_name):
 
 
 def save_to_file(item, file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
 
     full_path = "".join([path_to_directory, raw_file])
@@ -478,11 +507,13 @@ def save_to_file(item, file_name):
 
 
 def read_file(file_name):
-    path_to_directory = "/django-projects/tibia-stats/temp/"
+    path_to_directory = f"{tibia_stats.settings.TEMP_DIR}"
     raw_file = "".join([date_for_files(), "-", file_name, ".csv"])
     full_path = "".join([path_to_directory, raw_file])
 
-    file_df = pd.read_csv(filepath_or_buffer=full_path, index_col=False, memory_map=True)
+    file_df = pd.read_csv(
+        filepath_or_buffer=full_path, index_col=False, memory_map=True
+    )
     return file_df
 
 
@@ -514,9 +545,8 @@ def scrap_charms(date):
 
 def prepare_data_and_db(date):
     logging.info(f"Preparing data started: {date_with_seconds()}")
-    # datetime_obj = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
-    datetime_obj = date
-    yesterday = datetime_obj - timedelta(days=1, hours=4)
+
+    yesterday = Highscores.objects.all().order_by('-date').values('date')[:1]
 
     latest_highscores = read_file("raw_exp")
     latest_charms = read_file("raw_charms")
@@ -525,7 +555,9 @@ def prepare_data_and_db(date):
     latest_charms = latest_charms[latest_charms["level"] > 20]
 
     chars_id = collect_char_id()
-    latest_highscores["name_id_db"] = latest_highscores["name"].map(chars_id).fillna(0)
+    latest_highscores["name_id_db"] = (
+        latest_highscores["name"].map(chars_id).fillna(0)
+    )
     latest_charms["name_id_db"] = latest_charms["name"].map(chars_id).fillna(0)
 
     world_id = collect_world_id()
@@ -533,7 +565,9 @@ def prepare_data_and_db(date):
     latest_charms["world"].update(latest_charms["world"].map(world_id))
 
     voc_id = collect_voc_id()
-    latest_highscores["vocation"].update(latest_highscores["vocation"].map(voc_id))
+    latest_highscores["vocation"].update(
+        latest_highscores["vocation"].map(voc_id)
+    )
     latest_charms["vocation"].update(latest_charms["vocation"].map(voc_id))
 
     exp_without_id = latest_highscores[latest_highscores["name_id_db"] == 0]
@@ -544,7 +578,9 @@ def prepare_data_and_db(date):
     name_list_dont_exist = name_list_dont_exist1 + name_list_dont_exist2
     name_list_dont_exist = list(set(name_list_dont_exist))
 
-    checked = Tasks.objects.filter(task_name="checked_characters").values("status")[:1]
+    checked = Tasks.objects.filter(task_name="checked_characters").values(
+        "status"
+    )[:1]
 
     if checked and (checked[0]["status"] == "done"):
         names = read_json("checked.txt")
@@ -561,7 +597,9 @@ def prepare_data_and_db(date):
 
     if name_change:
         update_character(name_change)
-        logging.info(f"Update character completed. Updated {len(name_change)} characters")
+        logging.info(
+            f"Update character completed. Updated {len(name_change)} characters"
+        )
 
     latest_highscores.drop("name_id_db", axis=1, inplace=True)
     latest_charms.drop("name_id_db", axis=1, inplace=True)
@@ -569,7 +607,9 @@ def prepare_data_and_db(date):
     latest_highscores["name_id_db"] = (
         latest_highscores["name"].map(chars_id).fillna(0).astype("int64")
     )
-    latest_charms["name_id_db"] = latest_charms["name"].map(chars_id).fillna(0).astype("int64")
+    latest_charms["name_id_db"] = (
+        latest_charms["name"].map(chars_id).fillna(0).astype("int64")
+    )
 
     exp_after_up = latest_highscores[latest_highscores["name_id_db"] == 0]
     charm_after_up = latest_charms[latest_charms["name_id_db"] == 0]
@@ -591,8 +631,12 @@ def prepare_data_and_db(date):
 
     logging.info(f"{date_with_seconds()} - Name change preparing data.")
     if name_change:
-        name_change_exp = latest_highscores[latest_highscores["name"].isin(old_name_list)]
-        name_change_charm = latest_charms[latest_charms["name"].isin(old_name_list)]
+        name_change_exp = latest_highscores[
+            latest_highscores["name"].isin(old_name_list)
+        ]
+        name_change_charm = latest_charms[
+            latest_charms["name"].isin(old_name_list)
+        ]
         name_change_df = pd.concat([name_change_charm, name_change_exp])
         name_change_df = name_change_df.drop_duplicates("name")
         save_to_file(name_change_df, "name_changes_df")
@@ -629,10 +673,18 @@ def prepare_data_and_db(date):
         }
     )
 
-    all_chars.loc[all_chars["vocation_exp"] == 0, "vocation_exp"] = all_chars["vocation_charm"]
-    all_chars.loc[all_chars["world_exp"] == 0, "world_exp"] = all_chars["world_charm"]
-    all_chars.loc[(all_chars["name_exp"] == 0), "name_exp"] = all_chars["name_charm"]
-    all_chars.loc[all_chars["level_exp"] == 0, "level_exp"] = all_chars["level_charm"]
+    all_chars.loc[all_chars["vocation_exp"] == 0, "vocation_exp"] = all_chars[
+        "vocation_charm"
+    ]
+    all_chars.loc[all_chars["world_exp"] == 0, "world_exp"] = all_chars[
+        "world_charm"
+    ]
+    all_chars.loc[(all_chars["name_exp"] == 0), "name_exp"] = all_chars[
+        "name_charm"
+    ]
+    all_chars.loc[all_chars["level_exp"] == 0, "level_exp"] = all_chars[
+        "level_charm"
+    ]
 
     all_chars.drop(
         columns=[
@@ -663,7 +715,7 @@ def prepare_data_and_db(date):
 
     old_highscores_query = (
         Highscores.objects.all()
-        .filter(Q(date__gt=yesterday))
+        .filter(Q(date__gte=yesterday))
         .values(
             "exp_rank",
             "id_char",
@@ -706,9 +758,12 @@ def prepare_data_and_db(date):
         }
     )
 
-    world_transfers = prep_for_bulk[prep_for_bulk["world_id_db"] != prep_for_bulk["world_id_new"]]
+    world_transfers = prep_for_bulk[
+        prep_for_bulk["world_id_db"] != prep_for_bulk["world_id_new"]
+    ]
     world_transfers = world_transfers[
-        (world_transfers["world_id_new"] != 0) & (world_transfers["world_id_db"] != 0)
+        (world_transfers["world_id_new"] != 0)
+        & (world_transfers["world_id_db"] != 0)
     ]
 
     if not world_transfers.isnull().values.any():
@@ -716,28 +771,33 @@ def prepare_data_and_db(date):
         logging.info(f"World transfers file saved.")
 
     prep_for_bulk["exp_diff"] = np.where(
-        (prep_for_bulk["exp_value_db"] != 0) & (prep_for_bulk["exp_value_new"] != 0),
+        (prep_for_bulk["exp_value_db"] != 0)
+        & (prep_for_bulk["exp_value_new"] != 0),
         prep_for_bulk["exp_value_new"] - prep_for_bulk["exp_value_db"],
         0,
     )
 
     prep_for_bulk["exp_rank_change"] = np.where(
-        (prep_for_bulk["exp_rank_db"] != 0) & (prep_for_bulk["exp_rank_new"] != 0),
+        (prep_for_bulk["exp_rank_db"] != 0)
+        & (prep_for_bulk["exp_rank_new"] != 0),
         prep_for_bulk["exp_rank_db"] - prep_for_bulk["exp_rank_new"],
         0,
     )
 
-    prep_for_bulk["level_change"] = prep_for_bulk["level_new"] - prep_for_bulk["level_db"]
+    prep_for_bulk["level_change"] = (
+        prep_for_bulk["level_new"] - prep_for_bulk["level_db"]
+    )
 
     prep_for_bulk["charm_rank_change"] = np.where(
-        (prep_for_bulk["charm_rank_db"] != 0) & (prep_for_bulk["charm_rank_new"] != 0),
+        (prep_for_bulk["charm_rank_db"] != 0)
+        & (prep_for_bulk["charm_rank_new"] != 0),
         prep_for_bulk["charm_rank_db"] - prep_for_bulk["charm_rank_new"],
         0,
-
     )
 
     prep_for_bulk["charm_diff"] = np.where(
-        (prep_for_bulk["charm_value_db"] != 0) & (prep_for_bulk["charm_value_new"] != 0),
+        (prep_for_bulk["charm_value_db"] != 0)
+        & (prep_for_bulk["charm_value_new"] != 0),
         prep_for_bulk["charm_value_new"] - prep_for_bulk["charm_value_db"],
         0,
     )
@@ -755,7 +815,9 @@ def prepare_data_and_db(date):
 
     save_to_file(prep_for_bulk, "prep_for_bulk")
     Tasks.objects.filter(task_name="prepare_data_and_db").update(status="done")
-    logging.info(f"{len(prep_for_bulk)} characters prepared for insert. File saved.")
+    logging.info(
+        f"{len(prep_for_bulk)} characters prepared for insert. File saved."
+    )
 
 
 # ================== check_characters ====================
@@ -782,9 +844,13 @@ def check_characters_at_tibiacom(name_list_dont_exist):
     }
 
     save_to_json(character_names, "checked.txt")
-    task_name = Tasks(task_name="checked_characters", status="done", date=date_with_seconds())
+    task_name = Tasks(
+        task_name="checked_characters", status="done", date=date_with_seconds()
+    )
     task_name.save()
-    logging.info(f"{date_with_seconds()} - saved and updated task status in db.")
+    logging.info(
+        f"{date_with_seconds()} - saved and updated task status in db."
+    )
     return character_names
 
 
@@ -813,9 +879,15 @@ def insert_name_change(date):
 # === INSERT =============== New players ====================
 def insert_new_players(latest_highscores, latest_charms, new_players):
     logging.info(f"Insert new players started: {date_with_seconds()}")
-    new_characters_in_exp = latest_highscores[latest_highscores["name"].isin(new_players)]
-    new_characters_in_charms = latest_charms[latest_charms["name"].isin(new_players)]
-    new_characters = pd.concat([new_characters_in_charms, new_characters_in_exp])
+    new_characters_in_exp = latest_highscores[
+        latest_highscores["name"].isin(new_players)
+    ]
+    new_characters_in_charms = latest_charms[
+        latest_charms["name"].isin(new_players)
+    ]
+    new_characters = pd.concat(
+        [new_characters_in_charms, new_characters_in_exp]
+    )
     new_characters.reset_index(drop=True, inplace=True)
     new_characters_dict = new_characters.to_dict("index")
     char_to_insert = []
@@ -859,9 +931,12 @@ def insert_world_changes(date):
         )
         obj_world.append(transfer)
     WorldTransfers.objects.bulk_create(obj_world, batch_size=500)
-    Tasks.objects.filter(task_name="insert_world_changes").update(status="done")
+    Tasks.objects.filter(task_name="insert_world_changes").update(
+        status="done"
+    )
     logging.info(
-        f"{len(world_transfers_dict)}world transfers inserted. \n" f" End: {date_with_seconds()}"
+        f"{len(world_transfers_dict)}world transfers inserted. \n"
+        f" End: {date_with_seconds()}"
     )
 
 
@@ -869,7 +944,9 @@ def update_character(name_change):
     logging.info(f"UPDATE started: {date_with_seconds()}")
     for key, value in name_change.items():
         Character.objects.filter(name=key).update(name=value)
-    logging.info(f"UPDATE ended: {date_with_seconds()} updated: {len(name_change)} names.")
+    logging.info(
+        f"UPDATE ended: {date_with_seconds()} updated: {len(name_change)} names."
+    )
 
 
 def insert_highscores(date):
@@ -911,7 +988,6 @@ def insert_highscores(date):
             )
             obj.append(char)
 
-
             if index % 3000 == 0:
                 Highscores.objects.bulk_create(obj, batch_size=500)
                 obj = []
@@ -926,23 +1002,19 @@ def insert_highscores(date):
                 f"Actual amount of items: {db_count_after_insert}."
                 f"Items that should be added: {amouont_for_insert}."
             )
-        Tasks.objects.filter(task_name="insert_highscores").update(status="done")
+        Tasks.objects.filter(task_name="insert_highscores").update(
+            status="done"
+        )
         logging.info(f"Insert end: {date_with_seconds()}")
 
 
 def add_highscores():
     pass
     # date = "2023-02-01 05:00:00"
-    # temp_del()
-    # insert_name_change(date)
-    # insert_world_changes(date)
-    # insert_highscores(date)
-    # get_daily_records()
 
 
 def get_daily_records(date):
     # best exp yesterday on each world
-    # now = datetime.datetime.now()
     yesterday = date - timedelta(days=1, hours=2)
 
     # world_types = {
@@ -964,7 +1036,7 @@ def get_daily_records(date):
 
     # getting the best exp (each vocation on every world)
     best = Highscores.objects.filter(
-        Q(date__gt=yesterday) & Q(exp_diff__gt=0) | Q(exp_diff__lt=0)
+        Q(date__gt=yesterday) & (Q(exp_diff__gt="0") | Q(exp_diff__lt="0"))
     ).values(
         "exp_rank",
         "exp_rank_change",
@@ -988,7 +1060,8 @@ def get_daily_records(date):
         for vocation in vocations:
             best_exp = (
                 db_data_to_df[
-                    (db_data_to_df["world_id"] == world) & (db_data_to_df["voc_id"] == vocation)
+                    (db_data_to_df["world_id"] == world)
+                    & (db_data_to_df["voc_id"] == vocation)
                 ]
                 .sort_values(by="exp_diff")
                 .tail(1)
@@ -997,7 +1070,9 @@ def get_daily_records(date):
             if world == 1 and vocation == 1:
                 history_best_exp = best_exp
             else:
-                history_best_exp = pd.concat([best_exp, history_best_exp], ignore_index=True)
+                history_best_exp = pd.concat(
+                    [best_exp, history_best_exp], ignore_index=True
+                )
 
     # biggest lost experience
     for world in worlds:
@@ -1007,14 +1082,16 @@ def get_daily_records(date):
                     (db_data_to_df["world_id"] == world)
                     & (db_data_to_df["voc_id"] == vocation)
                     & (db_data_to_df["exp_diff"] < 0)
-                    ]
+                ]
                 .sort_values(by="exp_diff")
                 .head(1)
             )
             if world == 1 and vocation == 1:
                 history_worst_exp = worst_exp
             else:
-                history_worst_exp = pd.concat([worst_exp, history_worst_exp], ignore_index=True)
+                history_worst_exp = pd.concat(
+                    [worst_exp, history_worst_exp], ignore_index=True
+                )
 
     for world in worlds:
         for vocation in vocations:
@@ -1031,10 +1108,13 @@ def get_daily_records(date):
             if world == 1 and vocation == 1:
                 history_best_charm = best_charm
             else:
-                history_best_charm = pd.concat([best_charm, history_best_charm], ignore_index=True)
+                history_best_charm = pd.concat(
+                    [best_charm, history_best_charm], ignore_index=True
+                )
 
     history = pd.concat(
-        [history_worst_exp, history_best_charm, history_best_exp], ignore_index=True
+        [history_worst_exp, history_best_charm, history_best_exp],
+        ignore_index=True,
     )
 
     record_type = "exp"
@@ -1072,19 +1152,26 @@ def get_daily_records(date):
 
     db_record_history_count_after = RecordsHistory.objects.all().count()
     Tasks.objects.filter(task_name="get_daily_records").update(status="done")
-    if db_record_history_count_after == len(obj) + db_record_history_count_before:
+    if (
+        db_record_history_count_after
+        == len(obj) + db_record_history_count_before
+    ):
         logging.info(f"Successfully added {len(obj)} items to db.")
     else:
         logging.info(f"Some records might be missing. Added {len(obj)} to db.")
-    logging.info(f"# # END # # # # {date_with_seconds()} # # # # Daily records # # # # # #")
+    logging.info(
+        f"# # END # # # # {date_with_seconds()} # # # # Daily records # # # # # #"
+    )
 
 
 def move_only_active_players(date):
-    logging.info(f"# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # #")
+    logging.info(
+        f"# # START # # # # {date_with_seconds()} # # # # ACTIVE PLAYERS # # # # #"
+    )
     yesterday = date - timedelta(days=1)
 
     only_active = Highscores.objects.filter(
-        Q(date__gte=yesterday) & Q(exp_diff__gt="0") | Q(exp_diff__lt="0")
+        Q(date__gt=yesterday) & (Q(exp_diff__gt="0") | Q(exp_diff__lt="0"))
     ).values()
     only_active_df = pd.DataFrame(data=only_active)
 
@@ -1093,7 +1180,6 @@ def move_only_active_players(date):
 
     db_active_before = HighscoresHistory.objects.all().count()
 
-    # charm = 0  # temp variable
     obj = []
     only_active_dict = only_active_df.to_dict("index")
 
@@ -1125,19 +1211,26 @@ def move_only_active_players(date):
             HighscoresHistory.objects.bulk_create(obj, 500)
 
     db_active_after = HighscoresHistory.objects.all().count()
-    Tasks.objects.filter(task_name="move_only_active_players").update(status="done")
+    Tasks.objects.filter(task_name="move_only_active_players").update(
+        status="done"
+    )
     if db_active_after == len(obj) + db_active_before:
         logging.info(f"Successfully added {len(obj)} items to db history.")
     else:
-        logging.info(f"Some records might be missing. Added {len(obj)} to db history.")
+        logging.info(
+            f"Some records might be missing. Added {len(obj)} to db history."
+        )
 
 
 def delete_old_highscores_date(date):
-    date = date - timedelta(days=3, hours=2)
+    date = date - timedelta(days=2, hours=2)
 
     clear_data_query = Highscores.objects.filter(date__lt=date)
     clear_data_query._raw_delete(clear_data_query.db)
-    Tasks.objects.filter(task_name="delete_old_highscores_date").update(status="done")
+    Tasks.objects.filter(task_name="delete_old_highscores_date").update(
+        status="done"
+    )
+
 
 # # # # # # # Experience end # # # # # # #
 

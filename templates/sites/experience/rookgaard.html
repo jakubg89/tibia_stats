@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load custom_tags %}
 
 <!-- Title start -->
 <div class="container-fluid pt-4 px-4">
@@ -45,7 +46,7 @@
                                     </a>
                                     </td>
                                     <td>{{ i.level }}</td>
-                                    <td class="text-success">{{ i.exp_diff }}</td>
+                                    <td class="text-success">{{ i.exp_diff|exp_with_space }}</td>
                                 </tr>
                         {% endfor %}
                     </tbody>
@@ -107,7 +108,7 @@
                                 <td class="dt-center">{{ i.level_change }}</td>
 
                                 <!-- Experience value -->
-                                <td class="{% if i.players_online >= 250 %}text-danger{% else %}text-success{% endif %} dt-center"><b>{{ i.exp_diff }}</b></td>
+                                <td class="{% if i.players_online >= 250 %}text-danger{% else %}text-success{% endif %} dt-center"><b>{{ i.exp_diff|exp_with_space }}</b></td>
 
                                 <!-- PvP -->
                                 <td class="dt-center">{{ i.world.pvp_type }}</td>
