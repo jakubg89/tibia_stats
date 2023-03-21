@@ -202,3 +202,89 @@ class WorldTransfers(models.Model):
         managed = True
         db_table = "world_transfers"
         unique_together = (("world_transfer_id", "id_char"),)
+#
+#
+#
+# Kill statistics
+#
+
+
+class Monsters(models.Model):
+    name = models.CharField(max_length=35, blank=True, null=True)
+    disp_name = models.CharField(max_length=35, blank=True, null=True)
+    difficulty = models.SmallIntegerField(blank=True, null=True)
+    rarity = models.SmallIntegerField(blank=True, null=True)
+    experience = models.IntegerField(blank=True, null=True)
+    health = models.SmallIntegerField(blank=True, null=True)
+    charms = models.ForeignKey("CharmStage", models.DO_NOTHING)
+    img = models.ImageField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "monsters"
+
+
+class CharmStage(models.Model):
+    first_st_kills = models.SmallIntegerField(blank=True, null=True)
+    second_st_kills = models.SmallIntegerField(blank=True, null=True)
+    finished_kills = models.SmallIntegerField(blank=True, null=True)
+    points = models.SmallIntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "charm_stage"
+
+
+class MonsterStats(models.Model):
+    monster = models.ForeignKey("Monsters", models.DO_NOTHING)
+    killed_players = models.IntegerField(blank=True, null=True)
+    killed = models.IntegerField(blank=True, null=True)
+    world = models.ForeignKey("World", models.DO_NOTHING)
+    date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "monster_stats"
+
+
+# bosses
+class Bosses(models.Model):
+    name = models.CharField(max_length=35, blank=True, null=True)
+    disp_name = models.CharField(max_length=35, blank=True, null=True)
+    experience = models.IntegerField(blank=True, null=True)
+    health = models.IntegerField(blank=True, null=True)
+    type = models.ForeignKey("BossType", models.DO_NOTHING)
+    img = models.ImageField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "bosses"
+
+
+class BossType(models.Model):
+    name = models.CharField(max_length=35, blank=True, null=True)
+
+    first_st_kills = models.SmallIntegerField(blank=True, null=True)
+    second_st_kills = models.SmallIntegerField(blank=True, null=True)
+    finished_st_kills = models.SmallIntegerField(blank=True, null=True)
+
+    first_st_points = models.SmallIntegerField(blank=True, null=True)
+    second_st_points = models.SmallIntegerField(blank=True, null=True)
+    third_st_points = models.SmallIntegerField(blank=True, null=True)
+    total_points = models.SmallIntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "boss_type"
+
+
+class BossStats(models.Model):
+    boss = models.ForeignKey("Bosses", models.DO_NOTHING)
+    killed_players = models.IntegerField(blank=True, null=True)
+    killed = models.IntegerField(blank=True, null=True)
+    world = models.ForeignKey("World", models.DO_NOTHING)
+    date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "boss_stats"
