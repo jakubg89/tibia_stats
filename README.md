@@ -5,7 +5,6 @@
 - [About](#about)
 - [Features](#features)
 - [Tech stack](#stack)
-- [Requirements](#requirements)
 - [Installation](#installation)
 
 
@@ -37,8 +36,8 @@ and JavaScript frontend, making it easy to use the tools and analyze their Tibia
     - [ ] History of finished auctions.
     - [ ] Price statistics.
 6. **Boss information.**
-    - [ ] Boss list.
-    - [ ] Boss statistics.
+    - [x] Boss list.
+    - [x] Boss statistics.
 7. **Calculators.**
    - [ ] Training calculator.
    - [ ] Loot calculator.
@@ -51,27 +50,6 @@ and JavaScript frontend, making it easy to use the tools and analyze their Tibia
 **Database:** MySQL
 
 **Front-end:** HTML5, CSS3, Bootstrap, JavaScript
-
-# Requirements
-- Sentry account
-- MySQL server 8.0
-
-```bash
-beautifulsoup4==4.11.1
-bs4==0.0.1
-Django==4.1.3
-django-extensions==3.2.1
-idna==3.4
-lxml==4.9.1
-mysql-connector-python==8.0.31
-mysqlclient==2.1.1
-pandas==1.5.2
-requests==2.28.1
-urllib3==1.26.13
-python-dotenv==0.21.0
-sentry-sdk==1.14.0
-psutil~=5.9.4
-```
 
 # Installation
 

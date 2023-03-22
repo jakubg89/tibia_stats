@@ -1,0 +1,83 @@
+[
+  {
+    "model": "main.charmstage",
+    "pk": 1,
+    "fields": {
+      "first_st_kills": 5,
+      "second_st_kills": 10,
+      "finished_kills": 25,
+      "points": 1
+    }
+  },
+  {
+    "model": "main.charmstage",
+    "pk": 2,
+    "fields": {
+      "first_st_kills": 10,
+      "second_st_kills": 100,
+      "finished_kills": 250,
+      "points": 5
+    }
+  },
+  {
+    "model": "main.charmstage",
+    "pk": 3,
+    "fields": {
+      "first_st_kills": 2,
+      "second_st_kills": 3,
+      "finished_kills": 5,
+      "points": 10
+    }
+  },
+  {
+    "model": "main.charmstage",
+    "pk": 4,
+    "fields": {
+      "first_st_kills": 25,
+      "second_st_kills": 250,
+      "finished_kills": 500,
+      "points": 15
+    }
+  },
+  {
+    "model": "main.charmstage",
+    "pk": 5,
+    "fields": {
+      "first_st_kills": 50,
+      "second_st_kills": 500,
+      "finished_kills": 1000,
+      "points": 25
+    }
+  },
+  {
+    "model": "main.charmstage",
+    "pk": 6,
+    "fields": {
+      "first_st_kills": 2,
+      "second_st_kills": 3,
+      "finished_kills": 5,
+      "points": 30
+    }
+  },
+  {
+    "model": "main.charmstage",
+    "pk": 7,
+    "fields": {
+      "first_st_kills": 100,
+      "second_st_kills": 1000,
+      "finished_kills": 2500,
+      "points": 50
+    }
+  },
+  {
+    "model": "main.charmstage",
+    "pk": 8,
+    "fields": {
+        "first_st_kills": 200,
+        "second_st_kills": 2000,
+        "finished_kills": 5000,
+        "points": 100
+    }
+  }
+]
+

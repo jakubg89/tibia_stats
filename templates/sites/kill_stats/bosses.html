@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load custom_tags %}
+
+<!-- Title, select menu start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <!-- Title start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4 text-center">
+                <h1 class="display-4">{% if world %}{{ world }}{% else %}Select world{% endif %}</h1>
+                <small>...</small>
+            </div>
+        </div>
+        <!-- Title end -->
+
+        <!-- Select start -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded text-center h-100 p-5">
+
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+                <form>
+                    <select id="dynamic_select" class="form-select p-3" aria-label="Default select example" >
+                        <option value="/kill-stats/bosses">Select world...</option>
+                        {% for i in world_list %}
+                            {% if i.name != world %}
+                                <option value="/kill-stats/bosses/?q={{ i.name_value }}">{{ i.name }}</option>
+                            {% else %}
+                                <option selected value="/kill-stats/bosses/?q={{ i.value }}">{{ i.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <script>
+                       $(function(){
+                          $('#dynamic_select').on('change', function () {
+                              var url = $(this).val();
+                              if (url) {
+                                  window.location = url;
+                              }
+                              return false;
+                          });
+                        });
+                    </script>
+                </form>
+
+            </div>
+        </div>
+        <!-- Select end -->
+    </div>
+</div>
+<!-- Title, select menu end -->
+
+
+<!-- Table Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+
+        <div class="col-sm-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <div class="table-responsive-xl">
+                    <table id="boss-stats" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col" class="dt-center"></th>
+                                <th scope="col" class="dt-center">Name</th>
+                                <th scope="col" class="dt-center">Killed yesterday</th>
+                                <th scope="col" class="dt-center">Players killed yesterday</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in kill_stats %}
+                            <tr>
+
+                                <!-- Rank -->
+                                <td class="dt-center">{{ forloop.counter }}</td>
+
+                                <!-- Pic -->
+                                <td class="dt-center"><img src="{{ i.boss.img }}"></td>
+
+                                <!-- Name -->
+                                <td class="dt-center">{{ i.boss.disp_name }}</td>
+
+
+                                <!-- Killed -->
+                                <td class="dt-center">{{ i.killed }}</td>
+
+                                <!-- Killed players -->
+                                <td class="dt-center">{{ i.killed_players }}</td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Table End -->
+
+{% endblock %}

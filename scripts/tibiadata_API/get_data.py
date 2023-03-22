@@ -16,19 +16,20 @@ def request(url):
     return r
 
 
+api_version = "v3"
 # # # # # # # News ticker # # # # # # #
 
 
 # collecting news tickers from last 90 days
 def get_ticker_history():
-    url = "https://api.tibiadata.com/v3/news/newsticker"
+    url = f"https://api.tibiadata.com/{api_version}/news/newsticker"
     ticker_history = request(url)
     return ticker_history["news"]
 
 
 # collect specific news or ticker
 def get_specific_news(id_news):
-    url = f"https://api.tibiadata.com/v3/news/id/{id_news}"
+    url = f"https://api.tibiadata.com/{api_version}/news/id/{id_news}"
     news = request(url)
     return news["news"]
 
@@ -40,7 +41,7 @@ def get_specific_news(id_news):
 
 
 def get_news_history():
-    url = "https://api.tibiadata.com/v3/news/latest"
+    url = f"https://api.tibiadata.com/{api_version}/news/latest"
     news_history = request(url)
     return news_history["news"]
 
@@ -53,14 +54,14 @@ def get_news_history():
 
 # get boosted boss
 def boosted_boss():
-    url = "https://api.tibiadata.com/v3/boostablebosses"
+    url = f"https://api.tibiadata.com/{api_version}/boostablebosses"
     news = request(url)
     return news["boostable_bosses"]["boosted"]
 
 
 # get boosted boss
 def boosted_creature():
-    url = "https://api.tibiadata.com/v3/creatures"
+    url = f"https://api.tibiadata.com/{api_version}/creatures"
     news = request(url)
     return news["creatures"]["boosted"]
 
@@ -73,13 +74,13 @@ def boosted_creature():
 
 # get worlds list with basic information
 def get_worlds_information():
-    url = "https://api.tibiadata.com/v3/worlds"
+    url = f"https://api.tibiadata.com/{api_version}/worlds"
     worlds_info = request(url)
     return worlds_info["worlds"]["regular_worlds"]
 
 
 def get_world_details(world):
-    url = f"https://api.tibiadata.com/v3/world/{world}"
+    url = f"https://api.tibiadata.com/{api_version}/world/{world}"
     world_info = request(url)
     return world_info["worlds"]["world"]
 
@@ -92,8 +93,8 @@ def get_world_details(world):
 
 def get_highscores(
     world, category, profession, site_num
-):  # https://api.tibiadata.com/v3/highscores/Antica/experience/knights/3
-    url = f"https://api.tibiadata.com/v3/highscores/{world}/{category}/{profession}/{site_num}"
+):
+    url = f"https://api.tibiadata.com/{api_version}/highscores/{world}/{category}/{profession}/{site_num}"
     highscores = request(url)
     return highscores["highscores"]
 
@@ -105,9 +106,15 @@ def get_highscores(
 
 
 def get_character_info(character):
-    url = f"https://api.tibiadata.com/v3/character/{character}"
+    url = f"https://api.tibiadata.com/{api_version}/character/{character}"
     character = request(url)
     return character["characters"]
 
 
 # # # # # # # Character end # # # # # # #
+
+
+def get_kill_statistics(world):
+    url = f"https://api.tibiadata.com/{api_version}/killstatistics/{world}"
+    kill_statistics = request(url)
+    return kill_statistics["killstatistics"]["entries"]
