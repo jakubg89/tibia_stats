@@ -19,6 +19,10 @@ from main.models import (
     WorldOnlineHistory,
     HighscoresHistory,
     Tasks,
+    BossStats,
+    MonsterStats,
+    Monsters,
+    Bosses,
 )
 
 # custom
@@ -31,7 +35,6 @@ from datetime import datetime, timedelta
 import datetime
 from bs4 import BeautifulSoup
 import json
-from pathlib import Path
 import numpy as np
 
 import logging
@@ -67,32 +70,10 @@ sentry_sdk.init(
 
 def main():
     pass
-    # after server save and for check around 13-14 cet
-    # add_boss_to_db()
-    # add_creature_to_db()
-
-    # will see
-    # add_world_online_history()
-
-    # every 12 hours
-    # add_news_to_db()
-
-    # every 2 hours
-    # add_news_ticker_to_db()
-
-    # once a day (every 24h)
-    # add_highscores()
-    # get_daily_records()
-    # move_active_players_to_history
-    # delete_records_from_highscores
-
-    # once a week
-    # add_worlds_information_to_db
 
 
 def temp_del():
     now = datetime.datetime.now()
-    # date = now - timedelta(days=3, hours=2)
     date = "2023-02-01 04:00:00"
     clear_data_query = Highscores.objects.filter(date__gt=date)
 
@@ -136,10 +117,6 @@ def format_content(raw_html):
     for i in range(len(paragraphs_in_news)):
         paragraphs_in_news[i]["id"] = i
 
-    # deleting last paragraph
-    # if len(paragraphs_in_news) > 1:
-    #    formatted_html.find('p', {'id': (len(paragraphs_in_news) - 1)}).decompose()
-
     return str(formatted_html)
 
 
@@ -166,7 +143,8 @@ def add_news_ticker_to_db():
 
     id_list = not_existing_id["id_on_tibiacom"].values.tolist()
 
-    # check if list is not empty, if yes we just skip that part. All news tickers are up to date.
+    # check if list is not empty, if yes we just skip that part.
+    # All news tickers are up to date.
     if id_list:
         tickers = []
         for i in id_list:
@@ -215,7 +193,8 @@ def add_news_to_db():
 
     id_list = not_existing_id["id_on_tibiacom"].values.tolist()
 
-    # check if list is not empty, if yes we just skip that part. All news tickers are up to date.
+    # check if list is not empty, if yes we just skip that part.
+    # All news tickers are up to date.
     if id_list:
         obj = []
         for i in id_list:
@@ -1233,6 +1212,224 @@ def delete_old_highscores_date(date):
 
 
 # # # # # # # Experience end # # # # # # #
+
+# # # # # # # Kill statistics start # # # # # # #
+
+def get_creature_kill_stats():
+    date = datetime.datetime.now()
+
+    world_list = (
+        World.objects.all().values("name_value", "world_id").order_by("name")
+    )
+    world_df = pd.DataFrame(world_list)
+    world_dict = world_df.set_index("name_value")["world_id"].to_dict()
+    world_list = world_df["name_value"].values.tolist()
+
+    all_bosses = Bosses.objects.all().values("id", "name", "disp_name")
+    bosses_df = pd.DataFrame(all_bosses)
+
+    all_monsters = Monsters.objects.all().values("id", "name", "disp_name")
+    monsters_df = pd.DataFrame(all_monsters)
+
+    bosses_for_bulk = pd.DataFrame()
+    monsters_for_bulk = pd.DataFrame()
+
+    for world in world_list:
+        kill_stats_raw_df = get_data_in_df(world)
+
+        # MONSTERS
+        monsters_data = cleanup_and_prep_monsters(
+            kill_stats_raw_df, date, world, world_dict, monsters_df
+        )
+        monsters_for_bulk = pd.concat([monsters_for_bulk, monsters_data])
+
+        # BOSSES
+        bosses_seen = cleanup_and_prep_bosses(
+            kill_stats_raw_df, date, world, world_dict, bosses_df
+        )
+        bosses_for_bulk = pd.concat([bosses_for_bulk, bosses_seen])
+
+    bosses_for_bulk.reset_index(inplace=True, drop=True)
+    monsters_for_bulk.reset_index(inplace=True, drop=True)
+
+    bulk_bosses(bosses_for_bulk)
+    bulk_monsters(monsters_for_bulk)
+    # # todo some logs
+
+
+def get_data_in_df(world):
+    kill_stats_raw = dataapi.get_kill_statistics(world)
+    kill_stats_raw_df = pd.DataFrame(kill_stats_raw)
+
+    kill_stats_raw_df.drop(
+        columns=[
+            "last_week_players_killed",
+            "last_week_killed",
+        ],
+        axis=1,
+        inplace=True,
+    )
+    kill_stats_raw_df.rename(
+        columns={
+            "race": "disp_name",
+        },
+        inplace=True,
+    )
+    return kill_stats_raw_df
+
+
+def cleanup_and_prep_monsters(
+    kill_stats_raw_df, date, world, world_dict, monsters_df
+):
+    monsters_all = kill_stats_raw_df[
+        kill_stats_raw_df["disp_name"].str.islower()
+    ]
+
+    monsters_with_s = monsters_all[
+        monsters_all["disp_name"].str[-1] == "s"
+    ].copy()
+    monsters_removed_s = monsters_with_s.apply(
+        lambda x: x.str.slice(stop=-1) if x.dtype == "object" else x
+    )
+
+    monsters_without_s = monsters_all[
+        monsters_all["disp_name"].str[-1] != "s"
+    ].copy()
+
+    monsters_with_ies = monsters_without_s[
+        monsters_without_s["disp_name"].str.split().str[0].str[-3:] == "ies"
+    ].copy()
+    monsters_with_ies_list = monsters_with_ies["disp_name"].tolist()
+
+    monsters_with_ies["disp_name"] = monsters_with_ies[
+        "disp_name"
+    ].str.replace("ies", "y")
+    monsters_removed_ies = monsters_with_ies
+
+    all_without_ies = monsters_without_s[
+        ~monsters_without_s["disp_name"].isin(monsters_with_ies_list)
+    ].copy()
+
+    s_in_first_word = all_without_ies[
+        all_without_ies["disp_name"].str.split().str[0].str[-1] == "s"
+    ].copy()
+    no_s = all_without_ies[
+        all_without_ies["disp_name"].str.split().str[0].str[-1] != "s"
+    ].copy()
+
+    list_of_monsters = s_in_first_word["disp_name"].values.tolist()
+    new_dict = {}
+    for i in list_of_monsters:
+        x = i.split()
+        x[0] = x[0][:-1]
+        x = " ".join(x)
+        new_dict.update({i: x})
+
+    s_in_first_word["disp_name"].update(
+        s_in_first_word["disp_name"].map(new_dict)
+    )
+
+    to_concat = [
+        monsters_removed_ies,
+        monsters_removed_s,
+        no_s,
+        s_in_first_word,
+    ]
+
+    all_monsters_after_prep = pd.concat(to_concat)
+    all_monsters_after_prep.reset_index(inplace=True, drop=True)
+
+    monsters_df["name"] = monsters_df["name"].str.replace("_", " ")
+    all_monsters_after_prep.rename(columns={"disp_name": "name"}, inplace=True)
+    monsters_df = monsters_df.merge(all_monsters_after_prep, on="name")
+
+    monsters_df.drop(
+        columns=[
+            "name",
+            "disp_name",
+        ],
+        axis=1,
+        inplace=True,
+    )
+    monsters_df.rename(
+        columns={
+            "last_day_players_killed": "killed_players",
+            "last_day_killed": "killed",
+            "id": "monster",
+        },
+        inplace=True,
+    )
+    monsters_df["world"] = world
+    monsters_df["date"] = date
+    monsters_df.replace({"world": world_dict}, inplace=True)
+    monsters_df = monsters_df.loc[(monsters_df['killed'] > 0) | (monsters_df['killed_players'] > 0)]
+
+    return monsters_df
+
+
+def cleanup_and_prep_bosses(
+    kill_stats_raw_df, date, world, world_dict, bosses_df
+):
+    bosses_seen = bosses_df.merge(kill_stats_raw_df, on="disp_name")
+    bosses_seen.drop(
+        columns=[
+            "name",
+            "disp_name",
+        ],
+        axis=1,
+        inplace=True,
+    )
+    bosses_seen.rename(
+        columns={
+            "last_day_players_killed": "killed_players",
+            "last_day_killed": "killed",
+            "id": "boss",
+        },
+        inplace=True,
+    )
+    bosses_seen["world"] = world
+    bosses_seen["date"] = date
+    bosses_seen.replace({"world": world_dict}, inplace=True)
+    bosses_seen = bosses_seen.loc[
+        (bosses_seen['killed'] > 0) | (bosses_seen['killed_players'] > 0)]
+
+    return bosses_seen
+
+
+def bulk_bosses(bosses_for_bulk):
+    obj_bosses = []
+    bosses_for_bulk_dict = bosses_for_bulk.to_dict("index")
+
+    for i in bosses_for_bulk_dict:
+        boss = BossStats(
+            boss_id=bosses_for_bulk_dict[i]['boss'],
+            killed_players=bosses_for_bulk_dict[i]['killed_players'],
+            killed=bosses_for_bulk_dict[i]['killed'],
+            world_id=bosses_for_bulk_dict[i]['world'],
+            date=bosses_for_bulk_dict[i]['date'],
+        )
+        obj_bosses.append(boss)
+
+    BossStats.objects.bulk_create(obj_bosses, batch_size=500)
+
+
+def bulk_monsters(monsters_for_bulk):
+    obj_monster = []
+    monsters_for_bulk_dict = monsters_for_bulk.to_dict("index")
+
+    for i in monsters_for_bulk_dict:
+        monster = MonsterStats(
+            monster_id=monsters_for_bulk_dict[i]["monster"],
+            killed_players=monsters_for_bulk_dict[i]["killed_players"],
+            killed=monsters_for_bulk_dict[i]["killed"],
+            world_id=monsters_for_bulk_dict[i]["world"],
+            date=monsters_for_bulk_dict[i]["date"],
+        )
+        obj_monster.append(monster)
+
+    MonsterStats.objects.bulk_create(obj_monster, batch_size=500)
+
+# # # # # # # Kill statistics end # # # # # # #
 
 
 if __name__ == "__main__":

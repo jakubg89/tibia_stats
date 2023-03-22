@@ -10,8 +10,8 @@ from sentry_sdk import set_level
 set_level("info")
 # All of this is already happening by default!
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.INFO  # Send errors as events
+    level=logging.INFO,  # Capture info and above as breadcrumbs
+    event_level=logging.INFO,  # Send errors as events
 )
 
 load_dotenv()
@@ -157,6 +157,11 @@ USE_TZ = False
 STATIC_URL = "/static/"
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
 STATIC_ROOT = os.path.join(BASE_DIR, "static/root/")
+
+# Media files
+MEDIA_URL = ""
+MEDIA_ROOT = os.path.join(BASE_DIR)
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
