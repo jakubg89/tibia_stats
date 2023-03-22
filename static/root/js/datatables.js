@@ -533,7 +533,7 @@ $(document).ready(function () {
 
 } );
 
-// name_change_table
+// monster-stats
 $(document).ready(function () {
     $('#monster-stats').DataTable( {
         // czy mozna szukac
@@ -548,7 +548,66 @@ $(document).ready(function () {
         },
 
         // sortowanie po pierwszym wczytaniu
-        // order: [[3, 'desc']],
+        order: [[0, 'asc']],
+
+        // szerokoĹ›Ä‡ automatyczna
+        "autoWidth": true,
+
+        // moĹĽliwoĹ›Ä‡ sortowania
+        "ordering": true,
+
+        "responsive": true,
+        "bLengthChange": true,
+
+        // ustawienia do wyswietlania danej liczby wynikow
+        lengthMenu: [
+            [25, 50, 100, 250, 500, -1],
+            [25, 50, 100, 250, 500, 'All'],
+        ],
+
+        // opcje do paginacji
+        "pageLength": 100,
+        "paging": true,
+        "pagingType": 'full_numbers',
+
+        // nie pamiÄ™tam
+        "bInfo": false,
+
+        // search engine
+        "aoColumnDefs": [
+        { "bSearchable": true, "aTargets": [2] }],
+        //"dom": "<'row float-start'<'col-md'f>>"
+
+        // pozycjonowanie
+        "dom": "<'row d-flex justify-content-between'<'col-md-2'f><'col-md-1'l>><'row'<'col-md-12't>><'row'<'col-sm-12'p>>"
+
+
+
+    }
+    );
+    $('div.dataTables_filter input').addClass('shadow-sm mb-3');
+    $('div.dataTables_length select').addClass('shadow-sm mb-3 mt-2');
+    // $('.dataTables_paginate .paginate_button:active').addClass('btn btn-outline-link m-2');
+
+} );
+
+
+// boss-stats
+$(document).ready(function () {
+    $('#boss-stats').DataTable( {
+        // czy mozna szukac
+        "searching": true,
+
+        // pole do szukania
+        language: {
+                    search: "",
+                    searchPlaceholder: "Search...",
+                    lengthMenu: "_MENU_",
+                    "zeroRecords": "Chose you filters"
+        },
+
+        // sortowanie po pierwszym wczytaniu
+        order: [[0, 'asc']],
 
         // szerokoĹ›Ä‡ automatyczna
         "autoWidth": true,

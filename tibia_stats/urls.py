@@ -32,7 +32,7 @@ from main.views import (
     name_changes,
     top_250_charms,
     world_charms,
-    kill_stats_main_page
+    kill_stats_monsters, kill_stats_bosses
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -76,8 +76,8 @@ urlpatterns = [
     path("character/transfers", world_transfers),
     path("character/name_change", name_changes),
     # Boss menu
-    path("kill-stats/monsters/", kill_stats_main_page),
-    path("kill-stats/bosses/", under_construction),
+    path("kill-stats/monsters/", kill_stats_monsters),
+    path("kill-stats/bosses/", kill_stats_bosses),
     # Calculators menu
     path("calculator/training", under_construction),
     path("calculator/loot", under_construction),

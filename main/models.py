@@ -258,7 +258,7 @@ class Bosses(models.Model):
 
     class Meta:
         managed = True
-        db_table = "kill_stats"
+        db_table = "bosses"
 
 
 class BossType(models.Model):
