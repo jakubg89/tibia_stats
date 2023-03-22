@@ -247,7 +247,7 @@ class MonsterStats(models.Model):
         db_table = "monster_stats"
 
 
-# bosses
+# kill_stats
 class Bosses(models.Model):
     name = models.CharField(max_length=35, blank=True, null=True)
     disp_name = models.CharField(max_length=35, blank=True, null=True)
@@ -258,7 +258,7 @@ class Bosses(models.Model):
 
     class Meta:
         managed = True
-        db_table = "bosses"
+        db_table = "kill_stats"
 
 
 class BossType(models.Model):

@@ -9,6 +9,7 @@ from .models import (
     Vocation,
     WorldTransfers,
     NameChange,
+    Monsters, MonsterStats,
 )
 from datetime import datetime, timedelta
 
@@ -279,7 +280,9 @@ def single_world(request, name):
     }
 
     # get world list with id
-    world_list = World.objects.all().values("name", "name_value")
+    world_list = (
+        World.objects.all().values("name", "name_value").order_by("name")
+    )
 
     content = {
         "world": world_information,
@@ -351,7 +354,7 @@ def mainland(request, *args, **kwargs):
     query = ""
     # get world list with id
     world_list = World.objects.all().values("name", "name_value", "world_id")
-    world_list = world_list.order_by('name')
+    world_list = world_list.order_by("name")
     main = {}
     if request.GET:
         query = request.GET["q"]
@@ -448,7 +451,7 @@ def world_charms(request):
     query = ""
     # get world list with id
     world_list = World.objects.all().values("name", "name_value", "world_id")
-    world_list = world_list.order_by('name')
+    world_list = world_list.order_by("name")
     main = {}
     if request.GET:
         query = request.GET["q"]
@@ -474,7 +477,7 @@ def explore_highscores(request, *args, **kwargs):
     vocations = Vocation.objects.all()
 
     # get world list with id / names
-    worlds = World.objects.all().order_by('name')
+    worlds = World.objects.all().order_by("name")
 
     pvp_type_q = worlds.values("pvp_type", "pvp_type_value")
     pvp_type = pd.DataFrame(data=pvp_type_q)
@@ -827,6 +830,32 @@ def name_changes(request, *args, **kwargs):
     }
 
     return render(request, "sites/characters/name_changes.html", content)
+
+
+def kill_stats_main_page(request, *args, **kwargs):
+    date = date_highscores()
+    date = date - timedelta(days=1)
+    query = ""
+    # get world list with id
+    world_list = World.objects.all().values("name", "name_value", "world_id")
+    world_list = world_list.order_by("name")
+    kill_stats = {}
+    if request.GET:
+        query = request.GET["q"]
+
+        worlds_df = pd.DataFrame(data=world_list)
+        worlds_id = worlds_df[worlds_df["name"] == query]["world_id"].item()
+
+        kill_stats = MonsterStats.objects.filter(Q(world_id=worlds_id) & Q(date__gt=date))
+
+    content = {
+        "kill_stats": kill_stats,
+        "world_list": world_list,
+    }
+
+    return render(
+        request, "sites/kill_stats/kill_stats_main_page.html", content
+    )
 
 
 # Discords

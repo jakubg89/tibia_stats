@@ -31,8 +31,11 @@ from main.views import (
     world_transfers,
     name_changes,
     top_250_charms,
-    world_charms
+    world_charms,
+    kill_stats_main_page
 )
+from django.conf import settings
+from django.conf.urls.static import static
 
 # Error custom view
 handler404 = "main.views.error404"
@@ -73,8 +76,8 @@ urlpatterns = [
     path("character/transfers", world_transfers),
     path("character/name_change", name_changes),
     # Boss menu
-    path("bosses/list", under_construction),
-    path("bosses/stats", under_construction),
+    path("kill-stats/monsters/", kill_stats_main_page),
+    path("kill-stats/bosses/", under_construction),
     # Calculators menu
     path("calculator/training", under_construction),
     path("calculator/loot", under_construction),
@@ -82,4 +85,4 @@ urlpatterns = [
     # Other
     path("discord/", under_construction),
     path("about/", about),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
