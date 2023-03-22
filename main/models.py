@@ -202,8 +202,7 @@ class WorldTransfers(models.Model):
         managed = True
         db_table = "world_transfers"
         unique_together = (("world_transfer_id", "id_char"),)
-
-
+        
 #
 #
 #
