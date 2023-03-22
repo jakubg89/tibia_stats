@@ -1,0 +1,44 @@
+[
+    {
+        "model": "main.bosstype",
+        "pk": 1,
+        "fields": {
+            "name": "Bane",
+            "first_st_kills": 25,
+            "second_st_kills": 100,
+            "finished_st_kills": 300,
+            "first_st_points": 5,
+            "second_st_points": 15,
+            "third_st_points": 30,
+            "total_points": 50
+        }
+    },
+    {
+        "model": "main.bosstype",
+        "pk": 2,
+        "fields": {
+            "name": "Archfoe",
+            "first_st_kills": 5,
+            "second_st_kills": 20,
+            "finished_st_kills": 60,
+            "first_st_points": 10,
+            "second_st_points": 30,
+            "third_st_points": 60,
+            "total_points": 100
+        }
+    },
+    {
+        "model": "main.bosstype",
+        "pk": 3,
+        "fields": {
+            "name": "Nemesis",
+            "first_st_kills": 1,
+            "second_st_kills": 3,
+            "finished_st_kills": 5,
+            "first_st_points": 10,
+            "second_st_points": 30,
+            "third_st_points": 60,
+            "total_points": 100
+        }
+    }
+]
