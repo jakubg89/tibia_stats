@@ -10,8 +10,8 @@ from sentry_sdk import set_level
 set_level("info")
 # All of this is already happening by default!
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
-    event_level=logging.INFO  # Send errors as events
+    level=logging.INFO,  # Capture info and above as breadcrumbs
+    event_level=logging.INFO,  # Send errors as events
 )
 
 load_dotenv()

@@ -9,7 +9,9 @@ from .models import (
     Vocation,
     WorldTransfers,
     NameChange,
-    Monsters, MonsterStats, BossStats,
+    Monsters,
+    MonsterStats,
+    BossStats,
 )
 from datetime import datetime, timedelta
 
@@ -846,16 +848,16 @@ def kill_stats_monsters(request, *args, **kwargs):
         worlds_df = pd.DataFrame(data=world_list)
         worlds_id = worlds_df[worlds_df["name"] == query]["world_id"].item()
 
-        kill_stats = MonsterStats.objects.filter(Q(world_id=worlds_id) & Q(date__gt=date))
+        kill_stats = MonsterStats.objects.filter(
+            Q(world_id=worlds_id) & Q(date__gt=date)
+        )
 
     content = {
         "kill_stats": kill_stats,
         "world_list": world_list,
     }
 
-    return render(
-        request, "sites/kill_stats/monsters.html", content
-    )
+    return render(request, "sites/kill_stats/monsters.html", content)
 
 
 def kill_stats_bosses(request, *args, **kwargs):
@@ -872,16 +874,16 @@ def kill_stats_bosses(request, *args, **kwargs):
         worlds_df = pd.DataFrame(data=world_list)
         worlds_id = worlds_df[worlds_df["name"] == query]["world_id"].item()
 
-        kill_stats = BossStats.objects.filter(Q(world_id=worlds_id) & Q(date__gt=date))
+        kill_stats = BossStats.objects.filter(
+            Q(world_id=worlds_id) & Q(date__gt=date)
+        )
 
     content = {
         "kill_stats": kill_stats,
         "world_list": world_list,
     }
 
-    return render(
-        request, "sites/kill_stats/bosses.html", content
-    )
+    return render(request, "sites/kill_stats/bosses.html", content)
 
 
 # Discords
